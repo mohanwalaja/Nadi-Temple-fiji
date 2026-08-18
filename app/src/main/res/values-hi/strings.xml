@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">श्री शिव सुब्रमण्य स्वामी मंदिर</string>
+    <string name="app_tagline">नादी, फिजी द्वीप समूह</string>
+    
+    <!-- Main Bottom Navigation Strings (Hindi) -->
+    <string name="nav_home">होम</string>
+    <string name="nav_calendar">कैलेंडर</string>
+    <string name="nav_panchangam">पंचांग</string>
+    <string name="nav_jathagam">कुंडली</string>
+    <string name="nav_temple">मंदिर</string>
+    
+    <!-- Secondary & Header Navigation Strings -->
+    <string name="nav_rasi_palan">राशिफल</string>
+    <string name="nav_dharma_sastra">धर्म शास्त्र</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    
+    <!-- Content Descriptions & Accessibility -->
+    <string name="cd_nav_home">होम स्क्रीन पर जाएं</string>
+    <string name="cd_nav_calendar">कैलेंडर स्क्रीन पर जाएं</string>
+    <string name="cd_nav_panchangam">दैनिक पंचांग स्क्रीन पर जाएं</string>
+    <string name="cd_nav_jathagam">वैदिक कुंडली स्क्रीन पर जाएं</string>
+    <string name="cd_nav_temple">मंदिर विवरण स्क्रीन पर जाएं</string>
+</resources>

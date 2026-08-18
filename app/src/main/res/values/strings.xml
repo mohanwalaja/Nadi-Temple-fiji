@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Sri Siva Subramaniya Swami Kovil</string>
+    <string name="app_tagline">Nadi, Fiji Islands</string>
+    
+    <!-- Main Bottom Navigation Strings -->
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_panchangam">Panchangam</string>
+    <string name="nav_jathagam">Jathagam</string>
+    <string name="nav_temple">Temple</string>
+    
+    <!-- Secondary & Header Navigation Strings -->
+    <string name="nav_rasi_palan">Rasi Palan</string>
+    <string name="nav_dharma_sastra">Dharma Sastra</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Content Descriptions & Accessibility -->
+    <string name="cd_nav_home">Navigate to Home Screen</string>
+    <string name="cd_nav_calendar">Navigate to Tamil Calendar Screen</string>
+    <string name="cd_nav_panchangam">Navigate to Daily Panchangam Screen</string>
+    <string name="cd_nav_jathagam">Navigate to Vedic Jathagam Horoscope Screen</string>
+    <string name="cd_nav_temple">Navigate to Temple Information Screen</string>
+</resources>
+

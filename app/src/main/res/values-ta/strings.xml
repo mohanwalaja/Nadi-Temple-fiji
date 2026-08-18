@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில்</string>
+    <string name="app_tagline">நாடி, பிஜி தீவுகள்</string>
+    
+    <!-- Main Bottom Navigation Strings (Tamil) -->
+    <string name="nav_home">முகப்பு</string>
+    <string name="nav_calendar">நாட்காட்டி</string>
+    <string name="nav_panchangam">பஞ்சாங்கம்</string>
+    <string name="nav_jathagam">ஜாதகம்</string>
+    <string name="nav_temple">திருக்கோயில்</string>
+    
+    <!-- Secondary & Header Navigation Strings -->
+    <string name="nav_rasi_palan">ராசி பலன்</string>
+    <string name="nav_dharma_sastra">தர்ம சாஸ்திரம்</string>
+    <string name="nav_settings">அமைப்புகள்</string>
+    
+    <!-- Content Descriptions & Accessibility -->
+    <string name="cd_nav_home">முகப்புத் திரைக்குச் செல்</string>
+    <string name="cd_nav_calendar">தமிழ் நாட்காட்டி திரைக்குச் செல்</string>
+    <string name="cd_nav_panchangam">தினசரி பஞ்சாங்கம் திரைக்குச் செல்</string>
+    <string name="cd_nav_jathagam">வேத ஜாதகம் திரைக்குச் செல்</string>
+    <string name="cd_nav_temple">திருக்கோயில் தகவல் திரைக்குச் செல்</string>
+</resources>
