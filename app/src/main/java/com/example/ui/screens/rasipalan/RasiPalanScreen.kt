@@ -50,20 +50,40 @@ fun RasiPalanScreen(
     val palan = state.palanResult
     val jathagam = state.jathagam
     val selectedRasi = state.selectedRasi
+    val selectedTimeframe = state.selectedTimeframe
+
+    val screenTitle = when (selectedTimeframe) {
+        PalanTimeframe.DAILY -> when (lang) {
+            AppLanguage.TAMIL -> "இன்றைய ராசிபலன் (Daily)"
+            AppLanguage.HINDI -> "आज का राशिफल (Daily)"
+            AppLanguage.ENGLISH -> "Daily Horoscope"
+        }
+        PalanTimeframe.WEEKLY -> when (lang) {
+            AppLanguage.TAMIL -> "வார ராசிபலன் (Weekly)"
+            AppLanguage.HINDI -> "साप्ताहिक राशिफल (Weekly)"
+            AppLanguage.ENGLISH -> "Weekly Horoscope"
+        }
+        PalanTimeframe.MONTHLY -> when (lang) {
+            AppLanguage.TAMIL -> "மாத ராசிபலன் (Monthly)"
+            AppLanguage.HINDI -> "मासिक राशिफल (Monthly)"
+            AppLanguage.ENGLISH -> "Monthly Horoscope"
+        }
+        PalanTimeframe.YEARLY -> when (lang) {
+            AppLanguage.TAMIL -> "2026–2027 வருட ராசிபலன்"
+            AppLanguage.HINDI -> "2026–2027 वार्षिक राशिफल"
+            AppLanguage.ENGLISH -> "2026–2027 Yearly Horoscope"
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = when (lang) {
-                            AppLanguage.TAMIL -> "2026 வருட ராசிபலன்"
-                            AppLanguage.HINDI -> "2026 वार्षिक राशिफल"
-                            AppLanguage.ENGLISH -> "2026 Yearly Rasi Palan"
-                        },
+                        text = screenTitle,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = 17.sp
                     )
                 },
                 navigationIcon = {
@@ -89,6 +109,55 @@ fun RasiPalanScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // 0. Timeframe Selector (Daily, Weekly, Monthly, Yearly)
+            item {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = if (lang == AppLanguage.TAMIL) "காலப்பகுதி (Period):" else if (lang == AppLanguage.HINDI) "काल अवधि (Timeframe):" else "Timeframe / Period:",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TempleMaroon
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("timeframe_tab_row"),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        val timeframes = listOf(
+                            PalanTimeframe.DAILY to when (lang) { AppLanguage.TAMIL -> "இன்று"; AppLanguage.HINDI -> "दैनिक"; AppLanguage.ENGLISH -> "Daily" },
+                            PalanTimeframe.WEEKLY to when (lang) { AppLanguage.TAMIL -> "வாரம்"; AppLanguage.HINDI -> "साप्ताहिक"; AppLanguage.ENGLISH -> "Weekly" },
+                            PalanTimeframe.MONTHLY to when (lang) { AppLanguage.TAMIL -> "மாதம்"; AppLanguage.HINDI -> "मासिक"; AppLanguage.ENGLISH -> "Monthly" },
+                            PalanTimeframe.YEARLY to when (lang) { AppLanguage.TAMIL -> "2026 வருடம்"; AppLanguage.HINDI -> "2026 वर्ष"; AppLanguage.ENGLISH -> "2026 Year" }
+                        )
+
+                        timeframes.forEach { (tf, label) ->
+                            val isSelected = selectedTimeframe == tf
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isSelected) TempleMaroon else MaterialTheme.colorScheme.surface,
+                                border = BorderStroke(1.dp, if (isSelected) TempleMaroon else MaterialTheme.colorScheme.outlineVariant),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { viewModel.selectTimeframe(tf) }
+                                    .testTag("timeframe_tab_${tf.name.lowercase()}")
+                            ) {
+                                Text(
+                                    text = label,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // 1. Rasi Selector Horizontal Strip
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -303,7 +372,7 @@ fun RasiPalanScreen(
                     }
                 }
 
-                // 2B. Selected Rasi & Period Header Banner
+                // 2B. Selected Rasi & Vedic Profile Header Banner
                 item {
                     Card(
                         modifier = Modifier
@@ -325,9 +394,9 @@ fun RasiPalanScreen(
                                         text = if (selectedRasi == null && jathagam != null) {
                                             if (lang == AppLanguage.TAMIL) "ஜாதகர்: ${jathagam.devoteeName}" else "Horoscope: ${jathagam.devoteeName}"
                                         } else {
-                                            if (lang == AppLanguage.TAMIL) "ராசிபலன் வழிகாட்டல்" else "Rasi Palan Insight"
+                                            if (lang == AppLanguage.TAMIL) "வேத ஜோதிட ராசி சுயவிவரம் (Vedic Astrology Profile)" else if (lang == AppLanguage.HINDI) "वैदिक ज्योतिष राशिफल विवरण" else "Vedic Astrology Sign Profile"
                                         },
-                                        fontSize = 13.sp,
+                                        fontSize = 12.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -355,17 +424,18 @@ fun RasiPalanScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f), thickness = 1.dp)
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
+                            // Grid of Vedic Attributes
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Column {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "ராசி அதிபதி" else "Rasi Lord",
+                                        text = if (lang == AppLanguage.TAMIL) "அதிபதி கிரகம்" else if (lang == AppLanguage.HINDI) "स्वामी ग्रह" else "Ruling Lord",
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -377,29 +447,110 @@ fun RasiPalanScreen(
                                     )
                                 }
 
-                                Column {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "நட்சத்திரம்" else "Nakshatram",
+                                        text = if (lang == AppLanguage.TAMIL) "தத்துவம் (Element)" else if (lang == AppLanguage.HINDI) "तत्व (Element)" else "Element",
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = "${palanResult.janmaNakshatram}",
-                                        fontSize = 13.sp,
+                                        text = palanResult.getElement(lang),
+                                        fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TempleMaroon
                                     )
                                 }
 
-                                Column {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "அதிர்ஷ்ட எண்" else "Lucky No.",
+                                        text = if (lang == AppLanguage.TAMIL) "இயல்பு (Quality)" else if (lang == AppLanguage.HINDI) "स्वभाव (Quality)" else "Quality",
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = palanResult.luckyNumber,
-                                        fontSize = 13.sp,
+                                        text = palanResult.getQuality(lang),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TempleMaroon
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Nakshatras in this Rasi
+                            if (palanResult.getNakshatras(lang).isNotBlank()) {
+                                Surface(
+                                    color = TempleGold.copy(alpha = 0.08f),
+                                    shape = RoundedCornerShape(8.dp),
+                                    border = BorderStroke(0.5.dp, TempleGold.copy(alpha = 0.4f)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Stars,
+                                            contentDescription = null,
+                                            tint = TempleGoldDark,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "${if (lang == AppLanguage.TAMIL) "நட்சத்திர பாதங்கள்: " else if (lang == AppLanguage.HINDI) "नक्षत्र चरण: " else "Nakshatra Padas: "}${palanResult.getNakshatras(lang)}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Lucky Gemstone, Metal, Direction & Days
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1.3f)) {
+                                    Text(
+                                        text = if (lang == AppLanguage.TAMIL) "அதிர்ஷ்ட ரத்தினம்" else if (lang == AppLanguage.HINDI) "शुभ रत्न" else "Lucky Gemstone",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = palanResult.getLuckyGemstone(lang),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TempleMaroon
+                                    )
+                                }
+
+                                Column(modifier = Modifier.weight(0.9f)) {
+                                    Text(
+                                        text = if (lang == AppLanguage.TAMIL) "அதிர்ஷ்ட திசை" else if (lang == AppLanguage.HINDI) "शुभ दिशा" else "Lucky Direction",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = palanResult.getLuckyDirection(lang),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TempleMaroon
+                                    )
+                                }
+
+                                Column(modifier = Modifier.weight(1.1f)) {
+                                    Text(
+                                        text = if (lang == AppLanguage.TAMIL) "அதிர்ஷ்டக் கிழமைகள்" else if (lang == AppLanguage.HINDI) "शुभ दिन" else "Lucky Days",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = palanResult.getLuckyDays(lang),
+                                        fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TempleMaroon
                                     )

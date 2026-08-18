@@ -72,11 +72,12 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Language, contentDescription = null, tint = TempleMaroon, modifier = Modifier.size(20.dp))
+                            Icon(imageVector = Icons.Default.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = when (lang) {
@@ -85,7 +86,7 @@ fun SettingsScreen(
                                     AppLanguage.ENGLISH -> "App Language"
                                 },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = TempleMaroon
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -161,6 +162,138 @@ fun SettingsScreen(
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+            // 2. UI Color Palette & Theme Chooser
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "வர்ண அலங்காரம் (Color Theme)"
+                                    AppLanguage.HINDI -> "रंग थीम (Color Theme)"
+                                    AppLanguage.ENGLISH -> "App Color Theme"
+                                },
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "செயலியின் வண்ணத்தை உங்களுக்கு விருப்பமான முறையில் மாற்றிக் கொள்ளலாம்"
+                                AppLanguage.HINDI -> "अपनी पसंद के अनुसार ऐप का रंग बदलें"
+                                AppLanguage.ENGLISH -> "Choose your preferred devotional color palette"
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Theme Preset Grid
+                        KovilThemePreset.entries.forEach { preset ->
+                            val isSelected = prefs.themePreset == preset.code
+                            val themeName = when (lang) {
+                                AppLanguage.TAMIL -> preset.nameTa
+                                AppLanguage.HINDI -> preset.nameHi
+                                AppLanguage.ENGLISH -> preset.nameEn
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .clickable { viewModel.setThemePreset(preset.code) }
+                                    .testTag("theme_preset_${preset.code.lowercase()}"),
+                                color = if (isSelected) preset.primaryColor.copy(alpha = 0.10f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                shape = RoundedCornerShape(12.dp),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    if (isSelected) 1.5.dp else 1.dp,
+                                    if (isSelected) preset.primaryColor else MaterialTheme.colorScheme.outlineVariant
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Color Swatch Circles
+                                    Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
+                                        Surface(
+                                            shape = androidx.compose.foundation.shape.CircleShape,
+                                            color = preset.primaryColor,
+                                            modifier = Modifier.size(24.dp),
+                                            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.White)
+                                        ) {}
+                                        Surface(
+                                            shape = androidx.compose.foundation.shape.CircleShape,
+                                            color = preset.secondaryColor,
+                                            modifier = Modifier.size(24.dp),
+                                            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.White)
+                                        ) {}
+                                    }
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Text(
+                                        text = themeName,
+                                        fontSize = 13.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isSelected) preset.primaryColor else MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.weight(1f)
+                                    )
+
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.CheckCircle,
+                                            contentDescription = "Selected",
+                                            tint = preset.primaryColor,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Dark Mode Toggle
+                        SettingToggleRow(
+                            title = if (lang == AppLanguage.TAMIL) "இரவு முறை (Dark Mode)" else if (lang == AppLanguage.HINDI) "डार्क मोड (Dark Mode)" else "Dark Mode",
+                            subtitle = if (lang == AppLanguage.TAMIL) "கண்களுக்கு இதமான இருண்ட தோற்றம்" else if (lang == AppLanguage.HINDI) "आँखों के लिए आरामदायक डार्क थीम" else "Eye-friendly dark atmosphere",
+                            isChecked = prefs.isDarkMode && !prefs.useSystemTheme,
+                            onCheckedChange = { isDark ->
+                                viewModel.setDarkMode(enabled = isDark, useSystem = false)
+                            },
+                            testTag = "toggle_dark_mode"
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // System Theme Toggle
+                        SettingToggleRow(
+                            title = if (lang == AppLanguage.TAMIL) "கைபேசி முறைப்படி (System Default)" else if (lang == AppLanguage.HINDI) "सिस्टम के अनुसार (System Default)" else "Follow System Theme",
+                            subtitle = if (lang == AppLanguage.TAMIL) "போனின் அமைப்பைப் பின்பற்றும்" else if (lang == AppLanguage.HINDI) "डिवाइस की थीम का पालन करें" else "Auto match phone settings",
+                            isChecked = prefs.useSystemTheme,
+                            onCheckedChange = { useSys ->
+                                viewModel.setDarkMode(enabled = prefs.isDarkMode, useSystem = useSys)
+                            },
+                            testTag = "toggle_system_theme"
+                        )
                     }
                 }
             }

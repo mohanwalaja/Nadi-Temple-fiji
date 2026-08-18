@@ -142,7 +142,25 @@ data class RasiPalanResult(
     val dashaInfluenceTa: String = "",
     val dashaInfluenceEn: String = "",
     val dashaInfluenceHi: String = "",
-    val periodYearLabel: String = "2026–2027"
+    val periodYearLabel: String = "2026–2027",
+    val elementTa: String = "",
+    val elementEn: String = "",
+    val elementHi: String = "",
+    val qualityTa: String = "",
+    val qualityEn: String = "",
+    val qualityHi: String = "",
+    val nakshatrasTa: String = "",
+    val nakshatrasEn: String = "",
+    val nakshatrasHi: String = "",
+    val luckyGemstoneTa: String = "",
+    val luckyGemstoneEn: String = "",
+    val luckyGemstoneHi: String = "",
+    val luckyDirectionTa: String = "",
+    val luckyDirectionEn: String = "",
+    val luckyDirectionHi: String = "",
+    val luckyDaysTa: String = "",
+    val luckyDaysEn: String = "",
+    val luckyDaysHi: String = ""
 ) {
     fun getGeneral(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> generalTa; AppLanguage.HINDI -> generalHi; AppLanguage.ENGLISH -> generalEn }
     fun getMoney(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> moneyTa; AppLanguage.HINDI -> moneyHi; AppLanguage.ENGLISH -> moneyEn }
@@ -159,5 +177,11 @@ data class RasiPalanResult(
     fun getPlanetaryTransitsSummary(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> planetaryTransitsSummaryTa; AppLanguage.HINDI -> planetaryTransitsSummaryHi; AppLanguage.ENGLISH -> planetaryTransitsSummaryEn }
     fun getRasiLord(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> rasiLordTa; AppLanguage.HINDI -> rasiLordHi; AppLanguage.ENGLISH -> rasiLordEn }
     fun getDashaInfluence(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> dashaInfluenceTa; AppLanguage.HINDI -> dashaInfluenceHi; AppLanguage.ENGLISH -> dashaInfluenceEn }
+    fun getElement(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> elementTa; AppLanguage.HINDI -> elementHi; AppLanguage.ENGLISH -> elementEn }
+    fun getQuality(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> qualityTa; AppLanguage.HINDI -> qualityHi; AppLanguage.ENGLISH -> qualityEn }
+    fun getNakshatras(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> nakshatrasTa; AppLanguage.HINDI -> nakshatrasHi; AppLanguage.ENGLISH -> nakshatrasEn }
+    fun getLuckyGemstone(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> luckyGemstoneTa; AppLanguage.HINDI -> luckyGemstoneHi; AppLanguage.ENGLISH -> luckyGemstoneEn }
+    fun getLuckyDirection(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> luckyDirectionTa; AppLanguage.HINDI -> luckyDirectionHi; AppLanguage.ENGLISH -> luckyDirectionEn }
+    fun getLuckyDays(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> luckyDaysTa; AppLanguage.HINDI -> luckyDaysHi; AppLanguage.ENGLISH -> luckyDaysEn }
 }
 

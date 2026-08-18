@@ -72,7 +72,8 @@ class MainActivity : ComponentActivity() {
             val userPrefs by preferencesRepository.preferences.collectAsState()
 
             SriSivaKovilTheme(
-                darkTheme = if (userPrefs.useSystemTheme) androidx.compose.foundation.isSystemInDarkTheme() else userPrefs.isDarkMode
+                darkTheme = if (userPrefs.useSystemTheme) androidx.compose.foundation.isSystemInDarkTheme() else userPrefs.isDarkMode,
+                themePresetCode = userPrefs.themePreset
             ) {
                 MainAppContainer(
                     preferencesRepository = preferencesRepository,
@@ -139,6 +140,13 @@ fun MainAppContainer(
                             AppLanguage.ENGLISH -> AppLanguage.TAMIL
                         }
                         preferencesRepository.setLanguage(nextLang)
+                    },
+                    onCycleTheme = {
+                        val currentPreset = userPrefs.themePreset
+                        val presets = com.example.ui.theme.KovilThemePreset.entries
+                        val currentIdx = presets.indexOfFirst { it.code.equals(currentPreset, ignoreCase = true) }.let { if (it >= 0) it else 0 }
+                        val nextIdx = (currentIdx + 1) % presets.size
+                        preferencesRepository.setThemePreset(presets[nextIdx].code)
                     },
                     onNavigateToRasiPalan = { navController.navigate(Screen.RasiPalan.route) },
                     onNavigateToDharmaSastra = { navController.navigate(Screen.DharmaSastra.route) },

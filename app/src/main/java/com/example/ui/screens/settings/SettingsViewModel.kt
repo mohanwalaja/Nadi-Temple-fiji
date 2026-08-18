@@ -16,6 +16,10 @@ class SettingsViewModel(
         preferencesRepository.setLanguage(language)
     }
 
+    fun setThemePreset(preset: String) {
+        preferencesRepository.setThemePreset(preset)
+    }
+
     fun setDarkMode(enabled: Boolean, useSystem: Boolean = false) {
         preferencesRepository.setDarkMode(enabled, useSystem)
     }

@@ -62,18 +62,17 @@ fun PanchangamScreen(
                         .padding(14.dp)
                 ) {
                     // Top location bar
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showLocationDialog = true }
                             .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.surfaceVariant,
-                            border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+                            border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.clickable { showLocationDialog = true }
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
@@ -99,6 +98,49 @@ fun PanchangamScreen(
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(16.dp)
                                 )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        // Quick 1-tap presets
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val quickPresets = listOf(
+                                "🇫🇯 நாடி (Nadi +12h)" to "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
+                                "🇮🇳 சென்னை (IST +5:30)" to "சென்னை (Chennai, India)",
+                                "🌍 பிற இடங்கள்..." to ""
+                            )
+                            quickPresets.forEach { (label, loc) ->
+                                val isSelected = loc.isNotEmpty() && state.selectedLocation.contains(loc.substringBefore(","))
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        0.5.dp,
+                                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            if (loc.isEmpty()) {
+                                                showLocationDialog = true
+                                            } else {
+                                                viewModel.setLocation(loc)
+                                            }
+                                        }
+                                ) {
+                                    Text(
+                                        text = label,
+                                        fontSize = 10.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 2.dp)
+                                    )
+                                }
                             }
                         }
                     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
@@ -25,6 +26,7 @@ import com.example.ui.theme.*
 fun TempleTopBar(
     currentLanguage: AppLanguage,
     onToggleLanguage: () -> Unit,
+    onCycleTheme: () -> Unit,
     onNavigateToRasiPalan: () -> Unit,
     onNavigateToDharmaSastra: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -49,6 +51,18 @@ fun TempleTopBar(
                 }
             },
             actions = {
+                // Quick Theme Color Changer
+                IconButton(
+                    onClick = onCycleTheme,
+                    modifier = Modifier.testTag("top_bar_theme_color_btn")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = "Change Theme Color",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
                 // Rasi Palan quick action
                 IconButton(
                     onClick = onNavigateToRasiPalan,

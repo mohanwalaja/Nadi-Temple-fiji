@@ -65,6 +65,8 @@ object RasiPalanEngine {
             saniStatus = jathagam.saniStatus
         )
 
+        val vedicAttrs = getVedicSignAttributes(rasi)
+
         return RasiPalanResult(
             rasi = rasi,
             period = period,
@@ -110,19 +112,37 @@ object RasiPalanEngine {
             pariharamTa = aspects.pariharamTa,
             pariharamEn = aspects.pariharamEn,
             pariharamHi = aspects.pariharamHi,
-            luckyNumber = aspects.luckyNumber,
-            luckyColorTa = aspects.luckyColorTa,
-            luckyColorEn = aspects.luckyColorEn,
-            luckyColorHi = aspects.luckyColorHi,
+            luckyNumber = vedicAttrs.luckyNumbers,
+            luckyColorTa = vedicAttrs.luckyColorsTa,
+            luckyColorEn = vedicAttrs.luckyColorsEn,
+            luckyColorHi = vedicAttrs.luckyColorsHi,
             dashaInfluenceTa = dashaInfluenceTa,
             dashaInfluenceEn = dashaInfluenceEn,
             dashaInfluenceHi = dashaInfluenceHi,
             periodYearLabel = when (period) {
-                PalanTimeframe.DAILY -> "இன்று (Today / आज)"
-                PalanTimeframe.WEEKLY -> "இந்த வாரம் (This Week / इस सप्ताह)"
-                PalanTimeframe.MONTHLY -> "இந்த மாதம் (This Month / इस माह)"
-                PalanTimeframe.YEARLY -> "2026–2027 (ஸ்ரீ குரோதி / விசுவாவசு)"
-            }
+                PalanTimeframe.DAILY -> "இன்றைய பலன் (Today / दैनिक)"
+                PalanTimeframe.WEEKLY -> "இந்த வார பலன் (This Week / साप्ताहिक)"
+                PalanTimeframe.MONTHLY -> "இந்த மாத பலன் (This Month / मासिक)"
+                PalanTimeframe.YEARLY -> "2026–2027 வருட பலன் (Annual)"
+            },
+            elementTa = vedicAttrs.elementTa,
+            elementEn = vedicAttrs.elementEn,
+            elementHi = vedicAttrs.elementHi,
+            qualityTa = vedicAttrs.qualityTa,
+            qualityEn = vedicAttrs.qualityEn,
+            qualityHi = vedicAttrs.qualityHi,
+            nakshatrasTa = vedicAttrs.nakshatrasTa,
+            nakshatrasEn = vedicAttrs.nakshatrasEn,
+            nakshatrasHi = vedicAttrs.nakshatrasHi,
+            luckyGemstoneTa = vedicAttrs.luckyGemstoneTa,
+            luckyGemstoneEn = vedicAttrs.luckyGemstoneEn,
+            luckyGemstoneHi = vedicAttrs.luckyGemstoneHi,
+            luckyDirectionTa = vedicAttrs.luckyDirectionTa,
+            luckyDirectionEn = vedicAttrs.luckyDirectionEn,
+            luckyDirectionHi = vedicAttrs.luckyDirectionHi,
+            luckyDaysTa = vedicAttrs.luckyDaysTa,
+            luckyDaysEn = vedicAttrs.luckyDaysEn,
+            luckyDaysHi = vedicAttrs.luckyDaysHi
         )
     }
 
@@ -159,6 +179,8 @@ object RasiPalanEngine {
             remedyEn = "Perform Saturday prayers and good deeds for peace and planetary blessings."
         )
 
+        val vedicAttrs = getVedicSignAttributes(rasi)
+
         val aspects = generateAspectsForJathagam(
             rasi = rasi,
             period = period,
@@ -166,14 +188,14 @@ object RasiPalanEngine {
             saniHouse = saniHouse,
             rahuHouse = rahuHouse,
             ketuHouse = ketuHouse,
-            nakshatra = "ராசி பொது",
+            nakshatra = vedicAttrs.nakshatrasTa.substringBefore(","),
             saniStatus = saniStatus
         )
 
         return RasiPalanResult(
             rasi = rasi,
             period = period,
-            janmaNakshatram = "ராசி பலன்",
+            janmaNakshatram = "${rasi.nameTa} நட்சத்திரங்கள்",
             janmaPada = 1,
             rasiLordTa = lordTa,
             rasiLordEn = lordEn,
@@ -215,19 +237,37 @@ object RasiPalanEngine {
             pariharamTa = aspects.pariharamTa,
             pariharamEn = aspects.pariharamEn,
             pariharamHi = aspects.pariharamHi,
-            luckyNumber = aspects.luckyNumber,
-            luckyColorTa = aspects.luckyColorTa,
-            luckyColorEn = aspects.luckyColorEn,
-            luckyColorHi = aspects.luckyColorHi,
-            dashaInfluenceTa = "கோச்சார கிரக நிலைகளின் அடிப்படையிலான பலன்கள்",
-            dashaInfluenceEn = "Planetary predictions based on current transit alignment",
-            dashaInfluenceHi = "गोचर ग्रह स्थिति अनुसार फल",
+            luckyNumber = vedicAttrs.luckyNumbers,
+            luckyColorTa = vedicAttrs.luckyColorsTa,
+            luckyColorEn = vedicAttrs.luckyColorsEn,
+            luckyColorHi = vedicAttrs.luckyColorsHi,
+            dashaInfluenceTa = "IndianAstrology வேத ஜோதிட கோச்சார விதிமுறைகளின் அடிப்படையிலான கணிப்பு",
+            dashaInfluenceEn = "Astrological forecasts based on IndianAstrology Vedic planetary principles",
+            dashaInfluenceHi = "वैदिक ज्योतिष के अनुसार गोचर फल",
             periodYearLabel = when (period) {
-                PalanTimeframe.DAILY -> "இன்று (Today / आज)"
-                PalanTimeframe.WEEKLY -> "இந்த வாரம் (This Week / इस सप्ताह)"
-                PalanTimeframe.MONTHLY -> "இந்த மாதம் (This Month / इस माह)"
-                PalanTimeframe.YEARLY -> "2026–2027 (ஸ்ரீ குரோதி / விசுவாவசு)"
-            }
+                PalanTimeframe.DAILY -> "இன்றைய பலன் (Today / दैनिक)"
+                PalanTimeframe.WEEKLY -> "இந்த வார பலன் (This Week / साप्ताहिक)"
+                PalanTimeframe.MONTHLY -> "இந்த மாத பலன் (This Month / मासिक)"
+                PalanTimeframe.YEARLY -> "2026–2027 வருட பலன் (Annual)"
+            },
+            elementTa = vedicAttrs.elementTa,
+            elementEn = vedicAttrs.elementEn,
+            elementHi = vedicAttrs.elementHi,
+            qualityTa = vedicAttrs.qualityTa,
+            qualityEn = vedicAttrs.qualityEn,
+            qualityHi = vedicAttrs.qualityHi,
+            nakshatrasTa = vedicAttrs.nakshatrasTa,
+            nakshatrasEn = vedicAttrs.nakshatrasEn,
+            nakshatrasHi = vedicAttrs.nakshatrasHi,
+            luckyGemstoneTa = vedicAttrs.luckyGemstoneTa,
+            luckyGemstoneEn = vedicAttrs.luckyGemstoneEn,
+            luckyGemstoneHi = vedicAttrs.luckyGemstoneHi,
+            luckyDirectionTa = vedicAttrs.luckyDirectionTa,
+            luckyDirectionEn = vedicAttrs.luckyDirectionEn,
+            luckyDirectionHi = vedicAttrs.luckyDirectionHi,
+            luckyDaysTa = vedicAttrs.luckyDaysTa,
+            luckyDaysEn = vedicAttrs.luckyDaysEn,
+            luckyDaysHi = vedicAttrs.luckyDaysHi
         )
     }
 
@@ -608,6 +648,322 @@ object RasiPalanEngine {
             luckyColorTa = luckyColorTa,
             luckyColorEn = luckyColorEn,
             luckyColorHi = luckyColorHi
+        )
+    }
+
+    data class VedicSignAttributes(
+        val elementTa: String,
+        val elementEn: String,
+        val elementHi: String,
+        val qualityTa: String,
+        val qualityEn: String,
+        val qualityHi: String,
+        val nakshatrasTa: String,
+        val nakshatrasEn: String,
+        val nakshatrasHi: String,
+        val luckyGemstoneTa: String,
+        val luckyGemstoneEn: String,
+        val luckyGemstoneHi: String,
+        val luckyDirectionTa: String,
+        val luckyDirectionEn: String,
+        val luckyDirectionHi: String,
+        val luckyDaysTa: String,
+        val luckyDaysEn: String,
+        val luckyDaysHi: String,
+        val luckyNumbers: String,
+        val luckyColorsTa: String,
+        val luckyColorsEn: String,
+        val luckyColorsHi: String
+    )
+
+    fun getVedicSignAttributes(rasi: Rasi): VedicSignAttributes = when (rasi) {
+        Rasi.MESHAM -> VedicSignAttributes(
+            elementTa = "நெருப்பு (Fire / அக்னி தத்துவம்)",
+            elementEn = "Fire Element (Agni Tatva)",
+            elementHi = "अग्नि तत्व (Fire Element)",
+            qualityTa = "சரம் (Movable / வேகமான செயல்பாடு)",
+            qualityEn = "Movable Sign (Chara Rashi)",
+            qualityHi = "चर राशि (Movable)",
+            nakshatrasTa = "அஸ்வினி (1, 2, 3, 4), பரணி (1, 2, 3, 4), கார்த்திகை (1-ஆம் பாதம்)",
+            nakshatrasEn = "Ashwini (1-4), Bharani (1-4), Krittika (Pada 1)",
+            nakshatrasHi = "अश्विनी (1-4), भरणी (1-4), कृत्तिका (चरण 1)",
+            luckyGemstoneTa = "சிவப்பு பவளம் & தங்கம் (Red Coral)",
+            luckyGemstoneEn = "Red Coral & Gold (Pavazham)",
+            luckyGemstoneHi = "लाल मूंगा एवं स्वर्ण (Red Coral)",
+            luckyDirectionTa = "கிழக்கு (East)",
+            luckyDirectionEn = "East",
+            luckyDirectionHi = "पूर्व (East)",
+            luckyDaysTa = "செவ்வாய், வியாழன்",
+            luckyDaysEn = "Tuesday, Thursday",
+            luckyDaysHi = "मंगलवार, गुरुवार",
+            luckyNumbers = "9, 1, 3",
+            luckyColorsTa = "சிவப்பு, மெரூன், செந்தூரம்",
+            luckyColorsEn = "Crimson Red, Maroon, Scarlet",
+            luckyColorsHi = "लाल, गहरा लाल, सिंदूरी"
+        )
+        Rasi.RISHABAM -> VedicSignAttributes(
+            elementTa = "நிலம் (Earth / பூமி தத்துவம்)",
+            elementEn = "Earth Element (Prithvi Tatva)",
+            elementHi = "पृथ्वी तत्व (Earth Element)",
+            qualityTa = "ஸ்திரம் (Fixed / உறுதி & நிதானம்)",
+            qualityEn = "Fixed Sign (Sthira Rashi)",
+            qualityHi = "स्थिर राशि (Fixed)",
+            nakshatrasTa = "கார்த்திகை (2, 3, 4), ரோகிணி (1, 2, 3, 4), மிருகசீரிஷம் (1, 2-ஆம் பாதம்)",
+            nakshatrasEn = "Krittika (2-4), Rohini (1-4), Mrigashirsha (Pada 1-2)",
+            nakshatrasHi = "कृत्तिका (2-4), रोहिणी (1-4), मृगशिरा (चरण 1-2)",
+            luckyGemstoneTa = "வைரம் / வெள்ளை புஷ்பராகம் & வெள்ளி (Diamond)",
+            luckyGemstoneEn = "Diamond / White Sapphire & Silver",
+            luckyGemstoneHi = "हीरा / सफेद पुखराज एवं चांदी",
+            luckyDirectionTa = "தென்கிழக்கு (South-East)",
+            luckyDirectionEn = "South-East",
+            luckyDirectionHi = "दक्षिण-पूर्व (आग्नेय)",
+            luckyDaysTa = "வெள்ளி, புதன்",
+            luckyDaysEn = "Friday, Wednesday",
+            luckyDaysHi = "शुक्रवार, बुधवार",
+            luckyNumbers = "6, 5, 8",
+            luckyColorsTa = "வெள்ளை, சந்தனம், வெளிர் பிங்க்",
+            luckyColorsEn = "Pure White, Cream Sandal, Soft Pink",
+            luckyColorsHi = "सफेद, चंदन, हल्का गुलाबी"
+        )
+        Rasi.MITHUNAM -> VedicSignAttributes(
+            elementTa = "காற்று (Air / வாயு தத்துவம்)",
+            elementEn = "Air Element (Vayu Tatva)",
+            elementHi = "वायु तत्व (Air Element)",
+            qualityTa = "உபயம் (Dual / புத்தி கூர்மை)",
+            qualityEn = "Dual Sign (Dwiswabhava)",
+            qualityHi = "द्विस्वभाव राशि (Dual)",
+            nakshatrasTa = "மிருகசீரிஷம் (3, 4), திருவாதிரை (1, 2, 3, 4), புனர்பூசம் (1, 2, 3-ஆம் பாதம்)",
+            nakshatrasEn = "Mrigashirsha (3-4), Ardra (1-4), Punarvasu (Pada 1-3)",
+            nakshatrasHi = "मृगशिरा (3-4), आर्द्रा (1-4), पुनर्वसु (चरण 1-3)",
+            luckyGemstoneTa = "மரகதப் பச்சை & வெண்கலம் (Emerald)",
+            luckyGemstoneEn = "Emerald & Bronze / Gold",
+            luckyGemstoneHi = "पन्ना एवं कांसा (Emerald)",
+            luckyDirectionTa = "வடக்கு (North)",
+            luckyDirectionEn = "North",
+            luckyDirectionHi = "उत्तर (North)",
+            luckyDaysTa = "புதன், வெள்ளி",
+            luckyDaysEn = "Wednesday, Friday",
+            luckyDaysHi = "बुधवार, शुक्रवार",
+            luckyNumbers = "5, 6, 14",
+            luckyColorsTa = "மரகதப் பச்சை, கிளிப்பச்சை",
+            luckyColorsEn = "Emerald Green, Parrot Green",
+            luckyColorsHi = "हरा, तोता हरा, गहरा हरा"
+        )
+        Rasi.KADAGAM -> VedicSignAttributes(
+            elementTa = "நீர் (Water / ஜல தத்துவம்)",
+            elementEn = "Water Element (Jala Tatva)",
+            elementHi = "जल तत्व (Water Element)",
+            qualityTa = "சரம் (Movable / உணர்ச்சி & கருணை)",
+            qualityEn = "Movable Sign (Chara Rashi)",
+            qualityHi = "चर राशि (Movable)",
+            nakshatrasTa = "புனர்பூசம் (4), பூசம் (1, 2, 3, 4), ஆயில்யம் (1, 2, 3, 4-ஆம் பாதம்)",
+            nakshatrasEn = "Punarvasu (Pada 4), Pushya (1-4), Ashlesha (1-4)",
+            nakshatrasHi = "पुनर्वसु (चरण 4), पुष्य (1-4), अश्लेषा (1-4)",
+            luckyGemstoneTa = "இயற்கை முத்து & வெள்ளி (Natural Pearl)",
+            luckyGemstoneEn = "Natural Pearl / Moonstone & Silver",
+            luckyGemstoneHi = "सच्चा मोती एवं चांदी (Pearl)",
+            luckyDirectionTa = "வடமேற்கு (North-West)",
+            luckyDirectionEn = "North-West",
+            luckyDirectionHi = "उत्तर-पश्चिम (वायव्य)",
+            luckyDaysTa = "திங்கள், வியாழன்",
+            luckyDaysEn = "Monday, Thursday",
+            luckyDaysHi = "सोमवार, गुरुवार",
+            luckyNumbers = "2, 7, 9",
+            luckyColorsTa = "முத்து வெள்ளை, வெள்ளி, கிரீம்",
+            luckyColorsEn = "Pearl White, Silver, Ivory Cream",
+            luckyColorsHi = "मोती सफेद, रुपहला, क्रीम"
+        )
+        Rasi.SIMHAM -> VedicSignAttributes(
+            elementTa = "நெருப்பு (Fire / ராஜச அக்னி)",
+            elementEn = "Fire Element (Royal Agni)",
+            elementHi = "अग्नि तत्व (Royal Fire)",
+            qualityTa = "ஸ்திரம் (Fixed / ஆளுமை & தலைமை)",
+            qualityEn = "Fixed Sign (Sthira Rashi - Leadership)",
+            qualityHi = "स्थिर राशि (Fixed - Leadership)",
+            nakshatrasTa = "மகம் (1, 2, 3, 4), பூரம் (1, 2, 3, 4), உத்திரம் (1-ஆம் பாதம்)",
+            nakshatrasEn = "Magha (1-4), Purva Phalguni (1-4), Uttara Phalguni (Pada 1)",
+            nakshatrasHi = "मघा (1-4), पूर्वाफाल्गुनी (1-4), उत्तराफाल्गुनी (चरण 1)",
+            luckyGemstoneTa = "மாணிக்கம் & தங்கம் (Ruby)",
+            luckyGemstoneEn = "Natural Ruby (Manikkam) & Gold",
+            luckyGemstoneHi = "माणिक्य एवं स्वर्ण (Ruby)",
+            luckyDirectionTa = "கிழக்கு (East)",
+            luckyDirectionEn = "East",
+            luckyDirectionHi = "पूर्व (East)",
+            luckyDaysTa = "ஞாயிறு, செவ்வாய்",
+            luckyDaysEn = "Sunday, Tuesday",
+            luckyDaysHi = "रविवार, मंगलवार",
+            luckyNumbers = "1, 4, 9",
+            luckyColorsTa = "பொன்னிறம், காவி, செம்மஞ்சள்",
+            luckyColorsEn = "Golden Amber, Royal Saffron, Orange",
+            luckyColorsHi = "सुनहरा, केसरिया, गहरा नारंगी"
+        )
+        Rasi.KANNI -> VedicSignAttributes(
+            elementTa = "நிலம் (Earth / பூமி தத்துவம்)",
+            elementEn = "Earth Element (Prithvi Tatva)",
+            elementHi = "पृथ्वी तत्व (Earth Element)",
+            qualityTa = "உபயம் (Dual / கூர்மையான பகுத்தறிவு)",
+            qualityEn = "Dual Sign (Dwiswabhava - Analytical)",
+            qualityHi = "द्विस्वभाव राशि (Analytical)",
+            nakshatrasTa = "உத்திரம் (2, 3, 4), அஸ்தம் (1, 2, 3, 4), சித்திரை (1, 2-ஆம் பாதம்)",
+            nakshatrasEn = "Uttara Phalguni (2-4), Hasta (1-4), Chitra (Pada 1-2)",
+            nakshatrasHi = "उत्तराफाल्गुनी (2-4), हस्त (1-4), चित्रा (चरण 1-2)",
+            luckyGemstoneTa = "மரகதப் பச்சை & வெண்கலம் (Emerald)",
+            luckyGemstoneEn = "Emerald & Bronze / Platinum",
+            luckyGemstoneHi = "पन्ना एवं कांसा (Emerald)",
+            luckyDirectionTa = "தெற்கு (South)",
+            luckyDirectionEn = "South",
+            luckyDirectionHi = "दक्षिण (South)",
+            luckyDaysTa = "புதன், வெள்ளி",
+            luckyDaysEn = "Wednesday, Friday",
+            luckyDaysHi = "बुधवार, शुक्रवार",
+            luckyNumbers = "5, 2, 7",
+            luckyColorsTa = "கரும்பச்சை, ஜேட் பச்சை, வெளிர் மஞ்சள்",
+            luckyColorsEn = "Dark Jade Green, Forest Green, Pale Gold",
+            luckyColorsHi = "गहरा हरा, तोतिया, हल्का पीला"
+        )
+        Rasi.THULAM -> VedicSignAttributes(
+            elementTa = "காற்று (Air / சமநிலை வாயு)",
+            elementEn = "Air Element (Vayu Tatva - Balance)",
+            elementHi = "वायु तत्व (Air Element - Balance)",
+            qualityTa = "சரம் (Movable / அழகு & நேர்த்தி)",
+            qualityEn = "Movable Sign (Chara Rashi - Harmony)",
+            qualityHi = "चर राशि (Movable - Harmony)",
+            nakshatrasTa = "சித்திரை (3, 4), சுவாதி (1, 2, 3, 4), விசாகம் (1, 2, 3-ஆம் பாதம்)",
+            nakshatrasEn = "Chitra (3-4), Swati (1-4), Vishakha (Pada 1-3)",
+            nakshatrasHi = "चित्रा (3-4), स्वाति (1-4), विशाखा (चरण 1-3)",
+            luckyGemstoneTa = "வைரம் / வெள்ளை புஷ்பராகம் (Diamond / Opal)",
+            luckyGemstoneEn = "Diamond / Opal / White Zircon",
+            luckyGemstoneHi = "हीरा / ओपल / सफेद पुखराज",
+            luckyDirectionTa = "மேற்கு (West)",
+            luckyDirectionEn = "West",
+            luckyDirectionHi = "पश्चिम (West)",
+            luckyDaysTa = "வெள்ளி, சனி",
+            luckyDaysEn = "Friday, Saturday",
+            luckyDaysHi = "शुक्रवार, शनिवार",
+            luckyNumbers = "6, 7, 8",
+            luckyColorsTa = "வெள்ளை, வெளிர் நீலம், பட்டு வர்ணம்",
+            luckyColorsEn = "Silk White, Sky Blue, Pastel Shades",
+            luckyColorsHi = "रेशमी सफेद, आसमानी नीला, पेस्टल"
+        )
+        Rasi.VIRUCHIGAM -> VedicSignAttributes(
+            elementTa = "நீர் (Water / ஆழ்ந்த ஜல தத்துவம்)",
+            elementEn = "Water Element (Occult Water)",
+            elementHi = "जल तत्व (Mystic Water)",
+            qualityTa = "ஸ்திரம் (Fixed / உறுதி & துணிச்சல்)",
+            qualityEn = "Fixed Sign (Sthira Rashi - Intuition)",
+            qualityHi = "स्थिर राशि (Intuition & Willpower)",
+            nakshatrasTa = "விசாகம் (4), அனுஷம் (1, 2, 3, 4), கேட்டை (1, 2, 3, 4-ஆம் பாதம்)",
+            nakshatrasEn = "Vishakha (Pada 4), Anuradha (1-4), Jyeshtha (1-4)",
+            nakshatrasHi = "विशाखा (चरण 4), अनुराधा (1-4), ज्येष्ठा (1-4)",
+            luckyGemstoneTa = "சிவப்பு பவளம் & செம்பு (Red Coral)",
+            luckyGemstoneEn = "Red Coral & Copper (Pavazham)",
+            luckyGemstoneHi = "लाल मूंगा एवं तांबा (Red Coral)",
+            luckyDirectionTa = "வடக்கு (North)",
+            luckyDirectionEn = "North",
+            luckyDirectionHi = "उत्तर (North)",
+            luckyDaysTa = "செவ்வாய், வியாழன்",
+            luckyDaysEn = "Tuesday, Thursday",
+            luckyDaysHi = "मंगलवार, गुरुवार",
+            luckyNumbers = "9, 3, 1",
+            luckyColorsTa = "அடர் சிவப்பு, மெரூன், பழுப்பு",
+            luckyColorsEn = "Deep Red, Scarlet Maroon, Rust",
+            luckyColorsHi = "गहरा लाल, मैरून, रक्त वर्ण"
+        )
+        Rasi.DHANUSU -> VedicSignAttributes(
+            elementTa = "நெருப்பு (Fire / ஞான அக்னி)",
+            elementEn = "Fire Element (Divine Fire)",
+            elementHi = "अग्नि तत्व (Dharma Fire)",
+            qualityTa = "உபயம் (Dual / தர்ம சிந்தனை)",
+            qualityEn = "Dual Sign (Dwiswabhava - Dharma)",
+            qualityHi = "द्विस्वभाव राशि (Dharma & Wisdom)",
+            nakshatrasTa = "மூலம் (1, 2, 3, 4), பூராடம் (1, 2, 3, 4), உத்திராடம் (1-ஆம் பாதம்)",
+            nakshatrasEn = "Moola (1-4), Purva Ashadha (1-4), Uttara Ashadha (Pada 1)",
+            nakshatrasHi = "मूल (1-4), पूर्वाषाढ़ा (1-4), उत्तराषाढ़ा (चरण 1)",
+            luckyGemstoneTa = "மஞ்சள் புஷ்பராகம் & தங்கம் (Yellow Sapphire)",
+            luckyGemstoneEn = "Yellow Sapphire (Pushparagam) & Gold",
+            luckyGemstoneHi = "पीला पुखराज एवं स्वर्ण (Yellow Sapphire)",
+            luckyDirectionTa = "வடகிழக்கு (ஈசான்யம் / North-East)",
+            luckyDirectionEn = "North-East (Ishanya)",
+            luckyDirectionHi = "उत्तर-पूर्व (ईशान कोण)",
+            luckyDaysTa = "வியாழன், ஞாயிறு",
+            luckyDaysEn = "Thursday, Sunday",
+            luckyDaysHi = "गुरुवार, रविवार",
+            luckyNumbers = "3, 5, 9",
+            luckyColorsTa = "மஞ்சள், பொன்னிறம், காவி",
+            luckyColorsEn = "Turmeric Yellow, Royal Gold, Saffron",
+            luckyColorsHi = "पीला, स्वर्णिम, केसरिया"
+        )
+        Rasi.MAGARAM -> VedicSignAttributes(
+            elementTa = "நிலம் (Earth / பூமி தத்துவம்)",
+            elementEn = "Earth Element (Prithvi Tatva)",
+            elementHi = "पृथ्वी तत्व (Earth Element)",
+            qualityTa = "சரம் (Movable / விடாமுயற்சி & கர்மம்)",
+            qualityEn = "Movable Sign (Chara Rashi - Diligence)",
+            qualityHi = "चर राशि (Hard Work & Discipline)",
+            nakshatrasTa = "உத்திராடம் (2, 3, 4), திருவோணம் (1, 2, 3, 4), அவிட்டம் (1, 2-ஆம் பாதம்)",
+            nakshatrasEn = "Uttara Ashadha (2-4), Shravana (1-4), Dhanishta (Pada 1-2)",
+            nakshatrasHi = "उत्तराषाढ़ा (2-4), श्रवण (1-4), धनिष्ठा (चरण 1-2)",
+            luckyGemstoneTa = "நீலக்கல் / அமேதிஸ்ட் (Blue Sapphire)",
+            luckyGemstoneEn = "Blue Sapphire (Neelam) / Amethyst & Steel",
+            luckyGemstoneHi = "नीलम / जामुनिया एवं लोहा",
+            luckyDirectionTa = "தெற்கு (South)",
+            luckyDirectionEn = "South",
+            luckyDirectionHi = "दक्षिण (South)",
+            luckyDaysTa = "சனி, வெள்ளி",
+            luckyDaysEn = "Saturday, Friday",
+            luckyDaysHi = "शनिवार, शुक्रवार",
+            luckyNumbers = "8, 4, 6",
+            luckyColorsTa = "நீலம், கருநீலம், சாம்பல்",
+            luckyColorsEn = "Royal Navy Blue, Indigo, Steel Grey",
+            luckyColorsHi = "नीला, गहरा नीला, स्लेटी"
+        )
+        Rasi.KUMBAM -> VedicSignAttributes(
+            elementTa = "காற்று (Air / விண்வெளி வாயு)",
+            elementEn = "Air Element (Cosmic Air)",
+            elementHi = "वायु तत्व (Cosmic Air)",
+            qualityTa = "ஸ்திரம் (Fixed / புதுமை & ஆராய்ச்சி)",
+            qualityEn = "Fixed Sign (Sthira Rashi - Humanitarian)",
+            qualityHi = "स्थिर राशि (Visionary & Thinker)",
+            nakshatrasTa = "அவிட்டம் (3, 4), சதயம் (1, 2, 3, 4), பூரட்டாதி (1, 2, 3-ஆம் பாதம்)",
+            nakshatrasEn = "Dhanishta (3-4), Shatabhisha (1-4), Purva Bhadrapada (Pada 1-3)",
+            nakshatrasHi = "धनिष्ठा (3-4), शतभिषा (1-4), पूर्वाभाद्रपद (चरण 1-3)",
+            luckyGemstoneTa = "நீலக்கல் / கோமேதகம் (Blue Sapphire)",
+            luckyGemstoneEn = "Blue Sapphire / Hessonite & Iron",
+            luckyGemstoneHi = "नीलम / गोमेद एवं लोहा",
+            luckyDirectionTa = "மேற்கு (West)",
+            luckyDirectionEn = "West",
+            luckyDirectionHi = "पश्चिम (West)",
+            luckyDaysTa = "சனி, புதன்",
+            luckyDaysEn = "Saturday, Wednesday",
+            luckyDaysHi = "शनिवार, बुधवार",
+            luckyNumbers = "8, 3, 7",
+            luckyColorsTa = "மின்னல் நீலம், ஆகாய நீலம், கருநீலம்",
+            luckyColorsEn = "Electric Blue, Cyan, Deep Navy",
+            luckyColorsHi = "आसमानी नीला, गहरा नीला, जामुनी"
+        )
+        Rasi.MEENAM -> VedicSignAttributes(
+            elementTa = "நீர் (Water / மோட்ச ஜல தத்துவம்)",
+            elementEn = "Water Element (Spiritual Water)",
+            elementHi = "जल तत्व (Moksha Water)",
+            qualityTa = "உபயம் (Dual / பக்தி & ஆன்மீகம்)",
+            qualityEn = "Dual Sign (Dwiswabhava - Spiritual)",
+            qualityHi = "द्विस्वभाव राशि (Spiritual & Kind)",
+            nakshatrasTa = "பூரட்டாதி (4), உத்திரட்டாதி (1, 2, 3, 4), ரேவதி (1, 2, 3, 4-ஆம் பாதம்)",
+            nakshatrasEn = "Purva Bhadrapada (Pada 4), Uttara Bhadrapada (1-4), Revati (1-4)",
+            nakshatrasHi = "पूर्वाभाद्रपद (चरण 4), उत्तराभाद्रपद (1-4), रेवती (1-4)",
+            luckyGemstoneTa = "மஞ்சள் புஷ்பராகம் & முத்து (Yellow Sapphire)",
+            luckyGemstoneEn = "Yellow Sapphire (Pushparagam) & Pearl",
+            luckyGemstoneHi = "पीला पुखराज एवं मोती",
+            luckyDirectionTa = "வடகிழக்கு (North-East)",
+            luckyDirectionEn = "North-East",
+            luckyDirectionHi = "उत्तर-पूर्व (ईशान)",
+            luckyDaysTa = "வியாழன், திங்கள்",
+            luckyDaysEn = "Thursday, Monday",
+            luckyDaysHi = "गुरुवार, सोमवार",
+            luckyNumbers = "3, 7, 9",
+            luckyColorsTa = "பொன் மஞ்சள், வெளிர் மஞ்சள், கடல் பச்சை",
+            luckyColorsEn = "Golden Yellow, Pale Saffron, Sea Green",
+            luckyColorsHi = "पीला, सुनहरा, हल्का समुद्री हरा"
         )
     }
 }

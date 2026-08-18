@@ -107,16 +107,22 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     )
 
     override fun calculatePanchangam(date: LocalDate, location: String): PanchangamDetail {
-        val loc = locationMap[location] ?: LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி")
+        val loc = resolveLocation(location)
 
-        // 1. Julian Day and Ephemeris Calculation at local noon
-        val ephemeris = calculateEphemeris(date, 0.5 - (loc.timeZoneOffsetHours / 24.0))
+        // 1. Sun & Moon Times calculation for exact location
+        val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
+        val sunriseLocal = formatDecTime(sunriseDec)
+        val sunsetLocal = formatDecTime(sunsetDec)
+
+        // 2. Julian Day and Ephemeris Calculation at local sunrise for standard Drik Panchangam
+        val sunriseUtcFraction = ((sunriseDec - loc.timeZoneOffsetHours + 24.0) % 24.0) / 24.0
+        val ephemeris = calculateEphemeris(date, sunriseUtcFraction)
         val sunSid = ephemeris.sunSidereal
         val moonSid = ephemeris.moonSidereal
         val sunTrop = ephemeris.sunTropical
         val moonTrop = ephemeris.moonTropical
 
-        // 2. Solar Month & Tamil Date from Sidereal Sun
+        // 3. Solar Month & Tamil Date from Sidereal Sun
         val sunRasiIndex = (sunSid / 30.0).toInt() % 12
         val tamilMonth = TamilMonth.values()[sunRasiIndex]
         val tamilDate = (sunSid % 30.0).toInt() + 1
@@ -136,7 +142,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         // 3. Rithu (Vedic Season)
         val ritu = when (tamilMonth) {
             TamilMonth.CHITHIRAI, TamilMonth.VAIKASI -> "வசந்த ருது (Vasanta Ritu / वसन्त ऋतु)"
-            TamilMonth.AANI, TamilMonth.AADI -> "கிரீஷ்ம ருது (Greeshma Ritu / ग्रीष्म ऋतु)"
+            TamilMonth.AANI, TamilMonth.AADI -> "கிரீஷ்ம ருது (Greeshma Ritu / ग्रीष्ம ऋतु)"
             TamilMonth.AVANI, TamilMonth.PURATTASI -> "வர்ஷ ருது (Varsha Ritu / वर्षा ऋतु)"
             TamilMonth.AIPASI, TamilMonth.KARTHIGAI -> "சரத் ருது (Sharad Ritu / शरद् ऋतु)"
             TamilMonth.MARGHAZHI, TamilMonth.THAI -> "ஹேமந்த ருது (Hemanta Ritu / हेमन्त ऋतु)"
@@ -156,10 +162,10 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             "கிருஷ்ண பக்ஷம் (Krishna Paksha / कृष्ण पक्ष - தேய்பிறை)"
         }
 
-        // Tithi End Time & Next Tithi calculation
+        // Tithi End Time & Next Tithi calculation relative to sunrise
         val remTithiDeg = 12.0 - (elongation % 12.0)
         val tithiHoursRemaining = (remTithiDeg / 12.19) * 24.0
-        val tithiEndTime = formatLocalEndTime(6.0 + tithiHoursRemaining)
+        val tithiEndTime = formatLocalEndTime(sunriseDec + tithiHoursRemaining)
         val nextTithiIndex = (tithiIndex + 1) % 30
         val nextTithi = tithisTa[nextTithiIndex]
 
@@ -181,7 +187,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
 
         val remNakDeg = (360.0 / 27.0) - (moonSid % (360.0 / 27.0))
         val nakHoursRemaining = (remNakDeg / 13.176) * 24.0
-        val nakshatraEndTime = formatLocalEndTime(6.0 + nakHoursRemaining)
+        val nakshatraEndTime = formatLocalEndTime(sunriseDec + nakHoursRemaining)
         val nextNakshatraIndex = (nakshatraIndex + 1) % 27
         val nextNakshatra = nakshatramsTa[nextNakshatraIndex]
 
@@ -191,7 +197,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val nithyaYogaName = nithyaYogamsTa[nithyaYogaIndex]
         val remYogaDeg = (360.0 / 27.0) - (yogaDeg % (360.0 / 27.0))
         val yogaHoursRemaining = (remYogaDeg / 14.16) * 24.0
-        val yogaEndTime = formatLocalEndTime(6.0 + yogaHoursRemaining)
+        val yogaEndTime = formatLocalEndTime(sunriseDec + yogaHoursRemaining)
         val dinaYoga = calculateDinaYoga(date.dayOfWeek, nakshatraIndex)
 
         // 10. Karanam
@@ -205,7 +211,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
         val remKarDeg = 6.0 - (elongation % 6.0)
         val karHoursRemaining = (remKarDeg / 12.19) * 24.0
-        val karanamEndTime = formatLocalEndTime(6.0 + karHoursRemaining)
+        val karanamEndTime = formatLocalEndTime(sunriseDec + karHoursRemaining)
 
         val nextHalfTithiIndex = (halfTithiIndex + 1) % 60
         val nextKaranam = when (nextHalfTithiIndex) {
@@ -225,11 +231,10 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val chandrashtamam = "${rasiNamesTa[chandrashtamaRasiIdx]} ராசி அன்பர்களுக்கு இன்றைய நாள் சந்திராஷ்டமம்."
 
         // Sun & Moon Times
-        val (sunriseLocal, sunsetLocal) = calculateSunriseSunset(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
         val (moonriseLocal, moonsetLocal) = calculateMoonriseMoonset(date, loc.lat, loc.lon, loc.timeZoneOffsetHours, elongation)
 
-        // Inauspicious Times
-        val (rahu, yama, kuli) = calculateDynamicInauspiciousTimes(date.dayOfWeek, sunriseLocal, sunsetLocal)
+        // Inauspicious Times (Dynamic 8-part division of daytime)
+        val (rahu, yama, kuli) = calculateDynamicInauspiciousTimes(date.dayOfWeek, sunriseDec, sunsetDec)
 
         // Nalla Neram
         val (nallaMorn, nallaEve) = getNallaNeram(date.dayOfWeek)
@@ -437,7 +442,24 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
     }
 
-    private fun calculateSunriseSunset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<String, String> {
+    private fun resolveLocation(location: String): LocationCoordinates {
+        // Direct match
+        locationMap[location]?.let { return it }
+        // Partial / fuzzy match
+        for ((key, value) in locationMap) {
+            if (location.contains(key, ignoreCase = true) || key.contains(location, ignoreCase = true) ||
+                location.contains(value.nameTa, ignoreCase = true) || (location.contains("Chennai", ignoreCase = true) && key.contains("Chennai", ignoreCase = true)) ||
+                (location.contains("சென்னை", ignoreCase = true) && key.contains("சென்னை", ignoreCase = true)) ||
+                (location.contains("India", ignoreCase = true) && key.contains("India", ignoreCase = true)) ||
+                (location.contains("Nadi", ignoreCase = true) && key.contains("Nadi", ignoreCase = true)) ||
+                (location.contains("நாடி", ignoreCase = true) && key.contains("நாடி", ignoreCase = true))) {
+                return value
+            }
+        }
+        return LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி")
+    }
+
+    private fun calculateSunriseSunsetDec(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<Double, Double> {
         val dayOfYear = date.dayOfYear
         val b = 2.0 * Math.PI * (dayOfYear - 81) / 365.0
         val eot = 9.87 * sin(2 * b) - 7.53 * cos(b) - 1.5 * sin(b)
@@ -453,7 +475,12 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val sunriseLocalDec = (solarNoonUtc - hHours + tzOffset + 24.0) % 24.0
         val sunsetLocalDec = (solarNoonUtc + hHours + tzOffset + 24.0) % 24.0
 
-        return formatDecTime(sunriseLocalDec) to formatDecTime(sunsetLocalDec)
+        return sunriseLocalDec to sunsetLocalDec
+    }
+
+    private fun calculateSunriseSunset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<String, String> {
+        val (riseDec, setDec) = calculateSunriseSunsetDec(date, lat, lon, tzOffset)
+        return formatDecTime(riseDec) to formatDecTime(setDec)
     }
 
     private fun calculateMoonriseMoonset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double, elongation: Double): Pair<String, String> {
@@ -463,15 +490,24 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         return formatDecTime(moonriseDec) to formatDecTime(moonsetDec)
     }
 
-    private fun calculateDynamicInauspiciousTimes(day: DayOfWeek, sunriseStr: String, sunsetStr: String): Triple<String, String, String> {
+    private fun calculateDynamicInauspiciousTimes(day: DayOfWeek, sunriseDec: Double, sunsetDec: Double): Triple<String, String, String> {
+        val dayDuration = if (sunsetDec > sunriseDec) sunsetDec - sunriseDec else (sunsetDec + 24.0 - sunriseDec)
+        val part = dayDuration / 8.0
+
+        fun getSegment(partIndex1Based: Int): String {
+            val start = (sunriseDec + (partIndex1Based - 1) * part) % 24.0
+            val end = (sunriseDec + partIndex1Based * part) % 24.0
+            return "${formatDecTime(start)} - ${formatDecTime(end)}"
+        }
+
         return when (day) {
-            DayOfWeek.SUNDAY -> Triple("04:30 PM - 06:00 PM", "12:00 PM - 01:30 PM", "03:00 PM - 04:30 PM")
-            DayOfWeek.MONDAY -> Triple("07:30 AM - 09:00 AM", "10:30 AM - 12:00 PM", "01:30 PM - 03:00 PM")
-            DayOfWeek.TUESDAY -> Triple("03:00 PM - 04:30 PM", "09:00 AM - 10:30 AM", "12:00 PM - 01:30 PM")
-            DayOfWeek.WEDNESDAY -> Triple("12:00 PM - 01:30 PM", "07:30 AM - 09:00 AM", "10:30 AM - 12:00 PM")
-            DayOfWeek.THURSDAY -> Triple("01:30 PM - 03:00 PM", "06:00 AM - 07:30 AM", "09:00 AM - 10:30 AM")
-            DayOfWeek.FRIDAY -> Triple("10:30 AM - 12:00 PM", "03:00 PM - 04:30 PM", "07:30 AM - 09:00 AM")
-            DayOfWeek.SATURDAY -> Triple("09:00 AM - 10:30 AM", "01:30 PM - 03:00 PM", "06:00 AM - 07:30 AM")
+            DayOfWeek.SUNDAY -> Triple(getSegment(8), getSegment(5), getSegment(7))
+            DayOfWeek.MONDAY -> Triple(getSegment(2), getSegment(4), getSegment(6))
+            DayOfWeek.TUESDAY -> Triple(getSegment(7), getSegment(3), getSegment(5))
+            DayOfWeek.WEDNESDAY -> Triple(getSegment(5), getSegment(2), getSegment(4))
+            DayOfWeek.THURSDAY -> Triple(getSegment(6), getSegment(1), getSegment(3))
+            DayOfWeek.FRIDAY -> Triple(getSegment(4), getSegment(7), getSegment(2))
+            DayOfWeek.SATURDAY -> Triple(getSegment(3), getSegment(6), getSegment(1))
         }
     }
 

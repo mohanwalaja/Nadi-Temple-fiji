@@ -11,6 +11,7 @@ data class UserPreferences(
     val language: AppLanguage = AppLanguage.TAMIL,
     val isDarkMode: Boolean = false,
     val useSystemTheme: Boolean = true,
+    val themePreset: String = "RUBY_MAROON",
     val selectedLocation: String = "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
     val festivalNotificationEnabled: Boolean = true,
     val templeEventNotificationEnabled: Boolean = true,
@@ -34,6 +35,7 @@ class UserPreferencesRepository(context: Context) {
         }
         val isDarkMode = prefs.getBoolean("key_dark_mode", false)
         val useSystemTheme = prefs.getBoolean("key_system_theme", true)
+        val themePreset = prefs.getString("key_theme_preset", "RUBY_MAROON") ?: "RUBY_MAROON"
         val location = prefs.getString("key_location", "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)") ?: "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)"
         val festivalNotif = prefs.getBoolean("key_notif_festival", true)
         val templeNotif = prefs.getBoolean("key_notif_temple", true)
@@ -45,6 +47,7 @@ class UserPreferencesRepository(context: Context) {
             language = language,
             isDarkMode = isDarkMode,
             useSystemTheme = useSystemTheme,
+            themePreset = themePreset,
             selectedLocation = location,
             festivalNotificationEnabled = festivalNotif,
             templeEventNotificationEnabled = templeNotif,
@@ -52,6 +55,11 @@ class UserPreferencesRepository(context: Context) {
             panchangamNotificationEnabled = panchangamNotif,
             fontSizeScale = fontSize
         )
+    }
+
+    fun setThemePreset(preset: String) {
+        prefs.edit().putString("key_theme_preset", preset).apply()
+        _preferences.value = _preferences.value.copy(themePreset = preset)
     }
 
     fun setLanguage(language: AppLanguage) {
