@@ -99,7 +99,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(bottom = 4.dp)
                     ) {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "முருகன் திருத்தலம்" else "LORD MURUGAN TEMPLE",
+                            text = AppStrings.templeTag(lang),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = TempleMaroonDark,
@@ -108,7 +108,7 @@ fun HomeScreen(
                     }
 
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில்" else "Sri Siva Subramaniya Swami Kovil",
+                        text = AppStrings.appTitle(lang),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 19.sp
@@ -117,7 +117,7 @@ fun HomeScreen(
                     )
 
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) "வள்ளி தெய்வானை சமேத ஸ்ரீ சுப்பிரமணியர்" else "Lord Murugan with Valli & Deivayanai",
+                        text = AppStrings.deityName(lang),
                         fontSize = 12.sp,
                         color = TempleGoldLight
                     )
@@ -161,7 +161,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "இன்று நடை சாத்துதல்: ${state.templeClosingTimeToday}" else "Closes: ${state.templeClosingTimeToday}",
+                            text = AppStrings.templeClosingTime(lang, state.templeClosingTimeToday),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -305,7 +305,7 @@ fun HomeScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "மாசம்: ${p.sanskritMonth}",
+                                    text = "${AppStrings.monthPrefix(lang)}: ${p.sanskritMonth}",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -410,7 +410,7 @@ fun HomeScreen(
                         ) {
                             Column(modifier = Modifier.padding(10.dp)) {
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "இன்றைய சுப மற்றும் கால நேரங்கள் (Auspicious Timings)" else "Today's Auspicious & Inauspicious Times",
+                                    text = AppStrings.dayTimingHeader(lang),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
@@ -428,7 +428,7 @@ fun HomeScreen(
                                         Text(text = "🟢", fontSize = 10.sp)
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            text = if (lang == AppLanguage.TAMIL) "நல்ல நேரம்:" else "Nalla Neram:",
+                                            text = "${AppStrings.nallaNeramLabel(lang)}:",
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Medium,
                                             color = MaterialTheme.colorScheme.onSurface
@@ -460,7 +460,7 @@ fun HomeScreen(
                                     ) {
                                         Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
                                             Text(
-                                                text = if (lang == AppLanguage.TAMIL) "இராகு காலம் (Rahu)" else "Rahukaalam",
+                                                text = AppStrings.rahuKalam(lang),
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.error
@@ -482,7 +482,7 @@ fun HomeScreen(
                                     ) {
                                         Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
                                             Text(
-                                                text = if (lang == AppLanguage.TAMIL) "எமகண்டம் (Yama)" else "Yamagandam",
+                                                text = AppStrings.yamagandam(lang),
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.error
@@ -514,7 +514,7 @@ fun HomeScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Stars,
+                                imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier.size(18.dp)
@@ -570,7 +570,7 @@ fun HomeScreen(
                             }
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "2026 முக்கிய கிரக எச்சரிக்கை" else if (lang == AppLanguage.HINDI) "2026 महत्वपूर्ण ग्रह गोचर अलर्ट" else "2026 Planetary Transit Alert",
+                                text = AppStrings.transitAlertTitle(lang),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
@@ -583,7 +583,7 @@ fun HomeScreen(
                             border = androidx.compose.foundation.BorderStroke(0.5.dp, TempleGold)
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "ராசி பலன்" else if (lang == AppLanguage.HINDI) "राशि फल" else "Rasi Palan",
+                                text = AppStrings.rasiPalan(lang),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = TempleGoldText,
@@ -595,13 +595,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) {
-                            "🔴 மிக முக்கிய கிரக எச்சரிக்கை: மேஷம் (சனி), கடகம் (ராகு/கேது), சிம்மம் (ராகு/கேது), மகரம் (ராகு/சனி), கும்பம் (சனி/கேது), மீனம் (சனி/கேது). 12 ராசிகளுக்கான விரிவான பலன்கள் மற்றும் பரிகாரங்கள்."
-                        } else if (lang == AppLanguage.HINDI) {
-                            "🔴 मुख्य ग्रह अलर्ट: मेष (शनि), कर्क (राहु/केतु), सिंह (राहु/केतु), मकर (राहु/शनि), कुंभ (शनि/केतु), मीन (शनि/केतु)। सभी 12 राशियों के लिए विस्तृत फल एवं उपाय।"
-                        } else {
-                            "🔴 Critical Planetary Alert: Aries (Saturn), Cancer (Rahu/Ketu), Leo (Rahu/Ketu), Capricorn (Rahu/Saturn), Aquarius (Saturn/Ketu), Pisces (Saturn/Ketu). Complete 12 Rasi predictions & remedies."
-                        },
+                        text = AppStrings.transitAlertSummary(lang),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                         lineHeight = 18.sp
@@ -619,7 +613,7 @@ fun HomeScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "வேலை • நிதி • திருமணம் • உடல்நலம்" else if (lang == AppLanguage.HINDI) "करियर • वित्त • विवाह • स्वास्थ्य" else "Career • Finance • Marriage • Health",
+                                text = AppStrings.transitCategories(lang),
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -628,7 +622,7 @@ fun HomeScreen(
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "படிக்க" else if (lang == AppLanguage.HINDI) "देखें" else "View All",
+                                text = AppStrings.readMore(lang),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
@@ -649,7 +643,7 @@ fun HomeScreen(
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
-                    text = if (lang == AppLanguage.TAMIL) "முக்கிய சேவைகள்" else "Key Services",
+                    text = AppStrings.quickServices(lang),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = TempleMaroon,
                     modifier = Modifier.padding(bottom = 10.dp)
@@ -661,18 +655,26 @@ fun HomeScreen(
                 ) {
                     QuickActionCard(
                         title = AppStrings.calendar(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "தமிழ் தேதிகள்" else "Tamil Calendar",
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "தமிழ் காலண்டர்"
+                            AppLanguage.HINDI -> "कैलेंडर विवरण"
+                            AppLanguage.ENGLISH -> "Tamil Calendar"
+                        },
                         icon = Icons.Default.CalendarMonth,
-                        color = TempleMaroon,
+                        color = MaterialTheme.colorScheme.primary,
                         onClick = onNavigateToCalendar,
                         modifier = Modifier.weight(1f),
                         testTag = "quick_btn_calendar"
                     )
                     QuickActionCard(
                         title = AppStrings.panchangam(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "தினசரி பஞ்சாங்கம்" else "Daily Ephemeris",
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "தினசரி பஞ்சாங்கம்"
+                            AppLanguage.HINDI -> "दैनिक पंचांग"
+                            AppLanguage.ENGLISH -> "Daily Panchangam"
+                        },
                         icon = Icons.Default.WbSunny,
-                        color = TempleGoldDark,
+                        color = MaterialTheme.colorScheme.secondary,
                         onClick = onNavigateToPanchangam,
                         modifier = Modifier.weight(1f),
                         testTag = "quick_btn_panchangam"
@@ -687,21 +689,29 @@ fun HomeScreen(
                 ) {
                     QuickActionCard(
                         title = AppStrings.jathagam(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "ஜாதக கணிப்பு" else "Horoscope & Dosha",
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "ஜாதக கணிப்பு"
+                            AppLanguage.HINDI -> "कुंडली एवं दोष"
+                            AppLanguage.ENGLISH -> "Horoscope & Birth Chart"
+                        },
                         icon = Icons.Default.AutoAwesome,
-                        color = TempleSaffron,
+                        color = MaterialTheme.colorScheme.primary,
                         onClick = onNavigateToJathagam,
                         modifier = Modifier.weight(1f),
                         testTag = "quick_btn_jathagam"
                     )
                     QuickActionCard(
-                        title = AppStrings.temple(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "பூஜை விவரங்கள்" else "Temple Darshan",
-                        icon = Icons.Default.AccountBalance,
-                        color = SacredGreen,
-                        onClick = onNavigateToTemple,
+                        title = AppStrings.rasiPalan(lang),
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "2026 வருட பலன்கள்"
+                            AppLanguage.HINDI -> "2026 वार्षिक फल"
+                            AppLanguage.ENGLISH -> "2026 Yearly Predictions"
+                        },
+                        icon = Icons.Default.Star,
+                        color = MaterialTheme.colorScheme.secondary,
+                        onClick = onNavigateToRasiPalan,
                         modifier = Modifier.weight(1f),
-                        testTag = "quick_btn_temple"
+                        testTag = "quick_btn_rasi_palan"
                     )
                 }
 
@@ -712,22 +722,30 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     QuickActionCard(
-                        title = AppStrings.rasiPalan(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "2026 வருட பலன்கள்" else if (lang == AppLanguage.HINDI) "2026 वार्षिक फल" else "2026 Yearly Palan",
-                        icon = Icons.Default.Stars,
-                        color = TempleKumkum,
-                        onClick = onNavigateToRasiPalan,
-                        modifier = Modifier.weight(1f),
-                        testTag = "quick_btn_rasi_palan"
-                    )
-                    QuickActionCard(
                         title = AppStrings.dharmaSastra(lang),
-                        subtitle = if (lang == AppLanguage.TAMIL) "சாஸ்திர விதிகள்" else "Scriptural Codes",
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "சாஸ்திர விதிகள்"
+                            AppLanguage.HINDI -> "शास्त्र नियम एवं मार्गदर्शन"
+                            AppLanguage.ENGLISH -> "Scriptural Codes"
+                        },
                         icon = Icons.Default.MenuBook,
-                        color = TempleMaroonLight,
+                        color = MaterialTheme.colorScheme.primary,
                         onClick = onNavigateToDharmaSastra,
                         modifier = Modifier.weight(1f),
                         testTag = "quick_btn_dharma_sastra"
+                    )
+                    QuickActionCard(
+                        title = AppStrings.temple(lang),
+                        subtitle = when (lang) {
+                            AppLanguage.TAMIL -> "பூஜை விவரங்கள்"
+                            AppLanguage.HINDI -> "दर्शन एवं पूजा"
+                            AppLanguage.ENGLISH -> "Temple & Darshan"
+                        },
+                        icon = Icons.Default.AccountBalance,
+                        color = MaterialTheme.colorScheme.secondary,
+                        onClick = onNavigateToTemple,
+                        modifier = Modifier.weight(1f),
+                        testTag = "quick_btn_temple"
                     )
                 }
             }
@@ -744,13 +762,13 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) "வரவிருக்கும் விசேஷங்கள்" else "Upcoming Festivals",
+                        text = AppStrings.upcomingFestivals(lang),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = TempleMaroon
                     )
 
                     TextButton(onClick = onNavigateToCalendar) {
-                        Text(text = if (lang == AppLanguage.TAMIL) "அனைத்தும்" else "View All", color = TempleGoldDark)
+                        Text(text = AppStrings.viewAll(lang), color = TempleGoldDark)
                     }
                 }
 

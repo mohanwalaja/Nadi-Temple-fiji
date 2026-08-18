@@ -9,9 +9,9 @@ data class TamilSamvatsara(
     val hindiName: String = englishName
 ) {
     fun displayName(lang: AppLanguage): String = when (lang) {
-        AppLanguage.TAMIL -> "$tamilName வருடம் ($englishName Samvatsara - $number)"
+        AppLanguage.TAMIL -> "$tamilName வருடம் ($number/60)"
         AppLanguage.HINDI -> "$hindiName संवत्सर ($number/60)"
-        AppLanguage.ENGLISH -> "$englishName Samvatsara ($tamilName - Year $number)"
+        AppLanguage.ENGLISH -> "$englishName Samvatsara ($number/60)"
     }
 }
 
@@ -23,20 +23,21 @@ enum class TamilMonth(
     val sanskritMasaEn: String,
     val solarRasi: String,
     val typicalStartDay: Int, // Gregorian start day in approx month
-    val hindiName: String = englishName
+    val hindiName: String = englishName,
+    val sanskritMasaHi: String = hindiName
 ) {
-    CHITHIRAI(1, "சித்திரை", "Chithirai", "மேஷ மாதம்", "Mesha Masa", "மேஷம் (Mesham)", 14, "चैत्र / मेष मास (Chaitra / Mesha)"),
-    VAIKASI(2, "வைகாசி", "Vaikasi", "ரிஷப மாதம்", "Vrishabha Masa", "ரிஷபம் (Rishabam)", 15, "वैशाख / वृषभ मास (Vaisakha / Vrishabha)"),
-    AANI(3, "ஆனி", "Aani", "மிதுன மாதம்", "Mithuna Masa", "மிதுனம் (Mithunam)", 15, "ज्येष्ठ / मिथुन मास (Jyeshtha / Mithuna)"),
-    AADI(4, "ஆடி", "Aadi", "கடக மாதம்", "Kataka Masa", "கடகம் (Kadagam)", 16, "आषाढ़ / कर्क मास (Ashadha / Kataka)"),
-    AVANI(5, "ஆவணி", "Avani", "சிம்ம மாதம்", "Simha Masa", "சிம்மம் (Simham)", 17, "श्रावण / सिंह मास (Shravana / Simha)"),
-    PURATTASI(6, "புரட்டாசி", "Purattasi", "கன்யா மாதம்", "Kanya Masa", "கன்னி (Kanni)", 17, "भाद्रपद / कन्या मास (Bhadrapada / Kanya)"),
-    AIPASI(7, "ஐப்பசி", "Aipasi", "துலா மாதம்", "Tula Masa", "துலாம் (Thulam)", 18, "आश्विन / तुला मास (Ashwin / Tula)"),
-    KARTHIGAI(8, "கார்த்திகை", "Karthigai", "விருச்சிக மாதம்", "Vrischika Masa", "விருச்சிகம் (Viruchigam)", 17, "कार्तिक / वृश्चिक मास (Karthigai / Vrischika)"),
-    MARGHAZHI(9, "மார்கழி", "Marghazhi", "தனுர் மாதம்", "Dhanus Masa", "தனுசு (Dhanusu)", 16, "मार्गशीर्ष / धनुष मास (Margashirsha / Dhanus)"),
-    THAI(10, "தை", "Thai", "மகர மாதம்", "Makara Masa", "மகரம் (Magaram)", 14, "पौष / मकर मास (Makara / Thai)"),
-    MASI(11, "மாசி", "Masi", "கும்ப மாதம்", "Kumbha Masa", "கும்பம் (Kumbham)", 13, "माघ / कुम्भ मास (Magha / Kumbha)"),
-    PANGUNI(12, "பங்குனி", "Panguni", "மீன மாதம்", "Meena Masa", "மீனம் (Meenam)", 14, "फाल्गुन / मीन मास (Phalguna / Meena)");
+    CHITHIRAI(1, "சித்திரை", "Chithirai", "மேஷ மாதம்", "Mesha Masa", "மேஷம்", 14, "चैत्र मास", "मेष मास"),
+    VAIKASI(2, "வைகாசி", "Vaikasi", "ரிஷப மாதம்", "Vrishabha Masa", "ரிஷபம்", 15, "वैशाख मास", "वृषभ मास"),
+    AANI(3, "ஆனி", "Aani", "மிதுன மாதம்", "Mithuna Masa", "மிதுனம்", 15, "ज्येष्ठ मास", "मिथुन मास"),
+    AADI(4, "ஆடி", "Aadi", "கடக மாதம்", "Kataka Masa", "கடகம்", 16, "आषाढ़ मास", "कर्क मास"),
+    AVANI(5, "ஆவணி", "Avani", "சிம்ம மாதம்", "Simha Masa", "சிம்மம்", 17, "श्रावण मास", "सिंह मास"),
+    PURATTASI(6, "புரட்டாசி", "Purattasi", "கன்யா மாதம்", "Kanya Masa", "கன்னி", 17, "भाद्रपद मास", "कन्या मास"),
+    AIPASI(7, "ஐப்பசி", "Aipasi", "துலா மாதம்", "Tula Masa", "துலாம்", 18, "आश्विन मास", "तुला मास"),
+    KARTHIGAI(8, "கார்த்திகை", "Karthigai", "விருச்சிக மாதம்", "Vrischika Masa", "விருச்சிகம்", 17, "कार्तिक मास", "वृश्चिक मास"),
+    MARGHAZHI(9, "மார்கழி", "Marghazhi", "தனுர் மாதம்", "Dhanus Masa", "தனுசு", 16, "मार्गशीर्ष मास", "धनु मास"),
+    THAI(10, "தை", "Thai", "மகர மாதம்", "Makara Masa", "மகரம்", 14, "पौष मास", "मकर मास"),
+    MASI(11, "மாசி", "Masi", "கும்ப மாதம்", "Kumbha Masa", "கும்பம்", 13, "माघ मास", "कुम्भ मास"),
+    PANGUNI(12, "பங்குனி", "Panguni", "மீன மாதம்", "Meena Masa", "மீனம்", 14, "फाल्गुन मास", "मीन मास");
 
     fun name(lang: AppLanguage): String = when (lang) {
         AppLanguage.TAMIL -> tamilName
@@ -45,9 +46,9 @@ enum class TamilMonth(
     }
 
     fun getDisplayNameWithSanskrit(lang: AppLanguage): String = when (lang) {
-        AppLanguage.TAMIL -> "$tamilName ($sanskritMasa / $sanskritMasaEn)"
-        AppLanguage.HINDI -> "$hindiName ($sanskritMasaEn)"
-        AppLanguage.ENGLISH -> "$englishName ($sanskritMasaEn / $sanskritMasa)"
+        AppLanguage.TAMIL -> "$tamilName ($sanskritMasa)"
+        AppLanguage.HINDI -> "$hindiName ($sanskritMasaHi)"
+        AppLanguage.ENGLISH -> "$englishName ($sanskritMasaEn)"
     }
 }
 

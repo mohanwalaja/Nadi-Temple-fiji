@@ -84,6 +84,17 @@ class HomeViewModel(
             }
         }
 
+        val tillLabel = when (language) {
+            AppLanguage.TAMIL -> "${panchangam.tithiEndTime} வரை"
+            AppLanguage.HINDI -> "${panchangam.tithiEndTime} तक"
+            AppLanguage.ENGLISH -> "till ${panchangam.tithiEndTime}"
+        }
+        val nakTillLabel = when (language) {
+            AppLanguage.TAMIL -> "${panchangam.nakshatramEndTime} வரை"
+            AppLanguage.HINDI -> "${panchangam.nakshatramEndTime} तक"
+            AppLanguage.ENGLISH -> "till ${panchangam.nakshatramEndTime}"
+        }
+
         val fijiFormattedTime = FijiTimeHelper.formatFijiTime(currentTime)
 
         _uiState.value = HomeUiState(
@@ -91,9 +102,9 @@ class HomeViewModel(
             todayTamilDateStr = tamilDateFormatted,
             todayTamilMonthStr = tamilMonthName,
             todayTamilYearStr = tamilYearName,
-            dayOfWeekStr = panchangam.dayOfWeek,
-            tithiStr = "${panchangam.tithi} (${panchangam.tithiEndTime} வரை / till)",
-            nakshatramStr = "${panchangam.nakshatram} (${panchangam.nakshatramEndTime} வரை / till)",
+            dayOfWeekStr = panchangam.getDayOfWeek(language),
+            tithiStr = "${panchangam.getTithi(language)} ($tillLabel)",
+            nakshatramStr = "${panchangam.getNakshatram(language)} ($nakTillLabel)",
             todayObservanceStr = primaryObservance,
             isTempleOpen = isOpen,
             templeClosingTimeToday = closeTime,

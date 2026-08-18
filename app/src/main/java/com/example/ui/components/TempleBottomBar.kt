@@ -12,6 +12,8 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -73,11 +75,11 @@ fun TempleBottomBar(
             testTag = "nav_bottom_jathagam"
         ),
         NavItem(
-            route = Screen.Temple.route,
-            filledIcon = Icons.Filled.AccountBalance,
-            outlinedIcon = Icons.Outlined.AccountBalance,
-            labelProvider = { AppStrings.temple(it) },
-            testTag = "nav_bottom_temple"
+            route = Screen.RasiPalan.route,
+            filledIcon = Icons.Filled.Star,
+            outlinedIcon = Icons.Outlined.Star,
+            labelProvider = { AppStrings.rasiPalan(it) },
+            testTag = "nav_bottom_rasi_palan"
         )
     )
 

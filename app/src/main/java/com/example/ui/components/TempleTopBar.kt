@@ -6,9 +6,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,14 +18,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.AppLanguage
-import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TempleTopBar(
     currentLanguage: AppLanguage,
     onToggleLanguage: () -> Unit,
-    onCycleTheme: () -> Unit,
     onNavigateToRasiPalan: () -> Unit,
     onNavigateToDharmaSastra: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -37,41 +34,29 @@ fun TempleTopBar(
             title = {
                 Column {
                     Text(
-                        text = title ?: if (currentLanguage == AppLanguage.TAMIL) "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி" else "Sri Siva Subramaniya Swami",
+                        text = title ?: if (currentLanguage == AppLanguage.TAMIL) "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி" else if (currentLanguage == AppLanguage.HINDI) "श्री शिव सुब्रमण्य स्वामी मंदिर" else "Sri Siva Subramaniya Swami",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = if (currentLanguage == AppLanguage.TAMIL) "திருக்கோயில் • பஞ்சாங்கம் • ஜாதகம்" else "Temple • Panchangam • Horoscope",
+                        text = if (currentLanguage == AppLanguage.TAMIL) "திருக்கோயில் • பஞ்சாங்கம் • ஜாதகம்" else if (currentLanguage == AppLanguage.HINDI) "मंदिर • पंचांग • कुंडली" else "Temple • Panchangam • Horoscope",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             actions = {
-                // Quick Theme Color Changer
-                IconButton(
-                    onClick = onCycleTheme,
-                    modifier = Modifier.testTag("top_bar_theme_color_btn")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = "Change Theme Color",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
                 // Rasi Palan quick action
                 IconButton(
                     onClick = onNavigateToRasiPalan,
                     modifier = Modifier.testTag("top_bar_rasi_palan_btn")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Stars,
+                        imageVector = Icons.Default.Star,
                         contentDescription = "Rasi Palan",
-                        tint = TempleGold
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
 
@@ -98,30 +83,29 @@ fun TempleTopBar(
                         .testTag("top_bar_language_toggle_btn")
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Language,
-                            contentDescription = "Change Language",
+                            contentDescription = "Language",
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.width(5.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = when (currentLanguage) {
                                 AppLanguage.TAMIL -> "தமிழ்"
                                 AppLanguage.HINDI -> "हिन्दी"
-                                AppLanguage.ENGLISH -> "EN"
+                                AppLanguage.ENGLISH -> "ENG"
                             },
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
 
-                // Settings action
+                // Settings quick action
                 IconButton(
                     onClick = onNavigateToSettings,
                     modifier = Modifier.testTag("top_bar_settings_btn")
@@ -135,8 +119,8 @@ fun TempleTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-                actionIconContentColor = MaterialTheme.colorScheme.primary
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)

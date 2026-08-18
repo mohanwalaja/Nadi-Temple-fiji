@@ -10,6 +10,16 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.*
 
+data class Tuple6<A, B, C, D, E, F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F)
+
+data class EphemerisData(
+    val sunTropical: Double,
+    val sunSidereal: Double,
+    val moonTropical: Double,
+    val moonSidereal: Double,
+    val ayanamsha: Double
+)
+
 /**
  * Interface for Drik Panchangam Calculation.
  * Defaults to Nadi, Fiji Islands (UTC+12:00 / Pacific/Fiji).
@@ -22,144 +32,133 @@ class StandardPanchangamCalculator : PanchangamCalculator {
 
     // 15 Shukla Tithis + 15 Krishna Tithis
     private val tithisTa = listOf(
-        "பிரதமை (Prathama / प्रतिपदा)", "துவிதியை (Dvitiya / द्वितीया)", "திருதியை (Tritiya / तृतीया)",
-        "சதுர்த்தி (Chaturthi / चतुर्थी)", "பஞ்சமி (Panchami / पंचमी)", "சஷ்டி (Shashti / षष्ठी)",
-        "சப்தமி (Saptami / सप्तमी)", "அஷ்டமி (Ashtami / अष्टमी)", "நவமி (Navami / नवमी)",
-        "தசமி (Dashami / दशमी)", "ஏகாதசி (Ekadashi / एकादशी)", "துவாதசி (Dvadashi / द्वादशी)",
-        "திரயோதசி (Trayodashi / त्रयोदशी)", "சதுர்த்தசி (Chaturdashi / चतुर्दशी)", "பௌர்ணமி (Pournami / पूर्णिमा)",
-        "பிரதமை (Prathama / प्रतिपदा)", "துவிதியை (Dvitiya / द्वितीया)", "திருதியை (Tritiya / तृतीया)",
-        "சதுர்த்தி (Chaturthi / चतुर्थी)", "பஞ்சமி (Panchami / पंचमी)", "சஷ்டி (Shashti / षष्ठी)",
-        "சப்தமி (Saptami / सप्तमी)", "அஷ்டமி (Ashtami / अष्टमी)", "நவமி (Navami / नवमी)",
-        "தசமி (Dashami / दशमी)", "ஏகாதசி (Ekadashi / एकादशी)", "துவாதசி (Dvadashi / द्वादशी)",
-        "திரயோதசி (Trayodashi / त्रयोदशी)", "சதுர்த்தசி (Chaturdashi / चतुर्दशी)", "அமாவாசை (Amavasya / अमावस्या)"
+        "பிரதமை", "துவிதியை", "திருதியை", "சதுர்த்தி", "பஞ்சமி", "சஷ்டி", "சப்தமி", "அஷ்டமி", "நவமி", "தசமி", "ஏகாதசி", "துவாதசி", "திரயோதசி", "சதுர்த்தசி", "பௌர்ணமி",
+        "பிரதமை", "துவிதியை", "திருதியை", "சதுர்த்தி", "பஞ்சமி", "சஷ்டி", "சப்தமி", "அஷ்டமி", "நவமி", "தசமி", "ஏகாதசி", "துவாதசி", "திரயோதசி", "சதுர்த்தசி", "அமாவாசை"
+    )
+    private val tithisEn = listOf(
+        "Prathama", "Dvitiya", "Tritiya", "Chaturthi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dvadashi", "Trayodashi", "Chaturdashi", "Pournami (Full Moon)",
+        "Prathama", "Dvitiya", "Tritiya", "Chaturthi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dvadashi", "Trayodashi", "Chaturdashi", "Amavasya (New Moon)"
+    )
+    private val tithisHi = listOf(
+        "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी", "नवमी", "दशमी", "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "पूर्णिमा",
+        "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी", "नवमी", "दशमी", "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "अमावस्या"
     )
 
     // 27 Drik Nakshatras
     private val nakshatramsTa = listOf(
-        "அஸ்வினி (Ashwini / अश्विनी)", "பரணி (Bharani / भरणी)", "கார்த்திகை (Krittika / कृत्तिका)",
-        "ரோகிணி (Rohini / रोहिणी)", "மிருகசீரிஷம் (Mrigashirsha / मृगशिरा)", "திருவாதிரை (Ardra / आर्द्रा)",
-        "புனர்பூசம் (Punarvasu / पुनर्वसु)", "பூசம் (Pushya / पुष्य)", "ஆயில்யம் (Ashlesha / अश्लेषा)",
-        "மகம் (Magha / मघा)", "பூரம் (Purva Phalguni / पूर्वाफाल्गुनी)", "உத்திரம் (Uttara Phalguni / उत्तराफाल्गुनी)",
-        "அஸ்தம் (Hasta / हस्त)", "சித்திரை (Chitra / चित्रा)", "சுவாதி (Swati / स्वाति)",
-        "விசாகம் (Vishakha / विशाखा)", "அனுஷம் (Anuradha / अनुराधा)", "கேட்டை (Jyeshtha / ज्येष्ठा)",
-        "மூலம் (Moola / मूल)", "பூராடம் (Purvashada / पूर्वाषाढ़ा)", "உத்திராடம் (Uttarashada / उत्तराषाढ़ा)",
-        "திருவோணம் (Shravana / श्रवण)", "அவிட்டம் (Dhanishta / धनिष्ठा)", "சதயம் (Shatabhisha / शतभिषा)",
-        "பூரட்டாதி (Purva Bhadrapada / पूर्वाभाद्रपद)", "உத்திரட்டாதி (Uttara Bhadrapada / उत्तराभाद्रपद)", "ரேவதி (Revati / रेवती)"
+        "அசுவினி", "பரணி", "கார்த்திகை", "ரோகிணி", "மிருகசீரிஷம்", "திருவாதிரை", "புனர்பூசம்", "பூசம்", "ஆயில்யம்",
+        "மகம்", "பூரம்", "உத்திரம்", "அஸ்தம்", "சித்திரை", "சுவாதி", "விசாகம்", "அனுஷம்", "கேட்டை",
+        "மூலம்", "பூராடம்", "உத்திராடம்", "திருவோணம்", "அவிட்டம்", "சதயம்", "பூரட்டாதி", "உத்திரட்டாதி", "ரேவதி"
+    )
+    private val nakshatramsEn = listOf(
+        "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+        "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+        "Moola", "Purvashada", "Uttarashada", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+    )
+    private val nakshatramsHi = listOf(
+        "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी", "मृगशिरा", "आर्द्रा", "पुनर्वसु", "पुष्य", "आश्लेषा",
+        "मघा", "पूर्वाफाल्गुनी", "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाति", "विशाखा", "अनुराधा", "ज्येष्ठा",
+        "मूल", "पूर्वाषाढ़ा", "उत्तराषाढ़ा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"
     )
 
     // 27 Nithya Yogas
     private val nithyaYogamsTa = listOf(
-        "விஷ்கம்பம் (Vishkambha / विष्कुम्भ)", "ப்ரீதி (Priti / प्रीति)", "ஆயுஷ்மான் (Ayushman / आयुष्मान्)",
-        "சௌபாக்யம் (Saubhagya / सौभाग्य)", "சோபனம் (Shobhana / शोभन)", "அதிகண்டம் (Atiganda / अतिगण्ड)",
-        "சுகர்மம் (Sukarma / सुकर्मा)", "திருதி (Dhriti / धृति)", "சூலம் (Shoola / शूल)",
-        "கண்டம் (Ganda / गण्ड)", "விருத்தி (Vriddhi / वृद्धि)", "துருவம் (Dhruva / ध्रुव)",
-        "வியாகாதம் (Vyaghata / व्याघात)", "ஹர்ஷணம் (Harshana / हर्षण)", "வஜ்ரம் (Vajra / वज्र)",
-        "சித்தி (Siddhi / सिद्धि)", "வியதீபாதம் (Vyatipata / व्यतीपात)", "வாரியான் (Variyan / वरीयान्)",
-        "பரிகம் (Parigha / परिघ)", "சிவம் (Shiva / शिव)", "சித்தம் (Siddha / सिद्ध)",
-        "சாத்தியம் (Sadhya / साध्य)", "சுபம் (Shubha / शुभ)", "சுக்லம் (Shukla / शुक्ल)",
-        "பிரம்மம் (Brahma / ब्रह्म)", "ஐந்திரம் (Indra / ऐन्द्र)", "வைதிருதி (Vaidhriti / वैधृति)"
+        "விஷ்கம்பம்", "ப்ரீதி", "ஆயுஷ்மான்", "சௌபாக்யம்", "சோபனம்", "அதிகண்டம்", "சுகர்மம்", "திருதி", "சூலம்",
+        "கண்டம்", "விருத்தி", "துருவம்", "வியாகாதம்", "ஹர்ஷணம்", "வஜ்ரம்", "சித்தி", "வியதீபாதம்", "வாரியான்",
+        "பரிகம்", "சிவம்", "சித்தம்", "சாத்தியம்", "சுபம்", "சுக்லம்", "பிரம்மம்", "ஐந்திரம்", "வைதிருதி"
+    )
+    private val nithyaYogamsEn = listOf(
+        "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma", "Dhriti", "Shoola",
+        "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyan",
+        "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti"
+    )
+    private val nithyaYogamsHi = listOf(
+        "विष्कुम्भ", "प्रीति", "आयुष्मान्", "सौभाग्य", "शोभन", "अतिगण्ड", "सुकर्मा", "धृति", "शूल",
+        "गण्ड", "वृद्धि", "ध्रुव", "व्याघात", "हर्षण", "वज्र", "सिद्धि", "व्यतीपात", "वरीयान्",
+        "परिघ", "शिव", "सिद्ध", "साध्य", "शुभ", "शुक्ल", "ब्रह्म", "ऐन्द्र", "वैधृति"
     )
 
     // 7 Chara Karanas
-    private val charaKaranamsTa = listOf(
-        "பவம் (Bava / बव)", "பாலவம் (Balava / बालव)", "கௌலவம் (Kaulava / कौलव)",
-        "தைதுலம் (Taitila / तैतिल)", "கரஜை (Gara / गर)", "வனஜை (Vanija / वणिज)",
-        "பத்திரை / விஷ்டி (Vishti / विष्टि)"
-    )
+    private val charaKaranamsTa = listOf("பவம்", "பாலவம்", "கௌலவம்", "தைதுலம்", "கரஜை", "வனஜை", "பத்திரை")
+    private val charaKaranamsEn = listOf("Bava", "Balava", "Kaulava", "Taitila", "Gara", "Vanija", "Vishti (Bhadra)")
+    private val charaKaranamsHi = listOf("बव", "बालव", "कौलव", "तैतिल", "गर", "वणिज", "विष्टि (भद्रा)")
 
-    private val rasiNamesTa = listOf(
-        "மேஷம் (Aries)", "ரிஷபம் (Taurus)", "மிதுனம் (Gemini)",
-        "கடகம் (Cancer)", "சிம்மம் (Leo)", "கன்னி (Virgo)",
-        "துலாம் (Libra)", "விருச்சிகம் (Scorpio)", "தனுசு (Sagittarius)",
-        "மகரம் (Capricorn)", "கும்பம் (Aquarius)", "மீனம் (Pisces)"
-    )
+    private val rasiNamesTa = listOf("மேஷம்", "ரிஷபம்", "மிதுனம்", "கடகம்", "சிம்மம்", "கன்னி", "துலாம்", "விருச்சிகம்", "தனுசு", "மகரம்", "கும்பம்", "மீனம்")
+    private val rasiNamesEn = listOf("Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces")
+    private val rasiNamesHi = listOf("मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुम्भ", "मीन")
 
     data class LocationCoordinates(
         val lat: Double,
         val lon: Double,
         val timeZoneOffsetHours: Double,
-        val nameTa: String
+        val nameTa: String,
+        val nameEn: String = nameTa,
+        val nameHi: String = nameTa
     )
 
     private val locationMap = mapOf(
-        "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)" to LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி"),
-        "சுவா, பிஜி (Suva, Fiji Islands)" to LocationCoordinates(-18.14, 178.44, 12.0, "சுவா, பிஜி"),
-        "லவுடோகா, பிஜி (Lautoka, Fiji Islands)" to LocationCoordinates(-17.61, 177.45, 12.0, "லவுடோகா, பிஜி"),
-        "லபாசா, பிஜி (Labasa, Fiji Islands)" to LocationCoordinates(-16.43, 179.37, 12.0, "லபாசா, பிஜி"),
-        "சென்னை (Chennai, India)" to LocationCoordinates(13.08, 80.27, 5.5, "சென்னை"),
-        "மதுரை (Madurai, India)" to LocationCoordinates(9.93, 78.12, 5.5, "மதுரை"),
-        "யாழ்ப்பாணம் (Jaffna, Sri Lanka)" to LocationCoordinates(9.66, 80.01, 5.5, "யாழ்ப்பாணம்"),
-        "கொழும்பு (Colombo, Sri Lanka)" to LocationCoordinates(6.93, 79.86, 5.5, "கொழும்பு"),
-        "சிங்கப்பூர் (Singapore)" to LocationCoordinates(1.35, 103.82, 8.0, "சிங்கப்பூர்"),
-        "கோலாலம்பூர் (Kuala Lumpur, Malaysia)" to LocationCoordinates(3.14, 101.69, 8.0, "கோலாலம்பூர்"),
-        "சிட்னி (Sydney, Australia)" to LocationCoordinates(-33.87, 151.21, 10.0, "சிட்னி"),
-        "ஆக்லாந்து (Auckland, New Zealand)" to LocationCoordinates(-36.85, 174.76, 12.0, "ஆக்லாந்து"),
-        "லண்டன் (London, UK)" to LocationCoordinates(51.51, -0.13, 0.0, "லண்டன்"),
-        "டொராண்டோ (Toronto, Canada)" to LocationCoordinates(43.65, -79.38, -5.0, "டொராண்டோ")
-    )
-
-    data class EphemerisData(
-        val sunTropical: Double,
-        val sunSidereal: Double,
-        val moonTropical: Double,
-        val moonSidereal: Double,
-        val ayanamsha: Double
+        "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)" to LocationCoordinates(-17.7765, 177.4356, 12.0, "நாடி, பிஜி", "Nadi, Fiji", "नादी, फिजी"),
+        "சுவா, பிஜி தீவுகள் (Suva, Fiji Islands)" to LocationCoordinates(-18.1416, 178.4419, 12.0, "சுவா, பிஜி", "Suva, Fiji", "सुवा, फिजी"),
+        "லௌடோகா, பிஜி (Lautoka, Fiji)" to LocationCoordinates(-17.6167, 177.4667, 12.0, "லௌடோகா, பிஜி", "Lautoka, Fiji", "लौटोका, फिजी"),
+        "லம்பாசா, பிஜி (Labasa, Fiji)" to LocationCoordinates(-16.4333, 179.3667, 12.0, "லம்பாசா, பிஜி", "Labasa, Fiji", "लम्बासा, फिजी"),
+        "சென்னை (Chennai, India)" to LocationCoordinates(13.0827, 80.2707, 5.5, "சென்னை, இந்தியா", "Chennai, India", "चेन्नई, भारत"),
+        "மதுரை (Madurai, India)" to LocationCoordinates(9.9252, 78.1198, 5.5, "மதுரை, இந்தியா", "Madurai, India", "मदुरै, भारत"),
+        "சிட்னி (Sydney, Australia)" to LocationCoordinates(-33.8688, 151.2093, 10.0, "சிட்னி, ஆஸ்திரேலியா", "Sydney, Australia", "सिडनी, ऑस्ट्रेलिया"),
+        "ஆக்லாந்து (Auckland, NZ)" to LocationCoordinates(-36.8485, 174.7633, 12.0, "ஆக்லாந்து, நியூசிலாந்து", "Auckland, NZ", "ऑकलैंड, न्यूजीलैंड"),
+        "சிங்கப்பூர் (Singapore)" to LocationCoordinates(1.3521, 103.8198, 8.0, "சிங்கப்பூர்", "Singapore", "सिंगापुर"),
+        "லண்டன் (London, UK)" to LocationCoordinates(51.5074, -0.1278, 0.0, "லண்டன், இங்கிலாந்து", "London, UK", "लंदन, यूके"),
+        "நியூயார்க் (New York, USA)" to LocationCoordinates(40.7128, -74.0060, -5.0, "நியூயார்க், அமெரிக்கா", "New York, USA", "न्यूयॉर्क, यूएसए")
     )
 
     override fun calculatePanchangam(date: LocalDate, location: String): PanchangamDetail {
         val loc = resolveLocation(location)
+        val ephem = calculateEphemeris(date, 6.0 / 24.0) // 6:00 AM UTC approximation
 
-        // 1. Sun & Moon Times calculation for exact location
+        val sunTrop = ephem.sunTropical
+        val sunSid = ephem.sunSidereal
+        val moonTrop = ephem.moonTropical
+        val moonSid = ephem.moonSidereal
+
         val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
         val sunriseLocal = formatDecTime(sunriseDec)
         val sunsetLocal = formatDecTime(sunsetDec)
 
-        // 2. Julian Day and Ephemeris Calculation at local sunrise for standard Drik Panchangam
-        val sunriseUtcFraction = ((sunriseDec - loc.timeZoneOffsetHours + 24.0) % 24.0) / 24.0
-        val ephemeris = calculateEphemeris(date, sunriseUtcFraction)
-        val sunSid = ephemeris.sunSidereal
-        val moonSid = ephemeris.moonSidereal
-        val sunTrop = ephemeris.sunTropical
-        val moonTrop = ephemeris.moonTropical
-
-        // 3. Solar Month & Tamil Date from Sidereal Sun
-        val sunRasiIndex = (sunSid / 30.0).toInt() % 12
-        val tamilMonth = TamilMonth.values()[sunRasiIndex]
-        val tamilDate = (sunSid % 30.0).toInt() + 1
+        val (tamilMonth, tamilDate) = TamilSamvatsaraEngine.getTamilDate(date)
         val tamilYear = TamilSamvatsaraEngine.getSamvatsaraForDate(date)
+        val sunRasiIndex = (sunSid / 30.0).toInt() % 12
 
-        // 1. Samvatsara (Tamil Year) - Full display name like "பராபவ வருடம் (Parabhava Samvatsara)"
-        val samvatsaraName = "${tamilYear.tamilName} வருடம் (${tamilYear.englishName} Samvatsara - ${tamilYear.number})"
+        // 1. Samvatsara (Tamil Year)
+        val samvatsaraName = "${tamilYear.tamilName} வருடம் (${tamilYear.number}/60)"
 
         // 2. Ayanam: Uttarayanam (Makara/Thai to Mithuna/Aani), Dakshinayanam (Kataka/Aadi to Dhanus/Margazhi)
         val isUttarayanam = tamilMonth.index in listOf(10, 11, 12, 1, 2, 3)
-        val ayanam = if (isUttarayanam) {
-            "உத்தராயணம் (Uttarayanam / उत्तरायण)"
-        } else {
-            "தக்ஷிணாயணம் (Dakshinayanam / दक्षिणायन)"
-        }
+        val ayanamTa = if (isUttarayanam) "உத்தராயணம்" else "தக்ஷிணாயணம்"
+        val ayanamEn = if (isUttarayanam) "Uttarayanam" else "Dakshinayanam"
+        val ayanamHi = if (isUttarayanam) "उत्तरायण" else "दक्षिणायन"
 
         // 3. Rithu (Vedic Season)
-        val ritu = when (tamilMonth) {
-            TamilMonth.CHITHIRAI, TamilMonth.VAIKASI -> "வசந்த ருது (Vasanta Ritu / वसन्त ऋतु)"
-            TamilMonth.AANI, TamilMonth.AADI -> "கிரீஷ்ம ருது (Greeshma Ritu / ग्रीष्ம ऋतु)"
-            TamilMonth.AVANI, TamilMonth.PURATTASI -> "வர்ஷ ருது (Varsha Ritu / वर्षा ऋतु)"
-            TamilMonth.AIPASI, TamilMonth.KARTHIGAI -> "சரத் ருது (Sharad Ritu / शरद् ऋतु)"
-            TamilMonth.MARGHAZHI, TamilMonth.THAI -> "ஹேமந்த ருது (Hemanta Ritu / हेमन्त ऋतु)"
-            TamilMonth.MASI, TamilMonth.PANGUNI -> "சிசிர ருது (Shishira Ritu / शिशिर ऋतु)"
+        val (rituTa, rituEn, rituHi) = when (tamilMonth) {
+            TamilMonth.CHITHIRAI, TamilMonth.VAIKASI -> Triple("வசந்த ருது", "Vasanta Ritu", "वसन्त ऋतु")
+            TamilMonth.AANI, TamilMonth.AADI -> Triple("கிரீஷ்ம ருது", "Greeshma Ritu", "ग्रीष्म ऋतु")
+            TamilMonth.AVANI, TamilMonth.PURATTASI -> Triple("வர்ஷ ருது", "Varsha Ritu", "वर्षा ऋतु")
+            TamilMonth.AIPASI, TamilMonth.KARTHIGAI -> Triple("சரத் ருது", "Sharad Ritu", "शरद् ऋतु")
+            TamilMonth.MARGHAZHI, TamilMonth.THAI -> Triple("ஹேமந்த ருது", "Hemanta Ritu", "हेमन्त ऋतु")
+            TamilMonth.MASI, TamilMonth.PANGUNI -> Triple("சிசிர ருது", "Shishira Ritu", "शिशिर ऋतु")
         }
 
-        // 4. Tamil Masam in Sanskrit (e.g. மேஷ மாதம் / Mesha Masa)
-        val sanskritMonth = "${tamilMonth.sanskritMasa} (${tamilMonth.sanskritMasaEn} / ${tamilMonth.tamilName})"
+        // 4. Tamil Masam in Sanskrit
+        val sanskritMonth = tamilMonth.sanskritMasa
 
         // 5. Paksham (Shukla / Krishna) & 6. Tithi
         val elongation = normalizeDegrees(moonTrop - sunTrop)
         val tithiIndex = (elongation / 12.0).toInt() % 30
-        val tithiName = tithisTa[tithiIndex]
-        val paksha = if (tithiIndex < 15) {
-            "சுக்ல பக்ஷம் (Shukla Paksha / शुक्ल पक्ष - வளர்பிறை)"
+        val tithiNameTa = tithisTa[tithiIndex]
+        val tithiNameEn = tithisEn[tithiIndex]
+        val tithiNameHi = tithisHi[tithiIndex]
+        val (pakshaTa, pakshaEn, pakshaHi) = if (tithiIndex < 15) {
+            Triple("சுக்ல பக்ஷம் (வளர்பிறை)", "Shukla Paksha (Waxing)", "शुक्ल पक्ष")
         } else {
-            "கிருஷ்ண பக்ஷம் (Krishna Paksha / कृष्ण पक्ष - தேய்பிறை)"
+            Triple("கிருஷ்ண பக்ஷம் (தேய்பிறை)", "Krishna Paksha (Waning)", "कृष्ण पक्ष")
         }
 
         // Tithi End Time & Next Tithi calculation relative to sunrise
@@ -170,19 +169,21 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val nextTithi = tithisTa[nextTithiIndex]
 
         // 7. Vasaram (Vedic Day of Week)
-        val (vasaram, dayOfWeekTa) = when (date.dayOfWeek) {
-            DayOfWeek.SUNDAY -> "பானு வாசரம் (Bhanu Vasaram / भानुवासरः)" to "ஞாயிற்றுக்கிழமை (Sunday / रविवार)"
-            DayOfWeek.MONDAY -> "இந்து / சோம வாசரம் (Indu/Soma Vasaram / सोमवासरः)" to "திங்கட்கிழமை (Monday / सोमवार)"
-            DayOfWeek.TUESDAY -> "பௌம / மங்கள வாசரம் (Bhauma/Mangala Vasaram / भौमवासरः)" to "செவ்வாய்க்கிழமை (Tuesday / मंगलवार)"
-            DayOfWeek.WEDNESDAY -> "ஸௌம்ய / புத வாசரம் (Saumya/Budha Vasaram / सौम्यवासरः)" to "புதன்கிழமை (Wednesday / बुधवार)"
-            DayOfWeek.THURSDAY -> "குரு / பிருஹஸ்பதி வாசரம் (Guru Vasaram / गुरुवासरः)" to "வியாழக்கிழமை (Thursday / गुरुवार)"
-            DayOfWeek.FRIDAY -> "ப்ருகு / சுக்ர வாசரம் (Bhrigu/Shukra Vasaram / भृगुवासरः)" to "வெள்ளிக்கிழமை (Friday / शुक्रवार)"
-            DayOfWeek.SATURDAY -> "ஸ்திர / சனி வாசரம் (Sthira/Shani Vasaram / स्थिरवासरः)" to "சனிக்கிழமை (Saturday / शनिवार)"
+        val (vasaramTa, vasaramEn, vasaramHi, dayTa, dayEn, dayHi) = when (date.dayOfWeek) {
+            DayOfWeek.SUNDAY -> Tuple6("பானு வாசரம்", "Bhanu Vasaram", "भानुवासरः", "ஞாயிற்றுக்கிழமை", "Sunday", "रविवार")
+            DayOfWeek.MONDAY -> Tuple6("சோம வாசரம்", "Soma Vasaram", "सोमवासरः", "திங்கட்கிழமை", "Monday", "सोमवार")
+            DayOfWeek.TUESDAY -> Tuple6("பௌம வாசரம்", "Bhauma Vasaram", "भौमवासरः", "செவ்வாய்க்கிழமை", "Tuesday", "मंगलवार")
+            DayOfWeek.WEDNESDAY -> Tuple6("ஸௌம்ய வாசரம்", "Saumya Vasaram", "सौम्यवासरः", "புதன்கிழமை", "Wednesday", "बुधवार")
+            DayOfWeek.THURSDAY -> Tuple6("குரு வாசரம்", "Guru Vasaram", "गुरुवासरः", "வியாழக்கிழமை", "Thursday", "गुरुवार")
+            DayOfWeek.FRIDAY -> Tuple6("ப்ருகு வாசரம்", "Bhrigu Vasaram", "भृगुवासरः", "வெள்ளிக்கிழமை", "Friday", "शुक्रवार")
+            DayOfWeek.SATURDAY -> Tuple6("ஸ்திர வாசரம்", "Sthira Vasaram", "स्थिरवासरः", "சனிக்கிழமை", "Saturday", "शनिवार")
         }
 
         // 8. Nakshatram & Pada
         val nakshatraIndex = (moonSid / (360.0 / 27.0)).toInt() % 27
-        val nakshatraName = nakshatramsTa[nakshatraIndex]
+        val nakshatraNameTa = nakshatramsTa[nakshatraIndex]
+        val nakshatraNameEn = nakshatramsEn[nakshatraIndex]
+        val nakshatraNameHi = nakshatramsHi[nakshatraIndex]
         val pada = (((moonSid % (360.0 / 27.0)) / (360.0 / 108.0)).toInt() % 4) + 1
 
         val remNakDeg = (360.0 / 27.0) - (moonSid % (360.0 / 27.0))
@@ -194,20 +195,36 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         // 9. Nithya Yogam & Dina Yogam
         val yogaDeg = normalizeDegrees(sunSid + moonSid)
         val nithyaYogaIndex = (yogaDeg / (360.0 / 27.0)).toInt() % 27
-        val nithyaYogaName = nithyaYogamsTa[nithyaYogaIndex]
+        val nithyaYogaNameTa = nithyaYogamsTa[nithyaYogaIndex]
+        val nithyaYogaNameEn = nithyaYogamsEn[nithyaYogaIndex]
+        val nithyaYogaNameHi = nithyaYogamsHi[nithyaYogaIndex]
         val remYogaDeg = (360.0 / 27.0) - (yogaDeg % (360.0 / 27.0))
         val yogaHoursRemaining = (remYogaDeg / 14.16) * 24.0
         val yogaEndTime = formatLocalEndTime(sunriseDec + yogaHoursRemaining)
-        val dinaYoga = calculateDinaYoga(date.dayOfWeek, nakshatraIndex)
+        val dinaYogaTa = calculateDinaYoga(date.dayOfWeek, nakshatraIndex)
+        val dinaYogaEn = when {
+            dinaYogaTa.contains("அமிர்த") -> "Amrita Yoga"
+            dinaYogaTa.contains("சித்த") -> "Siddha Yoga"
+            else -> "Marana Yoga"
+        }
+        val dinaYogaHi = when {
+            dinaYogaTa.contains("அமிர்த") -> "अमृत योग"
+            dinaYogaTa.contains("சித்த") -> "सिद्ध योग"
+            else -> "मरण योग"
+        }
 
         // 10. Karanam
         val halfTithiIndex = (elongation / 6.0).toInt() % 60
-        val karanamName = when (halfTithiIndex) {
-            0 -> "கிம்ஸ்துக்னம் (Kimstughna / किंस्तुघ्न)"
-            in 1..56 -> charaKaranamsTa[(halfTithiIndex - 1) % 7]
-            57 -> "சகுனி (Shakuni / शकुनि)"
-            58 -> "சதுஷ்பாதம் (Chatushpada / चतुष्पद)"
-            else -> "நாகவம் (Naga / नाग)"
+        val (karanamNameTa, karanamNameEn, karanamNameHi) = when (halfTithiIndex) {
+            0 -> Triple("கிம்ஸ்துக்னம்", "Kimstughna", "किंस्तुघ्न")
+            in 1..56 -> Triple(
+                charaKaranamsTa[(halfTithiIndex - 1) % 7],
+                charaKaranamsEn[(halfTithiIndex - 1) % 7],
+                charaKaranamsHi[(halfTithiIndex - 1) % 7]
+            )
+            57 -> Triple("சகுனி", "Shakuni", "शकुनि")
+            58 -> Triple("சதுஷ்பாதம்", "Chatushpada", "चतुष्पद")
+            else -> Triple("நாகவம்", "Naga", "नाग")
         }
         val remKarDeg = 6.0 - (elongation % 6.0)
         val karHoursRemaining = (remKarDeg / 12.19) * 24.0
@@ -215,20 +232,26 @@ class StandardPanchangamCalculator : PanchangamCalculator {
 
         val nextHalfTithiIndex = (halfTithiIndex + 1) % 60
         val nextKaranam = when (nextHalfTithiIndex) {
-            0 -> "கிம்ஸ்துக்னம் (Kimstughna / किंस्तुघ्न)"
+            0 -> "கிம்ஸ்துக்னம்"
             in 1..56 -> charaKaranamsTa[(nextHalfTithiIndex - 1) % 7]
-            57 -> "சகுனி (Shakuni / शकुनि)"
-            58 -> "சதுஷ்பாதம் (Chatushpada / चतुष्पद)"
-            else -> "நாகவம் (Naga / नाग)"
+            57 -> "சகுனி"
+            58 -> "சதுஷ்பாதம்"
+            else -> "நாகவம்"
         }
 
         // Rasis & Chandrashtamam
         val moonRasiIndex = (moonSid / 30.0).toInt() % 12
-        val chandraRasi = rasiNamesTa[moonRasiIndex]
-        val suryaRasi = rasiNamesTa[sunRasiIndex]
+        val chandraRasiTa = rasiNamesTa[moonRasiIndex]
+        val chandraRasiEn = rasiNamesEn[moonRasiIndex]
+        val chandraRasiHi = rasiNamesHi[moonRasiIndex]
+        val suryaRasiTa = rasiNamesTa[sunRasiIndex]
+        val suryaRasiEn = rasiNamesEn[sunRasiIndex]
+        val suryaRasiHi = rasiNamesHi[sunRasiIndex]
 
         val chandrashtamaRasiIdx = (moonRasiIndex - 7 + 12) % 12
-        val chandrashtamam = "${rasiNamesTa[chandrashtamaRasiIdx]} ராசி அன்பர்களுக்கு இன்றைய நாள் சந்திராஷ்டமம்."
+        val chandrashtamamTa = "${rasiNamesTa[chandrashtamaRasiIdx]} ராசி அன்பர்களுக்கு இன்றைய நாள் சந்திராஷ்டமம்."
+        val chandrashtamamEn = "Chandrashtamam today for ${rasiNamesEn[chandrashtamaRasiIdx]} (Moon in 8th house)."
+        val chandrashtamamHi = "${rasiNamesHi[chandrashtamaRasiIdx]} राशि वालों के लिए आज चंद्राष्टम है।"
 
         // Sun & Moon Times
         val (moonriseLocal, moonsetLocal) = calculateMoonriseMoonset(date, loc.lat, loc.lon, loc.timeZoneOffsetHours, elongation)
@@ -241,7 +264,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val (gowriMorn, gowriEve) = getGowriNallaNeram(date.dayOfWeek)
 
         // Muhurtham & Disha Soola
-        val abhijitMuhurtham = if (date.dayOfWeek != DayOfWeek.WEDNESDAY) "11:52 AM - 12:44 PM" else "பிற்பகல் 12:00 - 12:45 (புதன் பரிகாரம்)"
+        val abhijitMuhurtham = "11:52 AM - 12:44 PM"
         val durMuhurtham = when (date.dayOfWeek) {
             DayOfWeek.SUNDAY -> "04:50 PM - 05:38 PM"
             DayOfWeek.MONDAY -> "12:45 PM - 01:35 PM"
@@ -253,14 +276,14 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
         val varjyam = "01:40 PM - 03:10 PM"
 
-        val (dishaSoola, soolaPariharam) = when (date.dayOfWeek) {
-            DayOfWeek.SUNDAY -> "மேற்கு (West)" to "வெல்லம் (Jaggery)"
-            DayOfWeek.MONDAY -> "கிழக்கு (East)" to "தயிர் (Curd)"
-            DayOfWeek.TUESDAY -> "வடக்கு (North)" to "பால் (Milk)"
-            DayOfWeek.WEDNESDAY -> "வடக்கு (North)" to "பால் (Milk)"
-            DayOfWeek.THURSDAY -> "தெற்கு (South)" to "தைலம் / நெய் (Oil/Ghee)"
-            DayOfWeek.FRIDAY -> "மேற்கு (West)" to "வெல்லம் (Jaggery)"
-            DayOfWeek.SATURDAY -> "கிழக்கு (East)" to "தயிர் (Curd)"
+        val (dishaSoolaTa, dishaSoolaEn, dishaSoolaHi, soolaPariharamTa, soolaPariharamEn, soolaPariharamHi) = when (date.dayOfWeek) {
+            DayOfWeek.SUNDAY -> Tuple6("மேற்கு", "West", "पश्चिम", "வெல்லம்", "Jaggery", "गुड़")
+            DayOfWeek.MONDAY -> Tuple6("கிழக்கு", "East", "पूर्व", "தயிர்", "Curd", "दही")
+            DayOfWeek.TUESDAY -> Tuple6("வடக்கு", "North", "उत्तर", "பால்", "Milk", "दूध")
+            DayOfWeek.WEDNESDAY -> Tuple6("வடக்கு", "North", "उत्तर", "பால்", "Milk", "दूध")
+            DayOfWeek.THURSDAY -> Tuple6("தெற்கு", "South", "दक्षिण", "நெய்", "Ghee", "घी")
+            DayOfWeek.FRIDAY -> Tuple6("மேற்கு", "West", "पश्चिम", "வெல்லம்", "Jaggery", "गुड़")
+            DayOfWeek.SATURDAY -> Tuple6("கிழக்கு", "East", "पूर्व", "தயிர்", "Curd", "दही")
         }
 
         // Special Observances
@@ -284,32 +307,32 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             tamilMonth = tamilMonth,
             tamilYear = tamilYear,
             samvatsaraName = samvatsaraName,
-            ayanam = ayanam,
-            ritu = ritu,
+            ayanam = ayanamTa,
+            ritu = rituTa,
             sanskritMonth = sanskritMonth,
-            paksha = paksha,
-            tithi = tithiName,
+            paksha = pakshaTa,
+            tithi = tithiNameTa,
             tithiEndTime = tithiEndTime,
             nextTithi = nextTithi,
-            vasaram = vasaram,
-            dayOfWeek = dayOfWeekTa,
-            nakshatram = nakshatraName,
+            vasaram = vasaramTa,
+            dayOfWeek = dayTa,
+            nakshatram = nakshatraNameTa,
             nakshatramEndTime = nakshatraEndTime,
             pada = pada,
             nextNakshatram = nextNakshatra,
-            yogam = nithyaYogaName,
+            yogam = nithyaYogaNameTa,
             yogamEndTime = yogaEndTime,
-            dinaYogam = dinaYoga,
-            karanam = karanamName,
+            dinaYogam = dinaYogaTa,
+            karanam = karanamNameTa,
             karanamEndTime = karanamEndTime,
             nextKaranam = nextKaranam,
             sunrise = "$sunriseLocal (${loc.nameTa})",
             sunset = "$sunsetLocal (${loc.nameTa})",
             moonrise = moonriseLocal,
             moonset = moonsetLocal,
-            chandraRasi = chandraRasi,
-            suryaRasi = suryaRasi,
-            chandrashtamam = chandrashtamam,
+            chandraRasi = chandraRasiTa,
+            suryaRasi = suryaRasiTa,
+            chandrashtamam = chandrashtamamTa,
             nallaNeramMorning = nallaMorn,
             nallaNeramEvening = nallaEve,
             gowriNallaNeramMorning = gowriMorn,
@@ -320,10 +343,56 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             abhijitMuhurtham = abhijitMuhurtham,
             durMuhurtham = durMuhurtham,
             varjyam = varjyam,
-            dishaSoola = dishaSoola,
-            soolaPariharam = soolaPariharam,
+            dishaSoola = dishaSoolaTa,
+            soolaPariharam = soolaPariharamTa,
             specialObservances = observances,
-            isDemoData = false
+            isDemoData = false,
+            
+            tithiTa = tithiNameTa,
+            tithiEn = tithiNameEn,
+            tithiHi = tithiNameHi,
+            nakshatramTa = nakshatraNameTa,
+            nakshatramEn = nakshatraNameEn,
+            nakshatramHi = nakshatraNameHi,
+            yogamTa = nithyaYogaNameTa,
+            yogamEn = nithyaYogaNameEn,
+            yogamHi = nithyaYogaNameHi,
+            karanamTa = karanamNameTa,
+            karanamEn = karanamNameEn,
+            karanamHi = karanamNameHi,
+            pakshaTa = pakshaTa,
+            pakshaEn = pakshaEn,
+            pakshaHi = pakshaHi,
+            ayanamTa = ayanamTa,
+            ayanamEn = ayanamEn,
+            ayanamHi = ayanamHi,
+            rituTa = rituTa,
+            rituEn = rituEn,
+            rituHi = rituHi,
+            dayOfWeekTa = dayTa,
+            dayOfWeekEn = dayEn,
+            dayOfWeekHi = dayHi,
+            vasaramTa = vasaramTa,
+            vasaramEn = vasaramEn,
+            vasaramHi = vasaramHi,
+            chandraRasiTa = chandraRasiTa,
+            chandraRasiEn = chandraRasiEn,
+            chandraRasiHi = chandraRasiHi,
+            suryaRasiTa = suryaRasiTa,
+            suryaRasiEn = suryaRasiEn,
+            suryaRasiHi = suryaRasiHi,
+            chandrashtamamTa = chandrashtamamTa,
+            chandrashtamamEn = chandrashtamamEn,
+            chandrashtamamHi = chandrashtamamHi,
+            dishaSoolaTa = dishaSoolaTa,
+            dishaSoolaEn = dishaSoolaEn,
+            dishaSoolaHi = dishaSoolaHi,
+            soolaPariharamTa = soolaPariharamTa,
+            soolaPariharamEn = soolaPariharamEn,
+            soolaPariharamHi = soolaPariharamHi,
+            dinaYogamTa = dinaYogaTa,
+            dinaYogamEn = dinaYogaEn,
+            dinaYogamHi = dinaYogaHi
         )
     }
 
@@ -456,7 +525,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
                 return value
             }
         }
-        return LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி")
+        return LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி", "Nadi, Fiji", "नादी, फिजी")
     }
 
     private fun calculateSunriseSunsetDec(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<Double, Double> {
@@ -476,11 +545,6 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val sunsetLocalDec = (solarNoonUtc + hHours + tzOffset + 24.0) % 24.0
 
         return sunriseLocalDec to sunsetLocalDec
-    }
-
-    private fun calculateSunriseSunset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<String, String> {
-        val (riseDec, setDec) = calculateSunriseSunsetDec(date, lat, lon, tzOffset)
-        return formatDecTime(riseDec) to formatDecTime(setDec)
     }
 
     private fun calculateMoonriseMoonset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double, elongation: Double): Pair<String, String> {

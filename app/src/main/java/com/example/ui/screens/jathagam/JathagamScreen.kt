@@ -3,9 +3,11 @@ package com.example.ui.screens.jathagam
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -360,21 +362,23 @@ fun JathagamScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            // Quick Location Suggestions with Timezone Clarity
+                            // Quick Location Suggestions with Timezone Clarity (Clean horizontally scrollable chips)
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 val popularPlaces = listOf(
-                                    "சென்னை (Chennai - IST +5:30)" to "சென்னை (Chennai)",
-                                    "மதுரை (Madurai - IST +5:30)" to "மதுரை (Madurai)",
-                                    "நாடி (Nadi - FJT +12:00)" to "நாடி (Nadi, Fiji)",
-                                    "சுவா (Suva - FJT +12:00)" to "சுவா (Suva)"
+                                    "சென்னை (Chennai)" to "சென்னை (Chennai)",
+                                    "மதுரை (Madurai)" to "மதுரை (Madurai)",
+                                    "நாடி (Nadi, Fiji)" to "நாடி (Nadi, Fiji)",
+                                    "சுவா (Suva, Fiji)" to "சுவா (Suva)"
                                 )
                                 popularPlaces.forEach { (display, value) ->
                                     val isSelected = state.birthPlace.contains(value.substringBefore(" "))
                                     Surface(
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(12.dp),
                                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                                         border = androidx.compose.foundation.BorderStroke(
                                             1.dp,
@@ -384,10 +388,10 @@ fun JathagamScreen(
                                     ) {
                                         Text(
                                             text = display,
-                                            fontSize = 10.5.sp,
+                                            fontSize = 11.sp,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                             color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                                         )
                                     }
                                 }
@@ -528,7 +532,7 @@ fun JathagamScreen(
                         }
                     }
 
-                    // 📄 Export PDF Action Card
+                    // 📄 Export PDF Action Card (Supporting all 3 languages: Tamil, English, Hindi)
                     item {
                         Card(
                             modifier = Modifier
@@ -536,8 +540,8 @@ fun JathagamScreen(
                                 .testTag("card_jathagam_export_pdf"),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = androidx.compose.foundation.BorderStroke(1.5.dp, TempleGold),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                            border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.secondary),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row(
@@ -547,60 +551,98 @@ fun JathagamScreen(
                                     Icon(
                                         imageVector = Icons.Default.PictureAsPdf,
                                         contentDescription = null,
-                                        tint = TempleKumkum,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = if (lang == AppLanguage.TAMIL) "ஜாதக PDF அறிக்கை (Vedic Horoscope PDF)" else "Vedic Horoscope PDF Report",
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "ஜாதக PDF அறிக்கை (Horoscope PDF)"
+                                                AppLanguage.HINDI -> "कुंडली PDF रिपोर्ट (Horoscope PDF)"
+                                                AppLanguage.ENGLISH -> "Vedic Horoscope PDF Report"
+                                            },
                                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                            color = TempleMaroon
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                         Text(
-                                            text = if (lang == AppLanguage.TAMIL) "ராசிக் கட்டம், நவகிரக நிலைகள், தசா புக்தி, தோஷம் மற்றும் பலன்கள் அடங்கிய முழுமையான அறிக்கை" else "Complete report with Rasi chart, planetary positions, Dasha, Doshas and predictions",
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "ராசிக் கட்டம், நவகிரக நிலைகள், தசா புக்தி மற்றும் பலன்கள் அடங்கிய PDF அறிக்கை"
+                                                AppLanguage.HINDI -> "कुंडली चक्र, नवग्रह स्थितियाँ, दशा और फलकथन युक्त PDF रिपोर्ट"
+                                                AppLanguage.ENGLISH -> "Complete report with Rasi chart, planetary positions, Dasha & predictions"
+                                            },
                                             fontSize = 11.5.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(14.dp))
 
-                                Button(
-                                    onClick = {
-                                        val pdfFile = HoroscopePdfExporter.exportHoroscopeToPdf(context, result, lang)
-                                        if (pdfFile != null) {
-                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "ஜாதக PDF உருவாக்கப்பட்டது!" else "Horoscope PDF created!", Toast.LENGTH_SHORT).show()
-                                            HoroscopePdfExporter.shareOrOpenPdf(context, pdfFile, "${result.devoteeName} - ஜாதக அறிக்கை")
-                                        } else {
-                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "PDF உருவாக்குவதில் பிழை ஏற்பட்டது" else "Error generating PDF", Toast.LENGTH_SHORT).show()
-                                        }
+                                // Quick Language PDF Export Chips
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "மொழியினைத் தேர்ந்தெடுத்து பதிவிறக்கவும்:"
+                                        AppLanguage.HINDI -> "भाषा चुनकर PDF डाउनलोड करें:"
+                                        AppLanguage.ENGLISH -> "Export PDF in preferred language:"
                                     },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("btn_export_jathagam_pdf"),
-                                    colors = ButtonDefaults.buttonColors(containerColor = TempleMaroon),
-                                    shape = RoundedCornerShape(12.dp),
-                                    contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Download,
-                                            contentDescription = null,
-                                            tint = TempleGoldLight,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = if (lang == AppLanguage.TAMIL) "📥 PDF அறிக்கை பதிவிறக்கம் / பகிர்" else "📥 Download & Share Horoscope PDF",
-                                            fontSize = 13.5.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
+                                    val languages = listOf(
+                                        Triple("தமிழ் (Tamil)", AppLanguage.TAMIL, "ta"),
+                                        Triple("English", AppLanguage.ENGLISH, "en"),
+                                        Triple("हिन्दी (Hindi)", AppLanguage.HINDI, "hi")
+                                    )
+
+                                    languages.forEach { (label, exportLang, tag) ->
+                                        Button(
+                                            onClick = {
+                                                val pdfFile = HoroscopePdfExporter.exportHoroscopeToPdf(context, result, exportLang)
+                                                if (pdfFile != null) {
+                                                    Toast.makeText(context, if (exportLang == AppLanguage.TAMIL) "ஜாதக PDF உருவாக்கப்பட்டது!" else if (exportLang == AppLanguage.HINDI) "कुंडली PDF तैयार है!" else "Horoscope PDF created!", Toast.LENGTH_SHORT).show()
+                                                    val shareTitle = "${result.devoteeName} - ${if (exportLang == AppLanguage.TAMIL) "ஜாதக அறிக்கை" else if (exportLang == AppLanguage.HINDI) "कुंडली रिपोर्ट" else "Horoscope Report"}"
+                                                    HoroscopePdfExporter.shareOrOpenPdf(context, pdfFile, shareTitle)
+                                                } else {
+                                                    Toast.makeText(context, "PDF Error", Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (lang == exportLang) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                                contentColor = if (lang == exportLang) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            ),
+                                            shape = RoundedCornerShape(10.dp),
+                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .testTag("btn_export_pdf_$tag")
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Download,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(14.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = label,
+                                                    fontSize = 11.5.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    maxLines = 1
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
