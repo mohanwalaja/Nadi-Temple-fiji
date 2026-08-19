@@ -112,16 +112,20 @@ class StandardPanchangamCalculator : PanchangamCalculator {
 
     override fun calculatePanchangam(date: LocalDate, location: String): PanchangamDetail {
         val loc = resolveLocation(location)
-        val ephem = calculateEphemeris(date, 6.0 / 24.0) // 6:00 AM UTC approximation
+        
+        // 1. Calculate Local Sunrise and Sunset with NOAA / Astronomical Zenith Standard
+        val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
+        val sunriseLocal = formatDecTime(sunriseDec)
+        val sunsetLocal = formatDecTime(sunsetDec)
+
+        // 2. Ephemeris at EXACT Local Sunrise UTC
+        val sunriseUtcHour = (sunriseDec - loc.timeZoneOffsetHours + 24.0) % 24.0
+        val ephem = calculateEphemeris(date, sunriseUtcHour / 24.0)
 
         val sunTrop = ephem.sunTropical
         val sunSid = ephem.sunSidereal
         val moonTrop = ephem.moonTropical
         val moonSid = ephem.moonSidereal
-
-        val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
-        val sunriseLocal = formatDecTime(sunriseDec)
-        val sunsetLocal = formatDecTime(sunsetDec)
 
         val (tamilMonth, tamilDate) = TamilSamvatsaraEngine.getTamilDate(date)
         val tamilYear = TamilSamvatsaraEngine.getSamvatsaraForDate(date)
@@ -512,6 +516,23 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     }
 
     private fun resolveLocation(location: String): LocationCoordinates {
+        // Check for GPS coordinate string e.g. "GPS: -17.77, 177.43, 12.0" or "GPS (-17.78, 177.42)"
+        if (location.startsWith("GPS:", ignoreCase = true) || location.startsWith("GPS (", ignoreCase = true)) {
+            try {
+                val cleaned = location.replace("GPS:", "").replace("GPS", "").replace("(", "").replace(")", "").replace("°", "")
+                val parts = cleaned.split(",").map { it.trim().toDouble() }
+                if (parts.size >= 2) {
+                    val lat = parts[0]
+                    val lon = parts[1]
+                    val offset = if (parts.size >= 3) parts[2] else (java.util.TimeZone.getDefault().rawOffset / 3600000.0)
+                    val label = String.format(Locale.US, "GPS (%.2f°, %.2f°)", lat, lon)
+                    return LocationCoordinates(lat, lon, offset, label, label, label)
+                }
+            } catch (e: Exception) {
+                // fall through
+            }
+        }
+
         // Direct match
         locationMap[location]?.let { return it }
         // Partial / fuzzy match

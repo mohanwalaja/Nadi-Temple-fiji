@@ -1,5 +1,8 @@
 package com.example.ui.screens.panchangam
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.AppLanguage
 import com.example.data.repository.AppStrings
+import com.example.data.service.GpsLocationHelper
 import com.example.ui.theme.*
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -34,6 +40,58 @@ fun PanchangamScreen(
     viewModel: PanchangamViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val gpsHelper = remember { GpsLocationHelper(context) }
+    var isLocating by remember { mutableStateOf(false) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        val granted = perms[android.Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                perms[android.Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            isLocating = true
+            coroutineScope.launch {
+                val data = gpsHelper.getCurrentLocation()
+                isLocating = false
+                if (data != null) {
+                    val gpsString = "GPS: ${data.latitude}, ${data.longitude}, ${data.utcOffsetHours}"
+                    viewModel.setLocation(gpsString)
+                    Toast.makeText(context, "Location: ${data.locationName}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Could not fetch GPS location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(context, "Location permission required for GPS", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val onUseMyLocationClick: () -> Unit = {
+        if (gpsHelper.hasLocationPermission()) {
+            isLocating = true
+            coroutineScope.launch {
+                val data = gpsHelper.getCurrentLocation()
+                isLocating = false
+                if (data != null) {
+                    val gpsString = "GPS: ${data.latitude}, ${data.longitude}, ${data.utcOffsetHours}"
+                    viewModel.setLocation(gpsString)
+                    Toast.makeText(context, "Location: ${data.locationName}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Could not fetch GPS location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
     val state by viewModel.uiState.collectAsState()
     val lang = state.language
     val panchangam = state.panchangamDetail
@@ -103,15 +161,50 @@ fun PanchangamScreen(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        // Quick 1-tap presets
+                        // Quick 1-tap presets with Use My Location button
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
+                            // GPS Button
+                            val isGpsSelected = state.selectedLocation.startsWith("GPS")
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isGpsSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isGpsSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                ),
+                                modifier = Modifier
+                                    .weight(1.2f)
+                                    .clickable { onUseMyLocationClick() }
+                                    .testTag("use_my_location_btn")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    if (isLocating) {
+                                        CircularProgressIndicator(modifier = Modifier.size(12.dp), strokeWidth = 1.5.dp, color = MaterialTheme.colorScheme.primary)
+                                    } else {
+                                        Icon(imageVector = Icons.Default.MyLocation, contentDescription = "Use My Location", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
+                                    }
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = if (lang == AppLanguage.TAMIL) "📍 எனது இடம்" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान" else "📍 My Location",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+
                             val quickPresets = listOf(
-                                "🇫🇯 நாடி (Nadi +12h)" to "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
-                                "🇮🇳 சென்னை (IST +5:30)" to "சென்னை (Chennai, India)",
-                                "🌍 பிற இடங்கள்..." to ""
+                                "🇫🇯 நாடி" to "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
+                                "🇮🇳 சென்னை" to "சென்னை (Chennai, India)",
+                                "🌍 பிற" to ""
                             )
                             quickPresets.forEach { (label, loc) ->
                                 val isSelected = loc.isNotEmpty() && state.selectedLocation.contains(loc.substringBefore(","))
@@ -138,7 +231,7 @@ fun PanchangamScreen(
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                         color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 2.dp)
+                                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 2.dp)
                                     )
                                 }
                             }
@@ -693,6 +786,44 @@ fun PanchangamScreen(
             },
             text = {
                 Column {
+                    // Use My Location action in dialog
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showLocationDialog = false
+                                onUseMyLocationClick()
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = if (lang == AppLanguage.TAMIL) "📍 எனது இருப்பிடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा वास्तविक स्थान (GPS)" else "📍 Use My Location (GPS)",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = if (lang == AppLanguage.TAMIL) "துல்லியமான சூரிய உதயம் மற்றும் திதி நேரம் பெற" else "Get exact sunrise & tithi timings for your GPS position",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    HorizontalDivider()
+                    Spacer(modifier = Modifier.height(6.dp))
+
                     state.availableLocations.forEach { loc ->
                         Row(
                             modifier = Modifier

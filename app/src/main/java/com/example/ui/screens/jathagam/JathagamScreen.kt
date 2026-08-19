@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.data.local.entities.HoroscopeProfileEntity
 import com.example.data.model.AppLanguage
 import com.example.data.model.DoshaCheckResult
@@ -32,9 +34,11 @@ import com.example.data.model.Graha
 import com.example.data.model.HoroscopeResult
 import com.example.data.model.PalanTimeframe
 import com.example.data.repository.AppStrings
+import com.example.data.service.GpsLocationHelper
 import com.example.ui.components.SouthIndianRasiChart
 import com.example.ui.theme.*
 import com.example.util.HoroscopePdfExporter
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -49,6 +53,55 @@ fun JathagamScreen(
     onNavigateToRasiPalanWithTimeframe: ((PalanTimeframe) -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val gpsHelper = remember { GpsLocationHelper(context) }
+    var isGpsLocating by remember { mutableStateOf(false) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        val granted = perms[android.Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                perms[android.Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            isGpsLocating = true
+            coroutineScope.launch {
+                val data = gpsHelper.getCurrentLocation()
+                isGpsLocating = false
+                if (data != null) {
+                    viewModel.onBirthPlaceChange(data.locationName)
+                    Toast.makeText(context, "Location: ${data.locationName}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Could not fetch GPS location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(context, "Location permission required for GPS", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val onUseMyLocationClick: () -> Unit = {
+        if (gpsHelper.hasLocationPermission()) {
+            isGpsLocating = true
+            coroutineScope.launch {
+                val data = gpsHelper.getCurrentLocation()
+                isGpsLocating = false
+                if (data != null) {
+                    viewModel.onBirthPlaceChange(data.locationName)
+                    Toast.makeText(context, "Location: ${data.locationName}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Could not fetch GPS location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
     val state by viewModel.uiState.collectAsState()
     val lang = state.language
     var selectedTab by remember { mutableStateOf(0) } // 0: Horoscope, 1: Saved Profiles
@@ -345,6 +398,18 @@ fun JathagamScreen(
                                 leadingIcon = {
                                     Icon(imageVector = Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = { onUseMyLocationClick() },
+                                        modifier = Modifier.testTag("jathagam_gps_btn")
+                                    ) {
+                                        if (isGpsLocating) {
+                                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
+                                        } else {
+                                            Icon(imageVector = Icons.Default.MyLocation, contentDescription = "Use My Location", tint = MaterialTheme.colorScheme.primary)
+                                        }
+                                    }
+                                },
                                 singleLine = true,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -362,13 +427,39 @@ fun JathagamScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            // Quick Location Suggestions with Timezone Clarity (Clean horizontally scrollable chips)
+                            // Quick Location Suggestions with Use My Location (GPS) Chip
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .horizontalScroll(rememberScrollState()),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                // GPS My Location Chip
+                                val isGpsActive = state.birthPlace.startsWith("GPS")
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isGpsActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        1.dp,
+                                        if (isGpsActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    ),
+                                    modifier = Modifier.clickable { onUseMyLocationClick() }
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(13.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = if (lang == AppLanguage.TAMIL) "📍 எனது இடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान (GPS)" else "📍 My Location (GPS)",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+
                                 val popularPlaces = listOf(
                                     "சென்னை (Chennai)" to "சென்னை (Chennai)",
                                     "மதுரை (Madurai)" to "மதுரை (Madurai)",

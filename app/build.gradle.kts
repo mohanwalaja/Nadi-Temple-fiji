@@ -17,8 +17,8 @@ android {
     applicationId = "com.aistudio.subramaniyakovil.kv8m"
     minSdk = 24
     targetSdk = 36
-    versionCode = 4
-    versionName = "1.3"
+    versionCode = 5
+    versionName = "1.4"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -116,7 +116,7 @@ dependencies {
   implementation(libs.logging.interceptor)
   implementation(libs.moshi.kotlin)
   implementation(libs.okhttp)
-  // implementation(libs.play.services.location)
+  implementation(libs.play.services.location)
   implementation(libs.retrofit)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)

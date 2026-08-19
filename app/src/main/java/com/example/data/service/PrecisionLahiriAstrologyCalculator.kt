@@ -282,6 +282,21 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
     }
 
     private fun resolveLocation(place: String): LocationInfo {
+        if (place.startsWith("GPS:", ignoreCase = true) || place.startsWith("GPS (", ignoreCase = true)) {
+            try {
+                val cleaned = place.replace("GPS:", "").replace("GPS", "").replace("(", "").replace(")", "").replace("°", "")
+                val parts = cleaned.split(",").map { it.trim().toDouble() }
+                if (parts.size >= 2) {
+                    val lat = parts[0]
+                    val lon = parts[1]
+                    val offset = if (parts.size >= 3) parts[2] else (java.util.TimeZone.getDefault().rawOffset / 3600000.0)
+                    return LocationInfo(lat, lon, offset)
+                }
+            } catch (e: Exception) {
+                // fall through
+            }
+        }
+
         for ((key, value) in LOCATION_MAP) {
             if (place.contains(key, ignoreCase = true) || key.contains(place, ignoreCase = true)) {
                 return value
