@@ -1,0 +1,40 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -e
+mkdir -p .github/workflows
+cat > .github/workflows/build-apk.yml << 'YML'
+name: Build APK
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.3.1
+      - name: Build debug APK
+        run: gradle assembleDebug --stacktrace
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+YML
+
+if [ ! -f debug.keystore ]; then
+  keytool -genkeypair -v -keystore debug.keystore -storetype PKCS12 -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+fi
+
+git add -f .github/workflows/build-apk.yml debug.keystore
+git commit -m "Restore build workflow and keystore" || echo "Nothing to commit"
+git push
