@@ -37,7 +37,6 @@ import com.example.data.model.RasiTransitPalan2026
 import com.example.data.repository.RasiTransit2026Repository
 import com.example.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RasiPalanScreen(
     viewModel: RasiPalanViewModel,
@@ -51,6 +50,7 @@ fun RasiPalanScreen(
     val jathagam = state.jathagam
     val selectedRasi = state.selectedRasi
     val selectedTimeframe = state.selectedTimeframe
+    val isDark = isSystemInDarkTheme()
 
     val screenTitle = when (selectedTimeframe) {
         PalanTimeframe.DAILY -> when (lang) {
@@ -75,88 +75,65 @@ fun RasiPalanScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = screenTitle,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.testTag("rasi_palan_back_btn")) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToJathagam, modifier = Modifier.testTag("btn_recalculate_top")) {
-                        Icon(imageVector = Icons.Default.EditCalendar, contentDescription = "Edit Jathagam", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TempleMaroon)
-            )
-        }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background)
-                .testTag("rasi_palan_container"),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            // 0. Timeframe Selector (Daily, Weekly, Monthly, Yearly)
-            item {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = if (lang == AppLanguage.TAMIL) "காலப்பகுதி (Period):" else if (lang == AppLanguage.HINDI) "काल अवधि (Timeframe):" else "Timeframe / Period:",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TempleMaroon
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("timeframe_tab_row"),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        val timeframes = listOf(
-                            PalanTimeframe.DAILY to when (lang) { AppLanguage.TAMIL -> "இன்று"; AppLanguage.HINDI -> "दैनिक"; AppLanguage.ENGLISH -> "Daily" },
-                            PalanTimeframe.WEEKLY to when (lang) { AppLanguage.TAMIL -> "வாரம்"; AppLanguage.HINDI -> "साप्ताहिक"; AppLanguage.ENGLISH -> "Weekly" },
-                            PalanTimeframe.MONTHLY to when (lang) { AppLanguage.TAMIL -> "மாதம்"; AppLanguage.HINDI -> "मासिक"; AppLanguage.ENGLISH -> "Monthly" },
-                            PalanTimeframe.YEARLY to when (lang) { AppLanguage.TAMIL -> "2026 வருடம்"; AppLanguage.HINDI -> "2026 वर्ष"; AppLanguage.ENGLISH -> "2026 Year" }
-                        )
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .testTag("rasi_palan_container"),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        // 0. Timeframe Selector (Daily, Weekly, Monthly, Yearly)
+        item {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = if (lang == AppLanguage.TAMIL) "காலப்பகுதி (Period):" else if (lang == AppLanguage.HINDI) "काल अवधि (Timeframe):" else "Timeframe / Period:",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = primaryColor
+                )
+                Spacer(modifier = Modifier.height(6.dp))
 
-                        timeframes.forEach { (tf, label) ->
-                            val isSelected = selectedTimeframe == tf
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) TempleMaroon else MaterialTheme.colorScheme.surface,
-                                border = BorderStroke(1.dp, if (isSelected) TempleMaroon else MaterialTheme.colorScheme.outlineVariant),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable { viewModel.selectTimeframe(tf) }
-                                    .testTag("timeframe_tab_${tf.name.lowercase()}")
-                            ) {
-                                Text(
-                                    text = label,
-                                    fontSize = 11.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
-                                )
-                            }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("timeframe_tab_row"),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val timeframes = listOf(
+                        PalanTimeframe.DAILY to when (lang) { AppLanguage.TAMIL -> "இன்று"; AppLanguage.HINDI -> "दैनिक"; AppLanguage.ENGLISH -> "Daily" },
+                        PalanTimeframe.WEEKLY to when (lang) { AppLanguage.TAMIL -> "வாரம்"; AppLanguage.HINDI -> "साप्ताहिक"; AppLanguage.ENGLISH -> "Weekly" },
+                        PalanTimeframe.MONTHLY to when (lang) { AppLanguage.TAMIL -> "மாதம்"; AppLanguage.HINDI -> "मासिक"; AppLanguage.ENGLISH -> "Monthly" },
+                        PalanTimeframe.YEARLY to when (lang) { AppLanguage.TAMIL -> "2026 வருடம்"; AppLanguage.HINDI -> "2026 वर्ष"; AppLanguage.ENGLISH -> "2026 Year" }
+                    )
+
+                    timeframes.forEach { (tf, label) ->
+                        val isSelected = selectedTimeframe == tf
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isSelected) primaryColor else MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, if (isSelected) primaryColor else MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { viewModel.selectTimeframe(tf) }
+                                .testTag("timeframe_tab_${tf.name.lowercase()}")
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 11.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
+                            )
                         }
                     }
                 }
             }
+        }
 
             // 1. Rasi Selector Horizontal Strip
             item {

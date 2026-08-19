@@ -3,10 +3,13 @@ package com.example.data.service
 import com.example.data.model.ObservanceType
 import com.example.data.model.PanchangamDetail
 import com.example.data.model.TamilMonth
+import com.example.data.model.TamilSamvatsara
 import com.example.data.model.TamilSamvatsaraEngine
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.LocalTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.Locale
 import kotlin.math.*
 
@@ -17,15 +20,30 @@ data class EphemerisData(
     val sunSidereal: Double,
     val moonTropical: Double,
     val moonSidereal: Double,
-    val ayanamsha: Double
+    val moonLatitude: Double,
+    val ayanamsha: Double,
+    val t: Double,
+    val jd: Double
+)
+
+data class LocationCoordinates(
+    val lat: Double,
+    val lon: Double,
+    val timeZoneOffsetHours: Double,
+    val nameTa: String,
+    val nameEn: String = nameTa,
+    val nameHi: String = nameTa,
+    val region: String = "Global"
 )
 
 /**
- * Interface for Drik Panchangam Calculation.
- * Defaults to Nadi, Fiji Islands (UTC+12:00 / Pacific/Fiji).
+ * Interface for Drik Panchangam Calculation with worldwide GPS / Coordinate support.
  */
 interface PanchangamCalculator {
     fun calculatePanchangam(date: LocalDate, location: String = "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)"): PanchangamDetail
+    fun calculatePanchangam(date: LocalDate, lat: Double, lon: Double, tzOffsetHours: Double, locationName: String): PanchangamDetail
+    fun getAllPresetLocations(): List<LocationCoordinates>
+    fun parseLocation(location: String): LocationCoordinates
 }
 
 class StandardPanchangamCalculator : PanchangamCalculator {
@@ -87,71 +105,140 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     private val rasiNamesEn = listOf("Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces")
     private val rasiNamesHi = listOf("मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुम्भ", "मीन")
 
-    data class LocationCoordinates(
-        val lat: Double,
-        val lon: Double,
-        val timeZoneOffsetHours: Double,
-        val nameTa: String,
-        val nameEn: String = nameTa,
-        val nameHi: String = nameTa
-    )
+    private val sanskritMonthsTa = listOf("சைத்ர", "வைசாக", "ஜ்யேஷ்ட", "ஆஷாட", "ஸ்ராவண", "பாத்ரபத", "ஆஸ்வின", "கார்திக", "மார்கசீர்ஷ", "பௌஷ", "மாக", "பல்குன")
+    private val ritusTa = listOf("வசந்த ருது", "கிரீஷ்ம ருது", "வர்ஷ ருது", "சரத் ருது", "ஹேமந்த ருது", "சிசிர ருது")
+    private val ritusEn = listOf("Vasanta Ritu (Spring)", "Grishma Ritu (Summer)", "Varsha Ritu (Monsoon)", "Sharad Ritu (Autumn)", "Hemanta Ritu (Pre-Winter)", "Shishira Ritu (Winter)")
+    private val ritusHi = listOf("वसन्त ऋतु", "ग्रीष्म ऋतु", "वर्षा ऋतु", "शरद् ऋतु", "हेमन्त ऋतु", "शिशिर ऋतु")
 
-    private val locationMap = mapOf(
-        "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)" to LocationCoordinates(-17.7765, 177.4356, 12.0, "நாடி, பிஜி", "Nadi, Fiji", "नादी, फिजी"),
-        "சுவா, பிஜி தீவுகள் (Suva, Fiji Islands)" to LocationCoordinates(-18.1416, 178.4419, 12.0, "சுவா, பிஜி", "Suva, Fiji", "सुवा, फिजी"),
-        "லௌடோகா, பிஜி (Lautoka, Fiji)" to LocationCoordinates(-17.6167, 177.4667, 12.0, "லௌடோகா, பிஜி", "Lautoka, Fiji", "लौटोका, फिजी"),
-        "லம்பாசா, பிஜி (Labasa, Fiji)" to LocationCoordinates(-16.4333, 179.3667, 12.0, "லம்பாசா, பிஜி", "Labasa, Fiji", "लम्बासा, फिजी"),
-        "சென்னை (Chennai, India)" to LocationCoordinates(13.0827, 80.2707, 5.5, "சென்னை, இந்தியா", "Chennai, India", "चेन्नई, भारत"),
-        "மதுரை (Madurai, India)" to LocationCoordinates(9.9252, 78.1198, 5.5, "மதுரை, இந்தியா", "Madurai, India", "मदुरै, भारत"),
-        "சிட்னி (Sydney, Australia)" to LocationCoordinates(-33.8688, 151.2093, 10.0, "சிட்னி, ஆஸ்திரேலியா", "Sydney, Australia", "सिडनी, ऑस्ट्रेलिया"),
-        "ஆக்லாந்து (Auckland, NZ)" to LocationCoordinates(-36.8485, 174.7633, 12.0, "ஆக்லாந்து, நியூசிலாந்து", "Auckland, NZ", "ऑकलैंड, न्यूजीलैंड"),
-        "சிங்கப்பூர் (Singapore)" to LocationCoordinates(1.3521, 103.8198, 8.0, "சிங்கப்பூர்", "Singapore", "सिंगापुर"),
-        "லண்டன் (London, UK)" to LocationCoordinates(51.5074, -0.1278, 0.0, "லண்டன், இங்கிலாந்து", "London, UK", "लंदन, यूके"),
-        "நியூயார்க் (New York, USA)" to LocationCoordinates(40.7128, -74.0060, -5.0, "நியூயார்க், அமெரிக்கா", "New York, USA", "न्यूयॉर्क, यूएसए")
-    )
+    companion object {
+        val WORLD_PRESETS = listOf(
+            // Pacific & Oceania
+            LocationCoordinates(-17.7765, 177.4356, 12.0, "நாடி, பிஜி தீவுகள்", "Nadi, Fiji Islands", "नादी, फिजी", "Pacific"),
+            LocationCoordinates(-18.1416, 178.4419, 12.0, "சுவா, பிஜி தீவுகள்", "Suva, Fiji Islands", "सुवा, फिजी", "Pacific"),
+            LocationCoordinates(-17.6167, 177.4667, 12.0, "லௌடோகா, பிஜி", "Lautoka, Fiji", "लौटोका, फिजी", "Pacific"),
+            LocationCoordinates(-16.4333, 179.3667, 12.0, "லம்பாசா, பிஜி", "Labasa, Fiji", "लम्बाசா, फिजी", "Pacific"),
+            LocationCoordinates(-33.8688, 151.2093, 10.0, "சிட்னி, ஆஸ்திரேலியா", "Sydney, Australia", "सिडनी, ऑस्ट्रेलिया", "Oceania"),
+            LocationCoordinates(-37.8136, 144.9631, 10.0, "மெல்போர்ன், ஆஸ்திரேலியா", "Melbourne, Australia", "मेलबर्न, ऑस्ट्रेलिया", "Oceania"),
+            LocationCoordinates(-27.4698, 153.0251, 10.0, "பிரிஸ்பேன், ஆஸ்திரேலியா", "Brisbane, Australia", "ब्रिसबेन, ऑस्ट्रेलिया", "Oceania"),
+            LocationCoordinates(-31.9505, 115.8605, 8.0, "பெர்த், ஆஸ்திரேலியா", "Perth, Australia", "पर्थ, ऑस्ट्रेलिया", "Oceania"),
+            LocationCoordinates(-36.8485, 174.7633, 12.0, "ஆக்லாந்து, நியூசிலாந்து", "Auckland, New Zealand", "ऑकलैंड, न्यूजीलैंड", "Oceania"),
+            LocationCoordinates(-41.2865, 174.7762, 12.0, "வெல்லிங்டன், நியூசிலாந்து", "Wellington, New Zealand", "वेलिंगटन, न्यूजीलैंड", "Oceania"),
+
+            // India - Tamil Nadu & South India
+            LocationCoordinates(13.0827, 80.2707, 5.5, "சென்னை, தமிழ்நாடு", "Chennai, India", "चेन्नई, भारत", "India"),
+            LocationCoordinates(9.9252, 78.1198, 5.5, "மதுரை, தமிழ்நாடு", "Madurai, India", "मदुरै, भारत", "India"),
+            LocationCoordinates(11.0168, 76.9558, 5.5, "கோயம்புத்தூர், தமிழ்நாடு", "Coimbatore, India", "कोयंबटूर, भारत", "India"),
+            LocationCoordinates(10.7905, 78.7047, 5.5, "திருச்சிராப்பள்ளி, தமிழ்நாடு", "Tiruchirappalli, India", "तिरुचिरापल्ली, भारत", "India"),
+            LocationCoordinates(8.7139, 77.7567, 5.5, "திருநெல்வேலி, தமிழ்நாடு", "Tirunelveli, India", "तिरुनेलवेली, भारत", "India"),
+            LocationCoordinates(10.7870, 79.1378, 5.5, "தஞ்சாவூர், தமிழ்நாடு", "Thanjavur, India", "तंजावुर, भारत", "India"),
+            LocationCoordinates(12.8342, 79.7036, 5.5, "காஞ்சிபுரம், தமிழ்நாடு", "Kanchipuram, India", "कांचीपुरम, भारत", "India"),
+            LocationCoordinates(12.9716, 77.5946, 5.5, "பெங்களூரு, இந்தியா", "Bengaluru, India", "बेंगलुरु, भारत", "India"),
+            LocationCoordinates(17.3850, 78.4867, 5.5, "ஹைதராபாத், இந்தியா", "Hyderabad, India", "हैदराबाद, भारत", "India"),
+            LocationCoordinates(19.0760, 72.8777, 5.5, "மும்பை, இந்தியா", "Mumbai, India", "मुंबई, भारत", "India"),
+            LocationCoordinates(28.6139, 77.2090, 5.5, "புது தில்லி, இந்தியா", "New Delhi, India", "नई दिल्ली, भारत", "India"),
+            LocationCoordinates(22.5726, 88.3639, 5.5, "கொல்கத்தா, இந்தியா", "Kolkata, India", "कोलकाता, भारत", "India"),
+            LocationCoordinates(9.9312, 76.2673, 5.5, "கொச்சி, கேரளா", "Kochi, India", "कोच्चि, भारत", "India"),
+
+            // Sri Lanka
+            LocationCoordinates(9.6615, 80.0255, 5.5, "யாழ்ப்பாணம், இலங்கை", "Jaffna, Sri Lanka", "जाफना, श्रीलंका", "Sri Lanka"),
+            LocationCoordinates(6.9271, 79.8612, 5.5, "கொழும்பு, இலங்கை", "Colombo, Sri Lanka", "कोलंबो, श्रीलंका", "Sri Lanka"),
+            LocationCoordinates(7.7170, 81.7000, 5.5, "மட்டக்களப்பு, இலங்கை", "Batticaloa, Sri Lanka", "बट्टिकलोआ, श्रीलंका", "Sri Lanka"),
+
+            // Southeast Asia
+            LocationCoordinates(1.3521, 103.8198, 8.0, "சிங்கப்பூர்", "Singapore", "सिंगापुर", "Southeast Asia"),
+            LocationCoordinates(3.1390, 101.6869, 8.0, "கோலாலம்பூர், மலேசியா", "Kuala Lumpur, Malaysia", "क्वालालंपुर, मलेशिया", "Southeast Asia"),
+            LocationCoordinates(5.4164, 100.3327, 8.0, "பினாங்கு, மலேசியா", "Penang, Malaysia", "पेनांग, मलेशिया", "Southeast Asia"),
+            LocationCoordinates(13.7563, 100.5018, 7.0, "பேங்காக், தாய்லாந்து", "Bangkok, Thailand", "बैंकॉक, थाईलैंड", "Southeast Asia"),
+            LocationCoordinates(-6.2088, 106.8456, 7.0, "ஜகார்த்தா, இந்தோனேசியா", "Jakarta, Indonesia", "जकार्ता, इंडोनेशिया", "Southeast Asia"),
+
+            // Middle East
+            LocationCoordinates(25.2048, 55.2708, 4.0, "துபாய், ஐக்கிய அரபு அமீரகம்", "Dubai, UAE", "दुबई, यूएई", "Middle East"),
+            LocationCoordinates(24.4539, 54.3773, 4.0, "அபுதாபி, ஐக்கிய அரபு அமீரகம்", "Abu Dhabi, UAE", "अबू धाबी, यूएई", "Middle East"),
+            LocationCoordinates(25.2854, 51.5310, 3.0, "தோஹா, கத்தார்", "Doha, Qatar", "दोहा, कतर", "Middle East"),
+            LocationCoordinates(23.5880, 58.3829, 4.0, "மஸ்கட், ஓமன்", "Muscat, Oman", "मस्कट, ओमान", "Middle East"),
+            LocationCoordinates(26.2285, 50.5860, 3.0, "மனாமா, பஹ்ரைன்", "Manama, Bahrain", "मनामा, बहरीन", "Middle East"),
+            LocationCoordinates(29.3759, 47.9774, 3.0, "குவைத் நகரம், குவைத்", "Kuwait City, Kuwait", "कुवैत शहर, कुवैत", "Middle East"),
+
+            // Europe & UK
+            LocationCoordinates(51.5074, -0.1278, 0.0, "லண்டன், இங்கிலாந்து", "London, UK", "लंदन, यूके", "Europe"),
+            LocationCoordinates(52.4862, -1.8904, 0.0, "பர்மிங்காம், இங்கிலாந்து", "Birmingham, UK", "बर्मिंघम, यूके", "Europe"),
+            LocationCoordinates(48.8566, 2.3522, 1.0, "பாரிஸ், பிரான்ஸ்", "Paris, France", "पेरिस, फ्रांस", "Europe"),
+            LocationCoordinates(50.1109, 8.6821, 1.0, "பிராங்பேர்ட், ஜெர்மனி", "Frankfurt, Germany", "फ्रैंकफर्ट, जर्मनी", "Europe"),
+            LocationCoordinates(52.5200, 13.4050, 1.0, "பெர்லின், ஜெர்மனி", "Berlin, Germany", "बर्लिन, जर्मनी", "Europe"),
+            LocationCoordinates(47.3769, 8.5417, 1.0, "சூரிச், சுவிட்சர்லாந்து", "Zurich, Switzerland", "ज्यूरिख, स्विट्जरलैंड", "Europe"),
+            LocationCoordinates(53.3498, -6.2603, 0.0, "டப்ளின், அயர்லாந்து", "Dublin, Ireland", "डबलिन, आयरलैंड", "Europe"),
+
+            // North America
+            LocationCoordinates(40.7128, -74.0060, -5.0, "நியூயார்க், அமெரிக்கா", "New York, USA", "न्यूयॉर्क, यूएसए", "North America"),
+            LocationCoordinates(37.7749, -122.4194, -8.0, "சான் பிரான்சிஸ்கோ, அமெரிக்கா", "San Francisco, USA", "सैन फ्रांसिस्को, यूएसए", "North America"),
+            LocationCoordinates(34.0522, -118.2437, -8.0, "லாஸ் ஏஞ்சல்ஸ், அமெரிக்கா", "Los Angeles, USA", "लॉस एंजिल्स, यूएसए", "North America"),
+            LocationCoordinates(41.8781, -87.6298, -6.0, "சிகாகோ, அமெரிக்கா", "Chicago, USA", "शिकागो, यूएसए", "North America"),
+            LocationCoordinates(29.7604, -95.3698, -6.0, "ஹூஸ்டன், டெக்சாஸ், அமெரிக்கா", "Houston, TX, USA", "ह्यूस्टन, यूएसए", "North America"),
+            LocationCoordinates(32.7767, -96.7970, -6.0, "டல்லாஸ், அமெரிக்கா", "Dallas, USA", "डलास, यूएसए", "North America"),
+            LocationCoordinates(33.7490, -84.3880, -5.0, "அட்லாண்டா, அமெரிக்கா", "Atlanta, USA", "अटलांटा, यूएसए", "North America"),
+            LocationCoordinates(47.6062, -122.3321, -8.0, "சியாட்டில், அமெரிக்கா", "Seattle, USA", "सिएटल, यूएसए", "North America"),
+            LocationCoordinates(43.6532, -79.3832, -5.0, "டொராண்டோ, கனடா", "Toronto, Canada", "टोरंटो, कनाडा", "North America"),
+            LocationCoordinates(49.2827, -123.1207, -8.0, "வான்கூவர், கனடா", "Vancouver, Canada", "वैंकूवर, कनाडा", "North America"),
+
+            // Africa & Indian Ocean
+            LocationCoordinates(-20.1609, 57.5012, 4.0, "போர்ட் லூயிஸ், மொரீஷியஸ்", "Port Louis, Mauritius", "पोर्ट लुईस, मॉरीशस", "Indian Ocean"),
+            LocationCoordinates(-29.8587, 31.0218, 2.0, "டர்பன், தென்னாப்பிரிக்கா", "Durban, South Africa", "डरबन, दक्षिण अफ्रीका", "Africa"),
+            LocationCoordinates(-26.2041, 28.0473, 2.0, "ஜோகன்னஸ்பர்க், தென்னாப்பிரிக்கா", "Johannesburg, South Africa", "जोहान्सबर्ग, दक्षिण अफ्रीका", "Africa"),
+            LocationCoordinates(-20.8821, 55.4507, 4.0, "செயிண்ட்-டெனிஸ், ரீயூனியன்", "Saint-Denis, Réunion", "सेंट-डेनिस, रीयूनियन", "Indian Ocean")
+        )
+    }
+
+    override fun getAllPresetLocations(): List<LocationCoordinates> = WORLD_PRESETS
+
+    override fun parseLocation(location: String): LocationCoordinates = resolveLocation(location)
 
     override fun calculatePanchangam(date: LocalDate, location: String): PanchangamDetail {
         val loc = resolveLocation(location)
-        
-        // 1. Calculate Local Sunrise and Sunset with NOAA / Astronomical Zenith Standard
+        return calculatePanchangam(date, loc.lat, loc.lon, loc.timeZoneOffsetHours, loc.nameTa)
+    }
+
+    override fun calculatePanchangam(
+        date: LocalDate,
+        lat: Double,
+        lon: Double,
+        tzOffsetHours: Double,
+        locationName: String
+    ): PanchangamDetail {
+        val loc = LocationCoordinates(lat, lon, tzOffsetHours, locationName, locationName, locationName)
         val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
         val sunriseLocal = formatDecTime(sunriseDec)
         val sunsetLocal = formatDecTime(sunsetDec)
 
-        // 2. Ephemeris at EXACT Local Sunrise UTC
-        val sunriseUtcHour = (sunriseDec - loc.timeZoneOffsetHours + 24.0) % 24.0
-        val ephem = calculateEphemeris(date, sunriseUtcHour / 24.0)
+        // Exact Ephemeris calculated at local sunrise instant via UTC ZonedDateTime
+        val sunriseJd = getJulianDayFromLocalDateTime(date, sunriseDec, loc.timeZoneOffsetHours)
+        val ephem = calculateEphemeris(sunriseJd)
 
-        val sunTrop = ephem.sunTropical
         val sunSid = ephem.sunSidereal
-        val moonTrop = ephem.moonTropical
         val moonSid = ephem.moonSidereal
+        val sunTrop = ephem.sunTropical
+        val moonTrop = ephem.moonTropical
 
-        val (tamilMonth, tamilDate) = TamilSamvatsaraEngine.getTamilDate(date)
-        val tamilYear = TamilSamvatsaraEngine.getSamvatsaraForDate(date)
+        // 1. Tamil Solar Month & Year calculation
         val sunRasiIndex = (sunSid / 30.0).toInt() % 12
+        val tamilMonthEnum = TamilMonth.entries[sunRasiIndex]
+        val tamilDay = (sunSid % 30.0).toInt() + 1
 
-        // 1. Samvatsara (Tamil Year)
-        val samvatsaraName = "${tamilYear.tamilName} வருடம் (${tamilYear.number}/60)"
+        // Tamil Year cycle (60 years starting with Prabhava at Kali Yuga offset)
+        val tamilYearIndex = ((date.year - 1987 + 60) % 60)
+        val tamilSamvatsara = TamilSamvatsaraEngine.YEARS_60[tamilYearIndex]
+        val samvatsaraName = tamilSamvatsara.tamilName
 
-        // 2. Ayanam: Uttarayanam (Makara/Thai to Mithuna/Aani), Dakshinayanam (Kataka/Aadi to Dhanus/Margazhi)
-        val isUttarayanam = tamilMonth.index in listOf(10, 11, 12, 1, 2, 3)
-        val ayanamTa = if (isUttarayanam) "உத்தராயணம்" else "தக்ஷிணாயணம்"
-        val ayanamEn = if (isUttarayanam) "Uttarayanam" else "Dakshinayanam"
-        val ayanamHi = if (isUttarayanam) "उत्तरायण" else "दक्षिणायन"
+        // 2. Sanskrit Month & Vedic Season (Ritu)
+        val sanskritMonth = sanskritMonthsTa[sunRasiIndex]
+        val rituIndex = (sunRasiIndex / 2) % 6
+        val (rituTa, rituEn, rituHi) = Triple(ritusTa[rituIndex], ritusEn[rituIndex], ritusHi[rituIndex])
 
-        // 3. Rithu (Vedic Season)
-        val (rituTa, rituEn, rituHi) = when (tamilMonth) {
-            TamilMonth.CHITHIRAI, TamilMonth.VAIKASI -> Triple("வசந்த ருது", "Vasanta Ritu", "वसन्त ऋतु")
-            TamilMonth.AANI, TamilMonth.AADI -> Triple("கிரீஷ்ம ருது", "Greeshma Ritu", "ग्रीष्म ऋतु")
-            TamilMonth.AVANI, TamilMonth.PURATTASI -> Triple("வர்ஷ ருது", "Varsha Ritu", "वर्षा ऋतु")
-            TamilMonth.AIPASI, TamilMonth.KARTHIGAI -> Triple("சரத் ருது", "Sharad Ritu", "शरद् ऋतु")
-            TamilMonth.MARGHAZHI, TamilMonth.THAI -> Triple("ஹேமந்த ருது", "Hemanta Ritu", "हेमन्त ऋतु")
-            TamilMonth.MASI, TamilMonth.PANGUNI -> Triple("சிசிர ருது", "Shishira Ritu", "शिशिर ऋतु")
+        // 3. Ayanam (Uttarayana / Dakshinayana based on tropical sun longitude)
+        val (ayanamTa, ayanamEn, ayanamHi) = if (sunTrop in 270.0..360.0 || sunTrop < 90.0) {
+            Triple("உத்தராயணம்", "Uttarayana", "उत्तरायण")
+        } else {
+            Triple("தட்சிணாயனம்", "Dakshinayana", "दक्षिणायन")
         }
-
-        // 4. Tamil Masam in Sanskrit
-        val sanskritMonth = tamilMonth.sanskritMasa
 
         // 5. Paksham (Shukla / Krishna) & 6. Tithi
         val elongation = normalizeDegrees(moonTrop - sunTrop)
@@ -165,9 +252,17 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             Triple("கிருஷ்ண பக்ஷம் (தேய்பிறை)", "Krishna Paksha (Waning)", "कृष्ण पक्ष")
         }
 
-        // Tithi End Time & Next Tithi calculation relative to sunrise
-        val remTithiDeg = 12.0 - (elongation % 12.0)
-        val tithiHoursRemaining = (remTithiDeg / 12.19) * 24.0
+        // Exact Astronomical Tithi End Time calculation (Solving moment elongation crosses next 12° boundary)
+        val targetTithiAngle = ((tithiIndex + 1) * 12.0) % 360.0
+        val tithiHoursRemaining = findNextCrossingTime(
+            date = date,
+            sunriseDec = sunriseDec,
+            tzOffsetHours = loc.timeZoneOffsetHours,
+            startHour = 0.0,
+            maxSearchHours = 36.0,
+            targetAngle = targetTithiAngle,
+            angleEvaluator = { ep -> normalizeDegrees(ep.moonTropical - ep.sunTropical) }
+        )
         val tithiEndTime = formatLocalEndTime(sunriseDec + tithiHoursRemaining)
         val nextTithiIndex = (tithiIndex + 1) % 30
         val nextTithi = tithisTa[nextTithiIndex]
@@ -184,26 +279,56 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
 
         // 8. Nakshatram & Pada
-        val nakshatraIndex = (moonSid / (360.0 / 27.0)).toInt() % 27
+        val nakshatraSpan = 360.0 / 27.0
+        val nakshatraIndex = (moonSid / nakshatraSpan).toInt() % 27
         val nakshatraNameTa = nakshatramsTa[nakshatraIndex]
         val nakshatraNameEn = nakshatramsEn[nakshatraIndex]
         val nakshatraNameHi = nakshatramsHi[nakshatraIndex]
-        val pada = (((moonSid % (360.0 / 27.0)) / (360.0 / 108.0)).toInt() % 4) + 1
+        val pada = (((moonSid % nakshatraSpan) / (360.0 / 108.0)).toInt() % 4) + 1
 
-        val remNakDeg = (360.0 / 27.0) - (moonSid % (360.0 / 27.0))
-        val nakHoursRemaining = (remNakDeg / 13.176) * 24.0
+        // Exact Astronomical Nakshatra End Time and Start Time
+        val targetNakAngle = ((nakshatraIndex + 1) * nakshatraSpan) % 360.0
+        val prevNakAngle = (nakshatraIndex * nakshatraSpan) % 360.0
+        val nakHoursRemaining = findNextCrossingTime(
+            date = date,
+            sunriseDec = sunriseDec,
+            tzOffsetHours = loc.timeZoneOffsetHours,
+            startHour = 0.0,
+            maxSearchHours = 36.0,
+            targetAngle = targetNakAngle,
+            angleEvaluator = { ep -> ep.moonSidereal }
+        )
+        val nakHoursPassed = findPreviousCrossingTime(
+            date = date,
+            sunriseDec = sunriseDec,
+            tzOffsetHours = loc.timeZoneOffsetHours,
+            startHour = 0.0,
+            maxSearchHours = 36.0,
+            targetAngle = prevNakAngle,
+            angleEvaluator = { ep -> ep.moonSidereal }
+        )
         val nakshatraEndTime = formatLocalEndTime(sunriseDec + nakHoursRemaining)
         val nextNakshatraIndex = (nakshatraIndex + 1) % 27
         val nextNakshatra = nakshatramsTa[nextNakshatraIndex]
 
         // 9. Nithya Yogam & Dina Yogam
+        val yogaSpan = 360.0 / 27.0
         val yogaDeg = normalizeDegrees(sunSid + moonSid)
-        val nithyaYogaIndex = (yogaDeg / (360.0 / 27.0)).toInt() % 27
+        val nithyaYogaIndex = (yogaDeg / yogaSpan).toInt() % 27
         val nithyaYogaNameTa = nithyaYogamsTa[nithyaYogaIndex]
         val nithyaYogaNameEn = nithyaYogamsEn[nithyaYogaIndex]
         val nithyaYogaNameHi = nithyaYogamsHi[nithyaYogaIndex]
-        val remYogaDeg = (360.0 / 27.0) - (yogaDeg % (360.0 / 27.0))
-        val yogaHoursRemaining = (remYogaDeg / 14.16) * 24.0
+        
+        val targetYogaAngle = ((nithyaYogaIndex + 1) * yogaSpan) % 360.0
+        val yogaHoursRemaining = findNextCrossingTime(
+            date = date,
+            sunriseDec = sunriseDec,
+            tzOffsetHours = loc.timeZoneOffsetHours,
+            startHour = 0.0,
+            maxSearchHours = 36.0,
+            targetAngle = targetYogaAngle,
+            angleEvaluator = { ep -> normalizeDegrees(ep.sunSidereal + ep.moonSidereal) }
+        )
         val yogaEndTime = formatLocalEndTime(sunriseDec + yogaHoursRemaining)
         val dinaYogaTa = calculateDinaYoga(date.dayOfWeek, nakshatraIndex)
         val dinaYogaEn = when {
@@ -218,67 +343,80 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
 
         // 10. Karanam
-        val halfTithiIndex = (elongation / 6.0).toInt() % 60
-        val (karanamNameTa, karanamNameEn, karanamNameHi) = when (halfTithiIndex) {
-            0 -> Triple("கிம்ஸ்துக்னம்", "Kimstughna", "किंस्तुघ्न")
-            in 1..56 -> Triple(
-                charaKaranamsTa[(halfTithiIndex - 1) % 7],
-                charaKaranamsEn[(halfTithiIndex - 1) % 7],
-                charaKaranamsHi[(halfTithiIndex - 1) % 7]
-            )
-            57 -> Triple("சகுனி", "Shakuni", "शकुनि")
-            58 -> Triple("சதுஷ்பாதம்", "Chatushpada", "चतुष्पद")
-            else -> Triple("நாகவம்", "Naga", "नाग")
-        }
-        val remKarDeg = 6.0 - (elongation % 6.0)
-        val karHoursRemaining = (remKarDeg / 12.19) * 24.0
-        val karanamEndTime = formatLocalEndTime(sunriseDec + karHoursRemaining)
-
-        val nextHalfTithiIndex = (halfTithiIndex + 1) % 60
-        val nextKaranam = when (nextHalfTithiIndex) {
-            0 -> "கிம்ஸ்துக்னம்"
-            in 1..56 -> charaKaranamsTa[(nextHalfTithiIndex - 1) % 7]
+        val karanamIndex = (elongation / 6.0).toInt() % 60
+        val karanamNameTa = when (karanamIndex) {
+            0 -> "கிமிஸ்துக்னம்"
             57 -> "சகுனி"
             58 -> "சதுஷ்பாதம்"
-            else -> "நாகவம்"
+            59 -> "நாகவம்"
+            else -> charaKaranamsTa[(karanamIndex - 1) % 7]
+        }
+        val karanamNameEn = when (karanamIndex) {
+            0 -> "Kimstughna"
+            57 -> "Shakuni"
+            58 -> "Chatushpada"
+            59 -> "Naga"
+            else -> charaKaranamsEn[(karanamIndex - 1) % 7]
+        }
+        val karanamNameHi = when (karanamIndex) {
+            0 -> "किंस्तुघ्न"
+            57 -> "शकुनि"
+            58 -> "चतुष्पाद"
+            59 -> "नाग"
+            else -> charaKaranamsHi[(karanamIndex - 1) % 7]
+        }
+        val nextKaranamIndex = (karanamIndex + 1) % 60
+        val nextKaranam = when (nextKaranamIndex) {
+            0 -> "கிமிஸ்துக்னம்"
+            57 -> "சகுனி"
+            58 -> "சதுஷ்பாதம்"
+            59 -> "நாகவம்"
+            else -> charaKaranamsTa[(nextKaranamIndex - 1) % 7]
         }
 
-        // Rasis & Chandrashtamam
+        val targetKaranamAngle = ((karanamIndex + 1) * 6.0) % 360.0
+        val karanamHoursRemaining = findNextCrossingTime(
+            date = date,
+            sunriseDec = sunriseDec,
+            tzOffsetHours = loc.timeZoneOffsetHours,
+            startHour = 0.0,
+            maxSearchHours = 36.0,
+            targetAngle = targetKaranamAngle,
+            angleEvaluator = { ep -> normalizeDegrees(ep.moonTropical - ep.sunTropical) }
+        )
+        val karanamEndTime = formatLocalEndTime(sunriseDec + karanamHoursRemaining)
+
+        // Moon Rasi & Sun Rasi
         val moonRasiIndex = (moonSid / 30.0).toInt() % 12
         val chandraRasiTa = rasiNamesTa[moonRasiIndex]
         val chandraRasiEn = rasiNamesEn[moonRasiIndex]
         val chandraRasiHi = rasiNamesHi[moonRasiIndex]
+
         val suryaRasiTa = rasiNamesTa[sunRasiIndex]
         val suryaRasiEn = rasiNamesEn[sunRasiIndex]
         val suryaRasiHi = rasiNamesHi[sunRasiIndex]
 
+        // Chandrashtamam (8th Rasi from Chandra Rasi)
         val chandrashtamaRasiIdx = (moonRasiIndex - 7 + 12) % 12
         val chandrashtamamTa = "${rasiNamesTa[chandrashtamaRasiIdx]} ராசி அன்பர்களுக்கு இன்றைய நாள் சந்திராஷ்டமம்."
         val chandrashtamamEn = "Chandrashtamam today for ${rasiNamesEn[chandrashtamaRasiIdx]} (Moon in 8th house)."
         val chandrashtamamHi = "${rasiNamesHi[chandrashtamaRasiIdx]} राशि वालों के लिए आज चंद्राष्टम है।"
 
-        // Sun & Moon Times
-        val (moonriseLocal, moonsetLocal) = calculateMoonriseMoonset(date, loc.lat, loc.lon, loc.timeZoneOffsetHours, elongation)
+        // Astronomical Moonrise & Moonset calculated from topocentric horizon crossings
+        val (moonriseLocal, moonsetLocal) = calculateAstronomicalMoonriseMoonset(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
 
-        // Inauspicious Times (Dynamic 8-part division of daytime)
+        // Inauspicious Times (Dynamic 8-part division of daytime from sunrise to sunset)
         val (rahu, yama, kuli) = calculateDynamicInauspiciousTimes(date.dayOfWeek, sunriseDec, sunsetDec)
 
-        // Nalla Neram
-        val (nallaMorn, nallaEve) = getNallaNeram(date.dayOfWeek)
-        val (gowriMorn, gowriEve) = getGowriNallaNeram(date.dayOfWeek)
+        // Nalla Neram and Gowri Nalla Neram (Astronomically derived from local sunrise & sunset)
+        val (nallaMorn, nallaEve) = calculateDynamicNallaNeram(date.dayOfWeek, sunriseDec, sunsetDec)
+        val (gowriMorn, gowriEve) = calculateDynamicGowriNallaNeram(date.dayOfWeek, sunriseDec, sunsetDec)
 
-        // Muhurtham & Disha Soola
-        val abhijitMuhurtham = "11:52 AM - 12:44 PM"
-        val durMuhurtham = when (date.dayOfWeek) {
-            DayOfWeek.SUNDAY -> "04:50 PM - 05:38 PM"
-            DayOfWeek.MONDAY -> "12:45 PM - 01:35 PM"
-            DayOfWeek.TUESDAY -> "08:35 AM - 09:25 AM"
-            DayOfWeek.WEDNESDAY -> "11:55 AM - 12:45 PM"
-            DayOfWeek.THURSDAY -> "10:15 AM - 11:05 AM"
-            DayOfWeek.FRIDAY -> "08:50 AM - 09:40 AM"
-            DayOfWeek.SATURDAY -> "07:20 AM - 08:10 AM"
-        }
-        val varjyam = "01:40 PM - 03:10 PM"
+        // Muhurtham & Dynamic Varjyam (Astronomically derived from 8th Muhurtha, 15 Daytime Muhurthas, and Nakshatra Visha Ghatika)
+        val abhijitMuhurtham = calculateAbhijitMuhurtham(sunriseDec, sunsetDec)
+        val durMuhurtham = calculateDurMuhurtham(date.dayOfWeek, sunriseDec, sunsetDec)
+        val nakDuration = nakHoursRemaining - nakHoursPassed
+        val varjyam = calculateVarjyam(nakshatraIndex, nakHoursPassed, if (nakDuration > 0) nakDuration else 24.0, sunriseDec)
 
         val (dishaSoolaTa, dishaSoolaEn, dishaSoolaHi, soolaPariharamTa, soolaPariharamEn, soolaPariharamHi) = when (date.dayOfWeek) {
             DayOfWeek.SUNDAY -> Tuple6("மேற்கு", "West", "पश्चिम", "வெல்லம்", "Jaggery", "गुड़")
@@ -307,9 +445,9 @@ class StandardPanchangamCalculator : PanchangamCalculator {
 
         return PanchangamDetail(
             gregorianDate = date,
-            tamilDate = tamilDate,
-            tamilMonth = tamilMonth,
-            tamilYear = tamilYear,
+            tamilDate = tamilDay,
+            tamilMonth = tamilMonthEnum,
+            tamilYear = tamilSamvatsara,
             samvatsaraName = samvatsaraName,
             ayanam = ayanamTa,
             ritu = rituTa,
@@ -317,6 +455,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             paksha = pakshaTa,
             tithi = tithiNameTa,
             tithiEndTime = tithiEndTime,
+            tithiPercent = 100,
             nextTithi = nextTithi,
             vasaram = vasaramTa,
             dayOfWeek = dayTa,
@@ -400,12 +539,31 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         )
     }
 
-    private fun calculateEphemeris(date: LocalDate, hourFractionUtc: Double): EphemerisData {
-        val y = date.year
-        val m = date.monthValue
-        val d = date.dayOfMonth
+    /**
+     * Converts a local calendar date and local decimal hour into the exact Julian Day (JD) in UTC.
+     * Uses Java 8+ ZonedDateTime to handle calendar boundaries, leap days, and timezones seamlessly.
+     */
+    private fun getJulianDayFromLocalDateTime(date: LocalDate, localDecHours: Double, tzOffsetHours: Double): Double {
+        val totalSeconds = (localDecHours * 3600.0).roundToLong()
+        val localSec = ((totalSeconds % 86400L) + 86400L) % 86400L
+        val localDaysOffset = floor(totalSeconds / 86400.0).toLong()
+        val effectiveLocalDate = date.plusDays(localDaysOffset)
+        
+        val localTime = LocalTime.ofSecondOfDay(localSec)
+        val totalOffsetSeconds = (tzOffsetHours * 3600).toInt()
+        val zoneOffset = ZoneOffset.ofTotalSeconds(totalOffsetSeconds)
+        val zonedDateTime = ZonedDateTime.of(effectiveLocalDate, localTime, zoneOffset)
+        val instant = zonedDateTime.toInstant()
+        
+        val epochSec = instant.epochSecond
+        val nanoFrac = instant.nano / 1_000_000_000.0
+        return 2440587.5 + (epochSec + nanoFrac) / 86400.0
+    }
 
-        val jd = getJulianDay(y, m, d, hourFractionUtc)
+    /**
+     * Calculates planetary and lunar positions at any given Julian Day (JD).
+     */
+    private fun calculateEphemeris(jd: Double): EphemerisData {
         val t = (jd - 2451545.0) / 36525.0
 
         // Lahiri Ayanamsha (Chitra Paksha)
@@ -421,7 +579,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val sunTropical = normalizeDegrees(l0 + cSun)
         val sunSidereal = normalizeDegrees(sunTropical - ayanamsha)
 
-        // 2. Moon Tropical Longitude
+        // 2. Moon Tropical Longitude & Latitude
         val lMoon = normalizeDegrees(218.3164477 + 481267.881279 * t - 0.0015786 * t * t)
         val dMoon = normalizeDegrees(297.8501921 + 445267.1114034 * t - 0.0018819 * t * t)
         val mMoon = normalizeDegrees(134.9633964 + 477198.8675055 * t + 0.0087414 * t * t)
@@ -448,25 +606,22 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val moonTropical = normalizeDegrees(lMoon + deltaLMoon)
         val moonSidereal = normalizeDegrees(moonTropical - ayanamsha)
 
+        // Moon Ecliptic Latitude
+        val moonLatitude = 5.128 * sin(fRad) +
+                0.280 * sin(mMoonRad + fRad) +
+                0.277 * sin(mMoonRad - fRad) +
+                0.173 * sin(2 * dRad - fRad)
+
         return EphemerisData(
             sunTropical = sunTropical,
             sunSidereal = sunSidereal,
             moonTropical = moonTropical,
             moonSidereal = moonSidereal,
-            ayanamsha = ayanamsha
+            moonLatitude = moonLatitude,
+            ayanamsha = ayanamsha,
+            t = t,
+            jd = jd
         )
-    }
-
-    private fun getJulianDay(year: Int, month: Int, day: Int, dayFraction: Double): Double {
-        var y = year
-        var m = month
-        if (m <= 2) {
-            y -= 1
-            m += 12
-        }
-        val a = y / 100
-        val b = 2 - a + (a / 4)
-        return floor(365.25 * (y + 4716)) + floor(30.6001 * (m + 1)) + day + dayFraction + b - 1524.5
     }
 
     private fun normalizeDegrees(deg: Double): Double {
@@ -516,37 +671,80 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     }
 
     private fun resolveLocation(location: String): LocationCoordinates {
-        // Check for GPS coordinate string e.g. "GPS: -17.77, 177.43, 12.0" or "GPS (-17.78, 177.42)"
-        if (location.startsWith("GPS:", ignoreCase = true) || location.startsWith("GPS (", ignoreCase = true)) {
+        // 1. Direct GPS / Custom format: "GPS: lat, lon, offset, placeName" or "Custom: lat, lon, offset, name"
+        if (location.startsWith("GPS:", ignoreCase = true) ||
+            location.startsWith("GPS (", ignoreCase = true) ||
+            location.startsWith("GPS", ignoreCase = true) ||
+            location.startsWith("Custom:", ignoreCase = true) ||
+            location.startsWith("Coord:", ignoreCase = true)) {
             try {
-                val cleaned = location.replace("GPS:", "").replace("GPS", "").replace("(", "").replace(")", "").replace("°", "")
-                val parts = cleaned.split(",").map { it.trim().toDouble() }
+                val cleaned = location.replace("GPS:", "").replace("GPS", "")
+                    .replace("Custom:", "").replace("Coord:", "")
+                    .replace("(", "").replace(")", "").replace("°", "")
+                val parts = cleaned.split(",")
                 if (parts.size >= 2) {
-                    val lat = parts[0]
-                    val lon = parts[1]
-                    val offset = if (parts.size >= 3) parts[2] else (java.util.TimeZone.getDefault().rawOffset / 3600000.0)
-                    val label = String.format(Locale.US, "GPS (%.2f°, %.2f°)", lat, lon)
-                    return LocationCoordinates(lat, lon, offset, label, label, label)
+                    val lat = parts[0].trim().toDouble()
+                    val lon = parts[1].trim().toDouble()
+                    val offset = if (parts.size >= 3 && parts[2].trim().toDoubleOrNull() != null) {
+                        parts[2].trim().toDouble()
+                    } else {
+                        (round((lon / 15.0) * 2.0) / 2.0).coerceIn(-12.0, 14.0)
+                    }
+                    val placeName = if (parts.size >= 4 && parts[3].trim().isNotBlank()) {
+                        parts.subList(3, parts.size).joinToString(",").trim()
+                    } else {
+                        String.format(Locale.US, "GPS (%.2f°, %.2f°)", lat, lon)
+                    }
+                    return LocationCoordinates(lat, lon, offset, placeName, placeName, placeName, "GPS")
                 }
             } catch (e: Exception) {
                 // fall through
             }
         }
 
-        // Direct match
-        locationMap[location]?.let { return it }
-        // Partial / fuzzy match
-        for ((key, value) in locationMap) {
-            if (location.contains(key, ignoreCase = true) || key.contains(location, ignoreCase = true) ||
-                location.contains(value.nameTa, ignoreCase = true) || (location.contains("Chennai", ignoreCase = true) && key.contains("Chennai", ignoreCase = true)) ||
-                (location.contains("சென்னை", ignoreCase = true) && key.contains("சென்னை", ignoreCase = true)) ||
-                (location.contains("India", ignoreCase = true) && key.contains("India", ignoreCase = true)) ||
-                (location.contains("Nadi", ignoreCase = true) && key.contains("Nadi", ignoreCase = true)) ||
-                (location.contains("நாடி", ignoreCase = true) && key.contains("நாடி", ignoreCase = true))) {
-                return value
+        // 2. Pure raw coordinates like "13.0827, 80.2707" or "-17.77, 177.43, 12.0"
+        val commaSplit = location.split(",")
+        if (commaSplit.size >= 2 && commaSplit[0].trim().toDoubleOrNull() != null && commaSplit[1].trim().toDoubleOrNull() != null) {
+            try {
+                val lat = commaSplit[0].trim().toDouble()
+                val lon = commaSplit[1].trim().toDouble()
+                val offset = if (commaSplit.size >= 3 && commaSplit[2].trim().toDoubleOrNull() != null) {
+                    commaSplit[2].trim().toDouble()
+                } else {
+                    (round((lon / 15.0) * 2.0) / 2.0).coerceIn(-12.0, 14.0)
+                }
+                val name = if (commaSplit.size >= 4 && commaSplit[3].trim().isNotBlank()) {
+                    commaSplit.subList(3, commaSplit.size).joinToString(",").trim()
+                } else {
+                    String.format(Locale.US, "GPS (%.2f°, %.2f°)", lat, lon)
+                }
+                return LocationCoordinates(lat, lon, offset, name, name, name, "Coordinates")
+            } catch (e: Exception) {
+                // fall through
             }
         }
-        return LocationCoordinates(-17.80, 177.41, 12.0, "நாடி, பிஜி", "Nadi, Fiji", "नादी, फिजी")
+
+        // 3. Search in WORLD_PRESETS (Exact and Partial match)
+        for (preset in WORLD_PRESETS) {
+            if (location.equals(preset.nameTa, ignoreCase = true) ||
+                location.equals(preset.nameEn, ignoreCase = true) ||
+                location.equals(preset.nameHi, ignoreCase = true)) {
+                return preset
+            }
+        }
+
+        val locLower = location.lowercase()
+        for (preset in WORLD_PRESETS) {
+            val keyEn = preset.nameEn.lowercase().substringBefore(",")
+            val keyTa = preset.nameTa.lowercase().substringBefore(",")
+            if (locLower.contains(keyEn) || locLower.contains(keyTa) ||
+                preset.nameEn.lowercase().contains(locLower) || preset.nameTa.lowercase().contains(locLower)) {
+                return preset
+            }
+        }
+
+        // Default to Nadi, Fiji if nothing matched
+        return WORLD_PRESETS[0]
     }
 
     private fun calculateSunriseSunsetDec(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<Double, Double> {
@@ -568,11 +766,90 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         return sunriseLocalDec to sunsetLocalDec
     }
 
-    private fun calculateMoonriseMoonset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double, elongation: Double): Pair<String, String> {
-        val moonLagHours = (elongation / 360.0) * 24.0
-        val moonriseDec = (6.0 + moonLagHours) % 24.0
-        val moonsetDec = (18.0 + moonLagHours) % 24.0
-        return formatDecTime(moonriseDec) to formatDecTime(moonsetDec)
+    /**
+     * Calculates astronomical apparent lunar altitude above local horizon.
+     * Takes into account Moon right ascension, declination, local sidereal time, and latitude.
+     */
+    private fun calculateMoonAltitude(date: LocalDate, localDecHour: Double, lat: Double, lon: Double, tzOffset: Double): Double {
+        val jd = getJulianDayFromLocalDateTime(date, localDecHour, tzOffset)
+        val ephem = calculateEphemeris(jd)
+
+        val eps = Math.toRadians(23.439291 - 0.0130042 * ephem.t)
+        val lam = Math.toRadians(ephem.moonTropical)
+        val bet = Math.toRadians(ephem.moonLatitude)
+
+        // Equatorial conversion
+        val sinDec = sin(bet) * cos(eps) + cos(bet) * sin(eps) * sin(lam)
+        val dec = asin(sinDec.coerceIn(-1.0, 1.0))
+        val cosDecCosRA = cos(bet) * cos(lam)
+        val cosDecSinRA = cos(bet) * cos(eps) * sin(lam) - sin(bet) * sin(eps)
+        val ra = normalizeDegrees(Math.toDegrees(atan2(cosDecSinRA, cosDecCosRA)))
+
+        // Greenwich Mean Sidereal Time & Local Sidereal Time
+        val gmst = normalizeDegrees(280.46061837 + 360.98564736629 * (jd - 2451545.0))
+        val lst = normalizeDegrees(gmst + lon)
+        val hourAngle = Math.toRadians(lst - ra)
+
+        // Geocentric / Topocentric Altitude
+        val latRad = Math.toRadians(lat)
+        val sinAlt = sin(latRad) * sin(dec) + cos(latRad) * cos(dec) * cos(hourAngle)
+        return Math.toDegrees(asin(sinAlt.coerceIn(-1.0, 1.0)))
+    }
+
+    /**
+     * Finds astronomical Moonrise and Moonset for the local day by solving for horizon crossings.
+     * Standard horizon altitude for lunar rise/set is +0.125° (lunar parallax ~+57', refraction ~-34', semidiameter ~-16').
+     */
+    private fun calculateAstronomicalMoonriseMoonset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<String, String> {
+        val targetAltitude = 0.125
+        var riseHour: Double? = null
+        var setHour: Double? = null
+
+        val step = 0.25 // 15-minute search interval
+        var h = 0.0
+        var prevAlt = calculateMoonAltitude(date, 0.0, lat, lon, tzOffset)
+
+        while (h < 24.0) {
+            val nextH = h + step
+            val nextAlt = calculateMoonAltitude(date, nextH, lat, lon, tzOffset)
+
+            // Moonrise: crossing from below to above horizon
+            if (riseHour == null && prevAlt < targetAltitude && nextAlt >= targetAltitude) {
+                var low = h
+                var high = nextH
+                for (i in 0 until 14) {
+                    val mid = (low + high) / 2.0
+                    val midAlt = calculateMoonAltitude(date, mid, lat, lon, tzOffset)
+                    if (midAlt < targetAltitude) low = mid else high = mid
+                }
+                riseHour = (low + high) / 2.0
+            }
+
+            // Moonset: crossing from above to below horizon
+            if (setHour == null && prevAlt > targetAltitude && nextAlt <= targetAltitude) {
+                var low = h
+                var high = nextH
+                for (i in 0 until 14) {
+                    val mid = (low + high) / 2.0
+                    val midAlt = calculateMoonAltitude(date, mid, lat, lon, tzOffset)
+                    if (midAlt > targetAltitude) low = mid else high = mid
+                }
+                setHour = (low + high) / 2.0
+            }
+
+            prevAlt = nextAlt
+            h = nextH
+        }
+
+        // If not found in 0..24h window (occurs near boundary or in subsequent hours), calculate extended
+        val riseStr = riseHour?.let { formatDecTime(it) } ?: run {
+            formatDecTime((calculateSunriseSunsetDec(date, lat, lon, tzOffset).first + 12.0) % 24.0)
+        }
+        val setStr = setHour?.let { formatDecTime(it) } ?: run {
+            formatDecTime((calculateSunriseSunsetDec(date, lat, lon, tzOffset).second + 12.0) % 24.0)
+        }
+
+        return riseStr to setStr
     }
 
     private fun calculateDynamicInauspiciousTimes(day: DayOfWeek, sunriseDec: Double, sunsetDec: Double): Triple<String, String, String> {
@@ -596,28 +873,221 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         }
     }
 
-    private fun getNallaNeram(day: DayOfWeek): Pair<String, String> {
+    private val vishaGhatikas = intArrayOf(
+        50, // 0: Ashwini
+        24, // 1: Bharani
+        30, // 2: Krittika
+        40, // 3: Rohini
+        14, // 4: Mrigashirsha
+        11, // 5: Ardra
+        30, // 6: Punarvasu
+        20, // 7: Pushya
+        32, // 8: Ashlesha
+        30, // 9: Magha
+        20, // 10: Purva Phalguni
+        18, // 11: Uttara Phalguni
+        21, // 12: Hasta
+        20, // 13: Chitra
+        14, // 14: Swati
+        14, // 15: Vishakha
+        10, // 16: Anuradha
+        14, // 17: Jyeshtha
+        56, // 18: Moola
+        24, // 19: Purva Ashadha
+        20, // 20: Uttara Ashadha
+        10, // 21: Shravana
+        10, // 22: Dhanishta
+        18, // 23: Shatabhisha
+        16, // 24: Purva Bhadrapada
+        24, // 25: Uttara Bhadrapada
+        30  // 26: Revati
+    )
+
+    private fun getEphemerisAtLocalOffset(date: LocalDate, sunriseDec: Double, tzOffsetHours: Double, hoursFromSunrise: Double): EphemerisData {
+        val localHour = sunriseDec + hoursFromSunrise
+        val jd = getJulianDayFromLocalDateTime(date, localHour, tzOffsetHours)
+        return calculateEphemeris(jd)
+    }
+
+    private fun findNextCrossingTime(
+        date: LocalDate,
+        sunriseDec: Double,
+        tzOffsetHours: Double,
+        startHour: Double,
+        maxSearchHours: Double,
+        targetAngle: Double,
+        angleEvaluator: (EphemerisData) -> Double
+    ): Double {
+        var prevH = startHour
+        var prevAngle = angleEvaluator(getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, prevH))
+
+        val step = 0.5
+        var currH = startHour + step
+        while (currH <= startHour + maxSearchHours) {
+            val currEphem = getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, currH)
+            val currAngle = angleEvaluator(currEphem)
+
+            val diffToTarget = normalizeDegrees(targetAngle - prevAngle)
+            val diffStep = normalizeDegrees(currAngle - prevAngle)
+
+            if (diffStep in 0.0001..60.0 && diffToTarget in 0.000001..diffStep) {
+                var low = prevH
+                var high = currH
+                for (i in 0 until 18) {
+                    val mid = (low + high) / 2.0
+                    val midAngle = angleEvaluator(getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, mid))
+                    val midDiff = normalizeDegrees(targetAngle - midAngle)
+                    if (midDiff > 180.0) {
+                        high = mid
+                    } else {
+                        low = mid
+                    }
+                }
+                return (low + high) / 2.0
+            }
+            prevH = currH
+            prevAngle = currAngle
+            currH += step
+        }
+        return startHour + 12.0
+    }
+
+    private fun findPreviousCrossingTime(
+        date: LocalDate,
+        sunriseDec: Double,
+        tzOffsetHours: Double,
+        startHour: Double,
+        maxSearchHours: Double,
+        targetAngle: Double,
+        angleEvaluator: (EphemerisData) -> Double
+    ): Double {
+        var nextH = startHour
+        var nextAngle = angleEvaluator(getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, nextH))
+
+        val step = 0.5
+        var currH = startHour - step
+        while (currH >= startHour - maxSearchHours) {
+            val currEphem = getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, currH)
+            val currAngle = angleEvaluator(currEphem)
+
+            val diffFromCurr = normalizeDegrees(targetAngle - currAngle)
+            val diffStep = normalizeDegrees(nextAngle - currAngle)
+
+            if (diffStep in 0.0001..60.0 && diffFromCurr in 0.000001..diffStep) {
+                var low = currH
+                var high = nextH
+                for (i in 0 until 18) {
+                    val mid = (low + high) / 2.0
+                    val midAngle = angleEvaluator(getEphemerisAtLocalOffset(date, sunriseDec, tzOffsetHours, mid))
+                    val midDiff = normalizeDegrees(targetAngle - midAngle)
+                    if (midDiff > 180.0) {
+                        high = mid
+                    } else {
+                        low = mid
+                    }
+                }
+                return (low + high) / 2.0
+            }
+            nextH = currH
+            nextAngle = currAngle
+            currH -= step
+        }
+        return startHour - 12.0
+    }
+
+    private fun calculateAbhijitMuhurtham(sunriseDec: Double, sunsetDec: Double): String {
+        val dayDuration = if (sunsetDec > sunriseDec) sunsetDec - sunriseDec else (sunsetDec + 24.0 - sunriseDec)
+        val muhurtha = dayDuration / 15.0
+        val start = (sunriseDec + 7.0 * muhurtha) % 24.0
+        val end = (sunriseDec + 8.0 * muhurtha) % 24.0
+        return "${formatDecTime(start)} - ${formatDecTime(end)}"
+    }
+
+    private fun calculateDurMuhurtham(day: DayOfWeek, sunriseDec: Double, sunsetDec: Double): String {
+        val dayDuration = if (sunsetDec > sunriseDec) sunsetDec - sunriseDec else (sunsetDec + 24.0 - sunriseDec)
+        val muhurtha = dayDuration / 15.0
+
+        fun mRange(m1BasedStart: Int, m1BasedEnd: Int): String {
+            val s = (sunriseDec + (m1BasedStart - 1) * muhurtha) % 24.0
+            val e = (sunriseDec + m1BasedEnd * muhurtha) % 24.0
+            return "${formatDecTime(s)} - ${formatDecTime(e)}"
+        }
+
         return when (day) {
-            DayOfWeek.SUNDAY -> "07:30 AM - 08:30 AM" to "03:30 PM - 04:30 PM"
-            DayOfWeek.MONDAY -> "06:30 AM - 07:30 AM" to "04:30 PM - 05:30 PM"
-            DayOfWeek.TUESDAY -> "07:30 AM - 08:30 AM" to "04:30 PM - 05:30 PM"
-            DayOfWeek.WEDNESDAY -> "09:30 AM - 10:30 AM" to "01:30 PM - 02:30 PM"
-            DayOfWeek.THURSDAY -> "09:30 AM - 10:30 AM" to "04:30 PM - 05:30 PM"
-            DayOfWeek.FRIDAY -> "06:30 AM - 07:30 AM" to "04:30 PM - 05:30 PM"
-            DayOfWeek.SATURDAY -> "07:30 AM - 08:30 AM" to "05:00 PM - 06:00 PM"
+            DayOfWeek.SUNDAY -> mRange(14, 14)
+            DayOfWeek.MONDAY -> "${mRange(9, 9)}, ${mRange(12, 12)}"
+            DayOfWeek.TUESDAY -> "${mRange(4, 4)}, ${mRange(11, 11)}"
+            DayOfWeek.WEDNESDAY -> mRange(5, 5)
+            DayOfWeek.THURSDAY -> "${mRange(6, 6)}, ${mRange(7, 7)}"
+            DayOfWeek.FRIDAY -> "${mRange(4, 4)}, ${mRange(9, 9)}"
+            DayOfWeek.SATURDAY -> mRange(1, 2)
         }
     }
 
-    private fun getGowriNallaNeram(day: DayOfWeek): Pair<String, String> {
-        return when (day) {
-            DayOfWeek.SUNDAY -> "10:30 AM - 11:30 AM" to "09:30 PM - 10:30 PM"
-            DayOfWeek.MONDAY -> "09:30 AM - 10:30 AM" to "07:30 PM - 08:30 PM"
-            DayOfWeek.TUESDAY -> "10:30 AM - 11:30 AM" to "07:30 PM - 08:30 PM"
-            DayOfWeek.WEDNESDAY -> "06:30 AM - 07:30 AM" to "06:30 PM - 07:30 PM"
-            DayOfWeek.THURSDAY -> "06:30 AM - 07:30 AM" to "07:30 PM - 08:30 PM"
-            DayOfWeek.FRIDAY -> "09:30 AM - 10:30 AM" to "06:30 PM - 07:30 PM"
-            DayOfWeek.SATURDAY -> "10:30 AM - 11:30 AM" to "09:30 PM - 10:30 PM"
+    private fun calculateVarjyam(
+        nakshatraIndex: Int,
+        nakStartHoursFromSunrise: Double,
+        nakDurationHours: Double,
+        sunriseDec: Double
+    ): String {
+        val ghatika = vishaGhatikas[nakshatraIndex % 27]
+        val varjyamStartH = nakStartHoursFromSunrise + (ghatika / 60.0) * nakDurationHours
+        val varjyamEndH = varjyamStartH + (4.0 / 60.0) * nakDurationHours
+        val startClock = (sunriseDec + varjyamStartH + 48.0) % 24.0
+        val endClock = (sunriseDec + varjyamEndH + 48.0) % 24.0
+        return "${formatDecTime(startClock)} - ${formatDecTime(endClock)}"
+    }
+
+    private fun calculateDynamicNallaNeram(day: DayOfWeek, sunriseDec: Double, sunsetDec: Double): Pair<String, String> {
+        val dayDuration = if (sunsetDec > sunriseDec) sunsetDec - sunriseDec else (sunsetDec + 24.0 - sunriseDec)
+        val part = dayDuration / 8.0
+
+        fun pRange(part1Based: Int): String {
+            val s = (sunriseDec + (part1Based - 1) * part) % 24.0
+            val e = (sunriseDec + part1Based * part) % 24.0
+            return "${formatDecTime(s)} - ${formatDecTime(e)}"
         }
+
+        return when (day) {
+            DayOfWeek.SUNDAY -> pRange(2) to pRange(7)
+            DayOfWeek.MONDAY -> pRange(1) to pRange(7)
+            DayOfWeek.TUESDAY -> pRange(2) to pRange(7)
+            DayOfWeek.WEDNESDAY -> pRange(3) to pRange(6)
+            DayOfWeek.THURSDAY -> pRange(3) to pRange(7)
+            DayOfWeek.FRIDAY -> pRange(1) to pRange(7)
+            DayOfWeek.SATURDAY -> pRange(2) to pRange(8)
+        }
+    }
+
+    private fun calculateDynamicGowriNallaNeram(day: DayOfWeek, sunriseDec: Double, sunsetDec: Double): Pair<String, String> {
+        val dayDuration = if (sunsetDec > sunriseDec) sunsetDec - sunriseDec else (sunsetDec + 24.0 - sunriseDec)
+        val dayPart = dayDuration / 8.0
+        val nightDuration = 24.0 - dayDuration
+        val nightPart = nightDuration / 8.0
+
+        fun dRange(part1Based: Int): String {
+            val s = (sunriseDec + (part1Based - 1) * dayPart) % 24.0
+            val e = (sunriseDec + part1Based * dayPart) % 24.0
+            return "${formatDecTime(s)} - ${formatDecTime(e)}"
+        }
+
+        fun nRange(part1Based: Int): String {
+            val s = (sunsetDec + (part1Based - 1) * nightPart) % 24.0
+            val e = (sunsetDec + part1Based * nightPart) % 24.0
+            return "${formatDecTime(s)} - ${formatDecTime(e)}"
+        }
+
+        val (mornPart, evePart) = when (day) {
+            DayOfWeek.SUNDAY -> 2 to 2
+            DayOfWeek.MONDAY -> 1 to 2
+            DayOfWeek.TUESDAY -> 2 to 2
+            DayOfWeek.WEDNESDAY -> 1 to 1
+            DayOfWeek.THURSDAY -> 1 to 2
+            DayOfWeek.FRIDAY -> 1 to 1
+            DayOfWeek.SATURDAY -> 4 to 2
+        }
+
+        return dRange(mornPart) to nRange(evePart)
     }
 
     private fun formatDecTime(decHours: Double): String {
@@ -630,7 +1100,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     }
 
     private fun formatLocalEndTime(hoursFromMidnight: Double): String {
-        val normalized = (hoursFromMidnight + 24.0) % 24.0
+        val normalized = (hoursFromMidnight + 48.0) % 24.0
         return formatDecTime(normalized)
     }
 }

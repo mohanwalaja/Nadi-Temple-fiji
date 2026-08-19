@@ -75,9 +75,8 @@ fun PanchangamScreen(
                 val data = gpsHelper.getCurrentLocation()
                 isLocating = false
                 if (data != null) {
-                    val gpsString = "GPS: ${data.latitude}, ${data.longitude}, ${data.utcOffsetHours}"
-                    viewModel.setLocation(gpsString)
-                    Toast.makeText(context, "Location: ${data.locationName}", Toast.LENGTH_SHORT).show()
+                    viewModel.setCoordinates(data.latitude, data.longitude, data.utcOffsetHours, data.locationName)
+                    Toast.makeText(context, "Location set: ${data.locationName}", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "Could not fetch GPS location", Toast.LENGTH_SHORT).show()
                 }
@@ -132,30 +131,48 @@ fun PanchangamScreen(
                             border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
                             modifier = Modifier.clickable { showLocationDialog = true }
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                            Column(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocationOn,
-                                    contentDescription = "Location",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(15.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = state.selectedLocation,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.width(3.dp))
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Select Location",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocationOn,
+                                        contentDescription = "Location",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    val displayName = state.parsedLocation?.let {
+                                        if (lang == AppLanguage.TAMIL) it.nameTa else if (lang == AppLanguage.HINDI) it.nameHi else it.nameEn
+                                    } ?: state.selectedLocation
+                                    Text(
+                                        text = displayName,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = "Select Location",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                                state.parsedLocation?.let { coords ->
+                                    val latStr = String.format(Locale.US, "%.2f°%s", kotlin.math.abs(coords.lat), if (coords.lat >= 0) "N" else "S")
+                                    val lonStr = String.format(Locale.US, "%.2f°%s", kotlin.math.abs(coords.lon), if (coords.lon >= 0) "E" else "W")
+                                    val tzStr = String.format(Locale.US, "UTC%+05.1f", coords.timeZoneOffsetHours)
+                                    Text(
+                                        text = "$latStr, $lonStr • $tzStr",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                         }
 
@@ -176,23 +193,23 @@ fun PanchangamScreen(
                                     if (isGpsSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                                 ),
                                 modifier = Modifier
-                                    .weight(1.2f)
+                                    .weight(1.3f)
                                     .clickable { onUseMyLocationClick() }
                                     .testTag("use_my_location_btn")
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 4.dp),
+                                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center
                                 ) {
                                     if (isLocating) {
                                         CircularProgressIndicator(modifier = Modifier.size(12.dp), strokeWidth = 1.5.dp, color = MaterialTheme.colorScheme.primary)
                                     } else {
-                                        Icon(imageVector = Icons.Default.MyLocation, contentDescription = "Use My Location", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
+                                        Icon(imageVector = Icons.Default.MyLocation, contentDescription = "Use My Location", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(13.dp))
                                     }
-                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "📍 எனது இடம்" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान" else "📍 My Location",
+                                        text = if (lang == AppLanguage.TAMIL) "📍 எனது GPS" else if (lang == AppLanguage.HINDI) "📍 मेरा GPS" else "📍 My GPS",
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
@@ -202,9 +219,9 @@ fun PanchangamScreen(
                             }
 
                             val quickPresets = listOf(
-                                "🇫🇯 நாடி" to "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
-                                "🇮🇳 சென்னை" to "சென்னை (Chennai, India)",
-                                "🌍 பிற" to ""
+                                "🇫🇯 நாடி" to "நாடி, பிஜி தீவுகள்",
+                                "🇮🇳 சென்னை" to "சென்னை, தமிழ்நாடு",
+                                "🌍 உலகம்" to ""
                             )
                             quickPresets.forEach { (label, loc) ->
                                 val isSelected = loc.isNotEmpty() && state.selectedLocation.contains(loc.substringBefore(","))
@@ -231,7 +248,7 @@ fun PanchangamScreen(
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                         color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 2.dp)
+                                        modifier = Modifier.padding(vertical = 6.dp, horizontal = 2.dp)
                                     )
                                 }
                             }
@@ -776,85 +793,358 @@ fun PanchangamScreen(
 
     // Location Selection Dialog
     if (showLocationDialog) {
-        AlertDialog(
-            onDismissRequest = { showLocationDialog = false },
-            title = {
-                Text(
-                    text = if (lang == AppLanguage.TAMIL) "பஞ்சாங்க இடத்தை தேர்ந்தெடுக்கவும்" else "Select Location",
-                    fontWeight = FontWeight.Bold
-                )
+        LocationSelectionDialog(
+            currentLocation = state.selectedLocation,
+            availableLocations = state.availableLocations,
+            lang = lang,
+            isLocating = isLocating,
+            onUseMyLocationClick = {
+                showLocationDialog = false
+                onUseMyLocationClick()
             },
-            text = {
-                Column {
-                    // Use My Location action in dialog
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showLocationDialog = false
-                                onUseMyLocationClick()
-                            }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = if (lang == AppLanguage.TAMIL) "📍 எனது இருப்பிடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा वास्तविक स्थान (GPS)" else "📍 Use My Location (GPS)",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = if (lang == AppLanguage.TAMIL) "துல்லியமான சூரிய உதயம் மற்றும் திதி நேரம் பெற" else "Get exact sunrise & tithi timings for your GPS position",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    state.availableLocations.forEach { loc ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.setLocation(loc)
-                                    showLocationDialog = false
-                                }
-                                .padding(vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = loc == state.selectedLocation,
-                                onClick = {
-                                    viewModel.setLocation(loc)
-                                    showLocationDialog = false
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = loc, fontSize = 14.sp)
-                        }
-                    }
-                }
+            onSelectPreset = { loc ->
+                viewModel.setLocation(loc.nameTa)
+                showLocationDialog = false
             },
-            confirmButton = {
-                TextButton(onClick = { showLocationDialog = false }) {
-                    Text(text = if (lang == AppLanguage.TAMIL) "முடிந்தது" else "Done")
-                }
-            }
+            onSaveCustomCoordinates = { lat, lon, offset, name ->
+                viewModel.setCoordinates(lat, lon, offset, name)
+                showLocationDialog = false
+            },
+            onDismiss = { showLocationDialog = false }
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LocationSelectionDialog(
+    currentLocation: String,
+    availableLocations: List<com.example.data.service.LocationCoordinates>,
+    lang: AppLanguage,
+    isLocating: Boolean,
+    onUseMyLocationClick: () -> Unit,
+    onSelectPreset: (com.example.data.service.LocationCoordinates) -> Unit,
+    onSaveCustomCoordinates: (Double, Double, Double, String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedTab by remember { mutableIntStateOf(0) }
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedRegion by remember { mutableStateOf("All") }
+
+    // Custom coordinates state
+    var customLat by remember { mutableStateOf("") }
+    var customLon by remember { mutableStateOf("") }
+    var customTz by remember { mutableStateOf("") }
+    var customName by remember { mutableStateOf("") }
+    var customError by remember { mutableStateOf<String?>(null) }
+
+    val regions = remember(availableLocations) {
+        listOf("All") + availableLocations.map { it.region }.distinct()
+    }
+
+    val filteredLocations = remember(availableLocations, searchQuery, selectedRegion) {
+        availableLocations.filter { loc ->
+            val matchesRegion = selectedRegion == "All" || loc.region.equals(selectedRegion, ignoreCase = true)
+            val matchesSearch = searchQuery.isBlank() ||
+                    loc.nameTa.contains(searchQuery, ignoreCase = true) ||
+                    loc.nameEn.contains(searchQuery, ignoreCase = true) ||
+                    loc.nameHi.contains(searchQuery, ignoreCase = true) ||
+                    loc.region.contains(searchQuery, ignoreCase = true)
+            matchesRegion && matchesSearch
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = if (lang == AppLanguage.TAMIL) "இருப்பிடம் தேர்வு (Location)" else if (lang == AppLanguage.HINDI) "स्थान का चयन (Location)" else "Select Location",
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp
+            )
+        },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth().heightIn(max = 480.dp)) {
+                // GPS One-tap card
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onUseMyLocationClick() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isLocating) {
+                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
+                        } else {
+                            Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = if (lang == AppLanguage.TAMIL) "📍 எனது இருப்பிடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान (GPS)" else "📍 Use My GPS Location",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = if (lang == AppLanguage.TAMIL) "துல்லியமான அட்சரேகை & தீர்க்கரேகை கணக்கீடு" else "Calculates exact Lat, Lon & Local Solar Ephemeris",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Tabs: World Cities vs Custom Coordinates
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = {
+                            Text(
+                                text = if (lang == AppLanguage.TAMIL) "🌍 உலக நகரங்கள்" else "🌍 World Cities",
+                                fontSize = 12.sp,
+                                fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = {
+                            Text(
+                                text = if (lang == AppLanguage.TAMIL) "🧭 தனிப்பயன் (Lat/Lon)" else "🧭 Custom Coordinates",
+                                fontSize = 12.sp,
+                                fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (selectedTab == 0) {
+                    // Search bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text(text = if (lang == AppLanguage.TAMIL) "நகரம் / நாடு தேடவும்..." else "Search city or country...", fontSize = 12.sp) },
+                        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(16.dp)) },
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Regions scrollable chips
+                    androidx.compose.foundation.lazy.LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(regions.size) { idx ->
+                            val r = regions[idx]
+                            val isSelected = selectedRegion == r
+                            Surface(
+                                shape = RoundedCornerShape(14.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier.clickable { selectedRegion = r }
+                            ) {
+                                Text(
+                                    text = r,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Cities list
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(filteredLocations.size) { idx ->
+                            val loc = filteredLocations[idx]
+                            val isSelected = currentLocation.contains(loc.nameTa.substringBefore(",")) ||
+                                    currentLocation.contains(loc.nameEn.substringBefore(","))
+                            val title = if (lang == AppLanguage.TAMIL) loc.nameTa else if (lang == AppLanguage.HINDI) loc.nameHi else loc.nameEn
+                            val latStr = String.format(Locale.US, "%.2f°%s", kotlin.math.abs(loc.lat), if (loc.lat >= 0) "N" else "S")
+                            val lonStr = String.format(Locale.US, "%.2f°%s", kotlin.math.abs(loc.lon), if (loc.lon >= 0) "E" else "W")
+                            val tzStr = String.format(Locale.US, "UTC%+05.1f", loc.timeZoneOffsetHours)
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    0.5.dp,
+                                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onSelectPreset(loc) }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = isSelected,
+                                        onClick = { onSelectPreset(loc) },
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = title,
+                                            fontSize = 13.sp,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = "$latStr, $lonStr • $tzStr (${loc.region})",
+                                            fontSize = 10.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Custom coordinates form
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item {
+                            Text(
+                                text = if (lang == AppLanguage.TAMIL) "எந்தவொரு ஊர்/கோயிலின் அட்சரேகை & தீர்க்கரேகையை உள்ளிடவும்:" else "Enter exact coordinates for any town, village or temple:",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        item {
+                            OutlinedTextField(
+                                value = customName,
+                                onValueChange = { customName = it },
+                                label = { Text(if (lang == AppLanguage.TAMIL) "இடத்தின் பெயர் (Place Name)" else "Location / Temple Name", fontSize = 11.sp) },
+                                placeholder = { Text("e.g. Sri Shiva Temple, Houston", fontSize = 11.sp) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = customLat,
+                                    onValueChange = { customLat = it },
+                                    label = { Text("Latitude (°N/S)", fontSize = 11.sp) },
+                                    placeholder = { Text("e.g. 13.0827", fontSize = 11.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                OutlinedTextField(
+                                    value = customLon,
+                                    onValueChange = {
+                                        customLon = it
+                                        val lonVal = it.toDoubleOrNull()
+                                        if (lonVal != null && customTz.isBlank()) {
+                                            val estTz = kotlin.math.round((lonVal / 15.0) * 2.0) / 2.0
+                                            customTz = String.format(Locale.US, "%.1f", estTz)
+                                        }
+                                    },
+                                    label = { Text("Longitude (°E/W)", fontSize = 11.sp) },
+                                    placeholder = { Text("e.g. 80.2707", fontSize = 11.sp) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+
+                        item {
+                            OutlinedTextField(
+                                value = customTz,
+                                onValueChange = { customTz = it },
+                                label = { Text("UTC Time Zone Offset (Hours)", fontSize = 11.sp) },
+                                placeholder = { Text("e.g. +5.5 for India, +12.0 for Fiji, -5.0 for NY", fontSize = 11.sp) },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        if (customError != null) {
+                            item {
+                                Text(
+                                    text = customError ?: "",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
+                        item {
+                            Button(
+                                onClick = {
+                                    val lat = customLat.trim().toDoubleOrNull()
+                                    val lon = customLon.trim().toDoubleOrNull()
+                                    val tz = customTz.trim().toDoubleOrNull() ?: if (lon != null) (kotlin.math.round((lon / 15.0) * 2.0) / 2.0) else null
+                                    val name = if (customName.trim().isNotBlank()) customName.trim() else "Custom Location"
+
+                                    if (lat == null || lat < -90.0 || lat > 90.0) {
+                                        customError = "Please enter a valid Latitude (-90.0 to +90.0)"
+                                    } else if (lon == null || lon < -180.0 || lon > 180.0) {
+                                        customError = "Please enter a valid Longitude (-180.0 to +180.0)"
+                                    } else if (tz == null || tz < -12.0 || tz > 14.0) {
+                                        customError = "Please enter a valid Timezone Offset (-12.0 to +14.0)"
+                                    } else {
+                                        customError = null
+                                        onSaveCustomCoordinates(lat, lon, tz, name)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(if (lang == AppLanguage.TAMIL) "பயன்படுத்து & கணக்கிடு" else "Apply Coordinates")
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = if (lang == AppLanguage.TAMIL) "மூடு" else "Close")
+            }
+        }
+    )
 }
 
 @Composable

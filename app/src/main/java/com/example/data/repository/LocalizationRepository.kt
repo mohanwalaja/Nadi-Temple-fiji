@@ -75,6 +75,24 @@ object AppStrings {
         AppLanguage.ENGLISH -> "Settings"
     }
 
+    fun weddingMatch(lang: AppLanguage) = when (lang) {
+        AppLanguage.TAMIL -> "திருமணப் பொருத்தம்"
+        AppLanguage.HINDI -> "विवाह मिलान"
+        AppLanguage.ENGLISH -> "Wedding Match"
+    }
+
+    fun babyNames(lang: AppLanguage) = when (lang) {
+        AppLanguage.TAMIL -> "பெயர் எழுத்துக்கள்"
+        AppLanguage.HINDI -> "नामकरण अक्षर"
+        AppLanguage.ENGLISH -> "Name Letters"
+    }
+
+    fun sevvayDosham(lang: AppLanguage) = when (lang) {
+        AppLanguage.TAMIL -> "செவ்வாய் தோஷம்"
+        AppLanguage.HINDI -> "मंगल दोष"
+        AppLanguage.ENGLISH -> "Sevvay Dosham"
+    }
+
     fun templeStatusOpen(lang: AppLanguage) = when (lang) {
         AppLanguage.TAMIL -> "திருக்கோயில் நடை திறந்துள்ளது"
         AppLanguage.HINDI -> "मंदिर खुला है"

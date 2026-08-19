@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +22,6 @@ import com.example.data.model.AppLanguage
 fun TempleTopBar(
     currentLanguage: AppLanguage,
     onToggleLanguage: () -> Unit,
-    onNavigateToRasiPalan: () -> Unit,
-    onNavigateToDharmaSastra: () -> Unit,
     onNavigateToSettings: () -> Unit,
     title: String? = null
 ) {
@@ -34,44 +30,20 @@ fun TempleTopBar(
             title = {
                 Column {
                     Text(
-                        text = title ?: if (currentLanguage == AppLanguage.TAMIL) "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி" else if (currentLanguage == AppLanguage.HINDI) "श्री शिव सुब्रमण्य स्वामी मंदिर" else "Sri Siva Subramaniya Swami",
+                        text = title ?: if (currentLanguage == AppLanguage.TAMIL) "பஞ்சாங்கம் • ஜாதகம்" else if (currentLanguage == AppLanguage.HINDI) "पंचांग • कुंडली • राशिफल" else "Panchangam • Horoscope",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = if (currentLanguage == AppLanguage.TAMIL) "திருக்கோயில் • பஞ்சாங்கம் • ஜாதகம்" else if (currentLanguage == AppLanguage.HINDI) "मंदिर • पंचांग • कुंडली" else "Temple • Panchangam • Horoscope",
+                        text = if (currentLanguage == AppLanguage.TAMIL) "துல்லிய திருக்கணித பஞ்சாங்கம் • திருமணப் பொருத்தம்" else if (currentLanguage == AppLanguage.HINDI) "सटीक वैदिक पंचांग • विवाह मिलान" else "Precision Vedic Panchangam & Astrology",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             actions = {
-                // Rasi Palan quick action
-                IconButton(
-                    onClick = onNavigateToRasiPalan,
-                    modifier = Modifier.testTag("top_bar_rasi_palan_btn")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Rasi Palan",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-
-                // Dharma Sastra quick action
-                IconButton(
-                    onClick = onNavigateToDharmaSastra,
-                    modifier = Modifier.testTag("top_bar_dharma_sastra_btn")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MenuBook,
-                        contentDescription = "Dharma Sastra",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
                 // Language Toggle pill button
                 Surface(
                     onClick = onToggleLanguage,

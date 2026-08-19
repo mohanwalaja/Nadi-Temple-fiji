@@ -29,10 +29,10 @@ enum class TamilMonth(
     CHITHIRAI(1, "சித்திரை", "Chithirai", "மேஷ மாதம்", "Mesha Masa", "மேஷம்", 14, "चैत्र मास", "मेष मास"),
     VAIKASI(2, "வைகாசி", "Vaikasi", "ரிஷப மாதம்", "Vrishabha Masa", "ரிஷபம்", 15, "वैशाख मास", "वृषभ मास"),
     AANI(3, "ஆனி", "Aani", "மிதுன மாதம்", "Mithuna Masa", "மிதுனம்", 15, "ज्येष्ठ मास", "मिथुन मास"),
-    AADI(4, "ஆடி", "Aadi", "கடக மாதம்", "Kataka Masa", "கடகம்", 16, "आषाढ़ मास", "कर्क मास"),
+    AADI(4, "ஆடி", "Aadi", "கடக மாதம்", "Kataka Masa", "கடகம்", 16, "ஆஷாட் மாஸ", "कर्क मास"),
     AVANI(5, "ஆவணி", "Avani", "சிம்ம மாதம்", "Simha Masa", "சிம்மம்", 17, "श्रावण मास", "सिंह मास"),
     PURATTASI(6, "புரட்டாசி", "Purattasi", "கன்யா மாதம்", "Kanya Masa", "கன்னி", 17, "भाद्रपद मास", "कन्या मास"),
-    AIPASI(7, "ஐப்பசி", "Aipasi", "துலா மாதம்", "Tula Masa", "துலாம்", 18, "आश्विन मास", "तुला मास"),
+    AIPASI(7, "ஐப்பசி", "Aipasi", "துலா மாதம்", "Tula Masa", "துலாம்", 18, "ஆஸ்வின மாஸ", "तुला मास"),
     KARTHIGAI(8, "கார்த்திகை", "Karthigai", "விருச்சிக மாதம்", "Vrischika Masa", "விருச்சிகம்", 17, "कार्तिक मास", "वृश्चिक मास"),
     MARGHAZHI(9, "மார்கழி", "Marghazhi", "தனுர் மாதம்", "Dhanus Masa", "தனுசு", 16, "मार्गशीर्ष मास", "धनु मास"),
     THAI(10, "தை", "Thai", "மகர மாதம்", "Makara Masa", "மகரம்", 14, "पौष मास", "मकर मास"),
@@ -116,20 +116,47 @@ object TamilSamvatsaraEngine {
         TamilSamvatsara(60, "அட்சய", "Akshaya", "क्षय")
     )
 
+    private fun getJulianDay(date: LocalDate, hourFraction: Double = 0.25): Double {
+        val y = date.year
+        val m = date.monthValue
+        val d = date.dayOfMonth + hourFraction
+        val a = if (m <= 2) y - 1 else y
+        val b = if (m <= 2) m + 12 else m
+        val capA = a / 100
+        val capB = 2 - capA + (capA / 4)
+        return kotlin.math.floor(365.25 * (a + 4716)) + kotlin.math.floor(30.6001 * (b + 1)) + d + capB - 1524.5
+    }
+
+    private fun getSunSiderealLongitude(jd: Double): Double {
+        val t = (jd - 2451545.0) / 36525.0
+        val l0 = (280.46646 + 36000.76983 * t + 0.0003032 * t * t) % 360.0
+        val m = (357.52911 + 35999.05029 * t - 0.0001537 * t * t) % 360.0
+        val c = (1.914602 - 0.004817 * t - 0.000014 * t * t) * kotlin.math.sin(Math.toRadians(m)) +
+                (0.019993 - 0.000101 * t) * kotlin.math.sin(Math.toRadians(2 * m)) +
+                0.000289 * kotlin.math.sin(Math.toRadians(3 * m))
+        var sunTrue = (l0 + c) % 360.0
+        if (sunTrue < 0) sunTrue += 360.0
+        // Lahiri Ayanamsha
+        val ayanamsha = 23.85 + (jd - 2451545.0) * (50.29 / 3600.0 / 365.25)
+        var sunSid = (sunTrue - ayanamsha) % 360.0
+        if (sunSid < 0) sunSid += 360.0
+        return sunSid
+    }
+
     /**
-     * Calculates the Tamil Samvatsara from Gregorian date.
-     * Tamil New Year begins around April 14.
-     * Year 2024 (after April 14) is Krodhi (38).
-     * Year 2025 is Visvavasu (39).
-     * Year 2026 is Parabhava (40).
+     * Calculates the true astronomical Tamil Samvatsara from Sun's Sidereal Longitude.
+     * Tamil New Year begins when the Sun enters Mesha Rasi (Mesha Sankranti in April).
      */
     fun getSamvatsaraForDate(date: LocalDate): TamilSamvatsara {
+        val jd = getJulianDay(date, 0.25)
+        val sunSid = getSunSiderealLongitude(jd)
         val year = date.year
-        // Tamil new year begins on April 14
-        val effectiveYear = if (date.monthValue > 4 || (date.monthValue == 4 && date.dayOfMonth >= 14)) {
-            year
-        } else {
+        // If in Jan-April before Mesha Sankranti (when sun is in Makara, Kumbha, or Meena > 270 deg),
+        // effective year is year - 1
+        val effectiveYear = if (date.monthValue < 4 || (date.monthValue == 4 && sunSid >= 330.0)) {
             year - 1
+        } else {
+            year
         }
         var index = ((effectiveYear - 1987) % 60)
         if (index < 0) index += 60
@@ -138,25 +165,31 @@ object TamilSamvatsaraEngine {
     }
 
     /**
-     * Calculates the Tamil Month and Date for a Gregorian date.
+     * Calculates the true astronomical Tamil Month and Date for a Gregorian date
+     * based on the exact solar transit (Sankranti) and solar sidereal longitude.
      */
     fun getTamilDate(date: LocalDate): Pair<TamilMonth, Int> {
-        val month = date.monthValue
-        val day = date.dayOfMonth
-        
-        return when {
-            month == 1 -> if (day >= 14) TamilMonth.THAI to (day - 13) else TamilMonth.MARGHAZHI to (day + 16)
-            month == 2 -> if (day >= 13) TamilMonth.MASI to (day - 12) else TamilMonth.THAI to (day + 18)
-            month == 3 -> if (day >= 14) TamilMonth.PANGUNI to (day - 13) else TamilMonth.MASI to (day + 16)
-            month == 4 -> if (day >= 14) TamilMonth.CHITHIRAI to (day - 13) else TamilMonth.PANGUNI to (day + 17)
-            month == 5 -> if (day >= 15) TamilMonth.VAIKASI to (day - 14) else TamilMonth.CHITHIRAI to (day + 17)
-            month == 6 -> if (day >= 15) TamilMonth.AANI to (day - 14) else TamilMonth.VAIKASI to (day + 17)
-            month == 7 -> if (day >= 16) TamilMonth.AADI to (day - 15) else TamilMonth.AANI to (day + 16)
-            month == 8 -> if (day >= 17) TamilMonth.AVANI to (day - 16) else TamilMonth.AADI to (day + 16)
-            month == 9 -> if (day >= 17) TamilMonth.PURATTASI to (day - 16) else TamilMonth.AVANI to (day + 15)
-            month == 10 -> if (day >= 18) TamilMonth.AIPASI to (day - 17) else TamilMonth.PURATTASI to (day + 14)
-            month == 11 -> if (day >= 17) TamilMonth.KARTHIGAI to (day - 16) else TamilMonth.AIPASI to (day + 14)
-            else -> if (day >= 16) TamilMonth.MARGHAZHI to (day - 15) else TamilMonth.KARTHIGAI to (day + 14) // month 12
+        val jd = getJulianDay(date, 0.25)
+        val sunSid = getSunSiderealLongitude(jd)
+        val rasiIndex = (sunSid / 30.0).toInt() % 12
+        val currentMonth = TamilMonth.entries[rasiIndex]
+
+        // Find the exact day of Sankranti (when Sun entered this rasi)
+        var testDate = date
+        var daysBack = 0
+        while (daysBack < 32) {
+            val prevDate = testDate.minusDays(1)
+            val prevJd = getJulianDay(prevDate, 0.25)
+            val prevSunSid = getSunSiderealLongitude(prevJd)
+            val prevRasi = (prevSunSid / 30.0).toInt() % 12
+            if (prevRasi != rasiIndex) {
+                // prevDate was in the previous rasi, so testDate is day 1!
+                break
+            }
+            testDate = prevDate
+            daysBack++
         }
+        val tamilDay = daysBack + 1
+        return currentMonth to tamilDay
     }
 }

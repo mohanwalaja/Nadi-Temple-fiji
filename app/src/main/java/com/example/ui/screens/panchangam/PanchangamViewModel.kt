@@ -6,6 +6,7 @@ import com.example.data.local.UserPreferencesRepository
 import com.example.data.model.AppLanguage
 import com.example.data.model.PanchangamDetail
 import com.example.data.service.FijiTimeHelper
+import com.example.data.service.LocationCoordinates
 import com.example.data.service.PanchangamCalculator
 import com.example.data.service.StandardPanchangamCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,28 +14,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.Locale
 
 data class PanchangamUiState(
     val selectedDate: LocalDate = FijiTimeHelper.todayInFiji(),
     val panchangamDetail: PanchangamDetail? = null,
     val selectedLocation: String = "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
+    val parsedLocation: LocationCoordinates? = null,
     val language: AppLanguage = AppLanguage.TAMIL,
-    val availableLocations: List<String> = listOf(
-        "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
-        "சுவா, பிஜி (Suva, Fiji Islands)",
-        "லவுடோகா, பிஜி (Lautoka, Fiji Islands)",
-        "லபாசா, பிஜி (Labasa, Fiji Islands)",
-        "சென்னை (Chennai, India)",
-        "மதுரை (Madurai, India)",
-        "யாழ்ப்பாணம் (Jaffna, Sri Lanka)",
-        "கொழும்பு (Colombo, Sri Lanka)",
-        "சிங்கப்பூர் (Singapore)",
-        "கோலாலம்பூர் (Kuala Lumpur, Malaysia)",
-        "சிட்னி (Sydney, Australia)",
-        "ஆக்லாந்து (Auckland, New Zealand)",
-        "லண்டன் (London, UK)",
-        "டொராண்டோ (Toronto, Canada)"
-    )
+    val availableLocations: List<LocationCoordinates> = StandardPanchangamCalculator.WORLD_PRESETS
 )
 
 class PanchangamViewModel(
@@ -48,9 +36,11 @@ class PanchangamViewModel(
     init {
         viewModelScope.launch {
             preferencesRepository.preferences.collect { prefs ->
+                val parsed = panchangamCalculator.parseLocation(prefs.selectedLocation)
                 _uiState.value = _uiState.value.copy(
                     language = prefs.language,
-                    selectedLocation = prefs.selectedLocation
+                    selectedLocation = prefs.selectedLocation,
+                    parsedLocation = parsed
                 )
                 calculateForDate(_uiState.value.selectedDate, prefs.selectedLocation)
             }
@@ -74,12 +64,29 @@ class PanchangamViewModel(
 
     fun setLocation(location: String) {
         preferencesRepository.setLocation(location)
-        _uiState.value = _uiState.value.copy(selectedLocation = location)
+        val parsed = panchangamCalculator.parseLocation(location)
+        _uiState.value = _uiState.value.copy(
+            selectedLocation = location,
+            parsedLocation = parsed
+        )
         calculateForDate(_uiState.value.selectedDate, location)
+    }
+
+    fun setCoordinates(lat: Double, lon: Double, tzOffset: Double, placeName: String) {
+        val formatted = String.format(
+            Locale.US,
+            "GPS: %.4f, %.4f, %.2f, %s",
+            lat, lon, tzOffset, placeName
+        )
+        setLocation(formatted)
     }
 
     private fun calculateForDate(date: LocalDate, location: String) {
         val detail = panchangamCalculator.calculatePanchangam(date, location)
-        _uiState.value = _uiState.value.copy(panchangamDetail = detail)
+        val parsed = panchangamCalculator.parseLocation(location)
+        _uiState.value = _uiState.value.copy(
+            panchangamDetail = detail,
+            parsedLocation = parsed
+        )
     }
 }
