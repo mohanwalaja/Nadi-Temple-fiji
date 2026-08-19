@@ -309,10 +309,13 @@ object AppStrings {
         AppLanguage.ENGLISH -> "Read More"
     }
 
-    fun transitAlertTitle(lang: AppLanguage) = when (lang) {
-        AppLanguage.TAMIL -> "2026 முக்கிய கிரக எச்சரிக்கை"
-        AppLanguage.HINDI -> "2026 महत्वपूर्ण ग्रह गोचर अलर्ट"
-        AppLanguage.ENGLISH -> "2026 Planetary Transit Alert"
+    fun transitAlertTitle(lang: AppLanguage): String {
+        val year = java.time.LocalDate.now().year
+        return when (lang) {
+            AppLanguage.TAMIL -> "$year முக்கிய கிரக எச்சரிக்கை"
+            AppLanguage.HINDI -> "$year महत्वपूर्ण ग्रह गोचर अलर्ट"
+            AppLanguage.ENGLISH -> "$year Planetary Transit Alert"
+        }
     }
 
     fun transitAlertSummary(lang: AppLanguage) = when (lang) {

@@ -398,10 +398,16 @@ object MatchMakingCalculator {
             isGroomHasDosham = gDoshaEffective,
             brideDoshamSeverity = if (!bHasRawDosham) "தோஷம் இல்லை" else if (bCancelled) "விதிவிலக்கு (தோஷ நிவர்த்தி)" else "செவ்வாய் தோஷம் உண்டு (${brideMarsHouse}-ஆம் இடம்)",
             groomDoshamSeverity = if (!gHasRawDosham) "தோஷம் இல்லை" else if (gCancelled) "விதிவிலக்கு (தோஷ நிவர்த்தி)" else "செவ்வாய் தோஷம் உண்டு (${groomMarsHouse}-ஆம் இடம்)",
+            brideDoshamSeverityEn = if (!bHasRawDosham) "No Dosha" else if (bCancelled) "Cancelled (Dosha Nivritti)" else "Kuja Dosha Present (House $brideMarsHouse)",
+            groomDoshamSeverityEn = if (!gHasRawDosham) "No Dosha" else if (gCancelled) "Cancelled (Dosha Nivritti)" else "Kuja Dosha Present (House $groomMarsHouse)",
+            brideDoshamSeverityHi = if (!bHasRawDosham) "दोष नहीं है" else if (bCancelled) "दोष निवृत्ति (रद्द)" else "मंगल दोष है (भाव $brideMarsHouse)",
+            groomDoshamSeverityHi = if (!gHasRawDosham) "दोष नहीं है" else if (gCancelled) "दोष निवृत्ति (रद्द)" else "मंगल दोष है (भाव $groomMarsHouse)",
             brideCancellationReasonTa = if (bCancelled) "செவ்வாய் நின்ற ராசி/வீடு அமைப்பால் செவ்வாய் தோஷம் விதிவிலக்கு பெற்று நிவர்த்தியாகியுள்ளது." else null,
             groomCancellationReasonTa = if (gCancelled) "செவ்வாய் நின்ற ராசி/வீடு அமைப்பால் செவ்வாய் தோஷம் விதிவிலக்கு பெற்று நிவர்த்தியாகியுள்ளது." else null,
             brideCancellationReasonEn = if (bCancelled) "Mars placement qualifies for classical cancellation (Kuja Dosha Nivritti)." else null,
             groomCancellationReasonEn = if (gCancelled) "Mars placement qualifies for classical cancellation (Kuja Dosha Nivritti)." else null,
+            brideCancellationReasonHi = if (bCancelled) "मंगल की राशि/भाव स्थिति के कारण मंगल दोष रद्द (दोष निवृत्ति) हो जाता है।" else null,
+            groomCancellationReasonHi = if (gCancelled) "मंगल की राशि/भाव स्थिति के कारण मंगल दोष रद्द (दोष निवृत्ति) हो जाता है।" else null,
             doshaSamyamStatusTa = when {
                 bDoshaEffective && gDoshaEffective -> "தோஷ சாம்யம் உண்டு (இருவருக்கும் செவ்வாய் தோஷம் உள்ளதால் மிகச் சிறந்த பொருத்தம்)"
                 !bDoshaEffective && !gDoshaEffective -> "தோஷ சாம்யம் உண்டு (இருவருக்கும் செவ்வாய் தோஷம் இல்லை - நற்பொருத்தம்)"

@@ -60,17 +60,47 @@ data class SevvayDoshamAnalysis(
     val isGroomHasDosham: Boolean,
     val brideDoshamSeverity: String, // "தோஷம் இல்லை" / "மிதமான தோஷம்" / "தீவிர தோஷம்"
     val groomDoshamSeverity: String,
+    val brideDoshamSeverityEn: String = brideDoshamSeverity,
+    val groomDoshamSeverityEn: String = groomDoshamSeverity,
+    val brideDoshamSeverityHi: String = brideDoshamSeverityEn,
+    val groomDoshamSeverityHi: String = groomDoshamSeverityEn,
     val brideCancellationReasonTa: String?,
     val groomCancellationReasonTa: String?,
     val brideCancellationReasonEn: String?,
     val groomCancellationReasonEn: String?,
+    val brideCancellationReasonHi: String? = brideCancellationReasonEn,
+    val groomCancellationReasonHi: String? = groomCancellationReasonEn,
     val doshaSamyamStatusTa: String, // தோஷ சாம்யம் உண்டு / இருவருக்கும் பொருந்தும்
     val doshaSamyamStatusEn: String,
     val doshaSamyamStatusHi: String,
     val recommendationTa: String,
     val recommendationEn: String,
     val recommendationHi: String
-)
+) {
+    fun getBrideDoshamSeverity(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> brideDoshamSeverity
+        AppLanguage.HINDI -> brideDoshamSeverityHi
+        AppLanguage.ENGLISH -> brideDoshamSeverityEn
+    }
+
+    fun getGroomDoshamSeverity(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> groomDoshamSeverity
+        AppLanguage.HINDI -> groomDoshamSeverityHi
+        AppLanguage.ENGLISH -> groomDoshamSeverityEn
+    }
+
+    fun getBrideCancellationReason(lang: AppLanguage): String? = when (lang) {
+        AppLanguage.TAMIL -> brideCancellationReasonTa
+        AppLanguage.HINDI -> brideCancellationReasonHi
+        AppLanguage.ENGLISH -> brideCancellationReasonEn
+    }
+
+    fun getGroomCancellationReason(lang: AppLanguage): String? = when (lang) {
+        AppLanguage.TAMIL -> groomCancellationReasonTa
+        AppLanguage.HINDI -> groomCancellationReasonHi
+        AppLanguage.ENGLISH -> groomCancellationReasonEn
+    }
+}
 
 data class WeddingMatchResult(
     val brideRasi: Rasi,

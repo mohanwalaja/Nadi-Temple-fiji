@@ -180,8 +180,8 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         // 8. Accurate Vimshottari Dasha with elapsed balance at birth
         val dashaPeriods = calculateVimshottariDashaBalance(nakshatraIdx, posInNak, nakSpan, dob)
 
-        // 9. Sani Transit Status (Saturn transit through Kumbam / Meenam)
-        val currentSaturnRasi = Rasi.KUMBAM
+        // 9. Sani Transit Status — computed from actual transit date, not a frozen constant
+        val currentSaturnRasi = TransitEphemerisProvider.currentSaniRasi(LocalDate.now()).rasi
         val saniDiff = ((currentSaturnRasi.index - chandraRasi.index + 12) % 12)
         val isEzharai = saniDiff in listOf(11, 0, 1)
         val ezharaiTypeTa = when (saniDiff) {

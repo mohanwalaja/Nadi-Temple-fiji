@@ -402,8 +402,15 @@ fun NakshatraSpotlightCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text("அதிபதி & தேவதை", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("${star.lordTa} • ${star.deityTa}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "அதிபதி & தேவதை"
+                                AppLanguage.HINDI -> "स्वामी एवं देवता"
+                                AppLanguage.ENGLISH -> "Lord & Deity"
+                            },
+                            fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text("${star.getLord(currentLanguage)} • ${star.getDeity(currentLanguage)}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -414,8 +421,15 @@ fun NakshatraSpotlightCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text("கணம் & யோனி", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("${star.ganaTa} • ${star.yoniTa}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "கணம் & யோனி"
+                                AppLanguage.HINDI -> "गण एवं योनि"
+                                AppLanguage.ENGLISH -> "Gana & Yoni"
+                            },
+                            fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text("${star.getGana(currentLanguage)} • ${star.getYoni(currentLanguage)}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -465,7 +479,11 @@ fun NakshatraSummaryCard(
                 }
 
                 Text(
-                    text = "அதிபதி: ${star.lordTa}",
+                    text = when (currentLanguage) {
+                        AppLanguage.TAMIL -> "அதிபதி: ${star.getLord(currentLanguage)}"
+                        AppLanguage.HINDI -> "स्वामी: ${star.getLord(currentLanguage)}"
+                        AppLanguage.ENGLISH -> "Lord: ${star.getLord(currentLanguage)}"
+                    },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -486,10 +504,31 @@ fun NakshatraSummaryCard(
                             modifier = Modifier.padding(4.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("பாதம் ${pada.padaNumber}", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(pada.letterTa, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TempleMaroon)
+                            Text(
+                                when (currentLanguage) {
+                                    AppLanguage.TAMIL -> "பாதம் ${pada.padaNumber}"
+                                    AppLanguage.HINDI -> "पाद ${pada.padaNumber}"
+                                    AppLanguage.ENGLISH -> "Pada ${pada.padaNumber}"
+                                },
+                                fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                when (currentLanguage) {
+                                    AppLanguage.TAMIL -> pada.letterTa
+                                    AppLanguage.HINDI -> pada.letterHi
+                                    AppLanguage.ENGLISH -> pada.letterEn
+                                },
+                                fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TempleMaroon
+                            )
                             Text(pada.letterEn, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(pada.rasiTa, fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = TempleGoldDark)
+                            Text(
+                                when (currentLanguage) {
+                                    AppLanguage.TAMIL -> pada.rasiTa
+                                    AppLanguage.HINDI -> pada.rasiHi
+                                    AppLanguage.ENGLISH -> pada.rasiEn
+                                },
+                                fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = TempleGoldDark
+                            )
                         }
                     }
                 }

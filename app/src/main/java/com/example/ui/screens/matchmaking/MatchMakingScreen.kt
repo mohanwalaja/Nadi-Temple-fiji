@@ -283,7 +283,11 @@ fun MatchMakingScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         PersonManualSelectorCard(
-                            title = "மணமகள்",
+                            title = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "மணமகள்"
+                                AppLanguage.HINDI -> "वधू"
+                                AppLanguage.ENGLISH -> "Bride"
+                            },
                             selectedRasi = uiState.brideRasi,
                             selectedNakshatraIdx = uiState.brideNakshatraIndex,
                             selectedPada = uiState.bridePada,
@@ -298,7 +302,11 @@ fun MatchMakingScreen(
                         )
 
                         PersonManualSelectorCard(
-                            title = "மணமகன்",
+                            title = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "மணமகன்"
+                                AppLanguage.HINDI -> "वर"
+                                AppLanguage.ENGLISH -> "Groom"
+                            },
                             selectedRasi = uiState.groomRasi,
                             selectedNakshatraIdx = uiState.groomNakshatraIndex,
                             selectedPada = uiState.groomPada,
@@ -725,7 +733,14 @@ fun PersonBirthInputCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Column(modifier = Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("லக்னம் (Lagna)", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "லக்னம்"
+                                AppLanguage.HINDI -> "लग्न"
+                                AppLanguage.ENGLISH -> "Lagna"
+                            },
+                            fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Text(calculatedLagna?.getName(currentLanguage) ?: "-", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -736,9 +751,20 @@ fun PersonBirthInputCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Column(modifier = Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("செவ்வாய் நிலை", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            text = "$calculatedMarsHouse-ஆம் இடம் ${if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) "⚠️" else "✓"}",
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "செவ்வாய் நிலை"
+                                AppLanguage.HINDI -> "मंगल स्थिति"
+                                AppLanguage.ENGLISH -> "Mars Status"
+                            },
+                            fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "$calculatedMarsHouse-ஆம் இடம்"
+                                AppLanguage.HINDI -> "भाव $calculatedMarsHouse"
+                                AppLanguage.ENGLISH -> "House $calculatedMarsHouse"
+                            } + " " + (if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) "⚠️" else "✓"),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) Color(0xFFC62828) else Color(0xFF2E7D32)
@@ -796,7 +822,16 @@ fun PersonManualSelectorCard(
                     value = selectedRasi.getName(currentLanguage),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("ராசி", fontSize = 10.sp) },
+                    label = {
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "ராசி"
+                                AppLanguage.HINDI -> "राशि"
+                                AppLanguage.ENGLISH -> "Rasi"
+                            },
+                            fontSize = 10.sp
+                        )
+                    },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = rasiExpanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -822,12 +857,26 @@ fun PersonManualSelectorCard(
                 expanded = starExpanded,
                 onExpandedChange = { starExpanded = !starExpanded }
             ) {
-                val starName = MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(selectedNakshatraIdx) { "" }
+                val nakshatramNames = when (currentLanguage) {
+                    AppLanguage.TAMIL -> MatchMakingCalculator.NAKSHATRAM_NAMES_TA
+                    AppLanguage.HINDI -> MatchMakingCalculator.NAKSHATRAM_NAMES_HI
+                    AppLanguage.ENGLISH -> MatchMakingCalculator.NAKSHATRAM_NAMES_EN
+                }
+                val starName = nakshatramNames.getOrElse(selectedNakshatraIdx) { "" }
                 OutlinedTextField(
                     value = starName,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("நட்சத்திரம்", fontSize = 10.sp) },
+                    label = {
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "நட்சத்திரம்"
+                                AppLanguage.HINDI -> "नक्षत्र"
+                                AppLanguage.ENGLISH -> "Nakshatram"
+                            },
+                            fontSize = 10.sp
+                        )
+                    },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = starExpanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -836,9 +885,9 @@ fun PersonManualSelectorCard(
                     expanded = starExpanded,
                     onDismissRequest = { starExpanded = false }
                 ) {
-                    MatchMakingCalculator.NAKSHATRAM_NAMES_TA.indices.forEach { idx ->
+                    nakshatramNames.indices.forEach { idx ->
                         DropdownMenuItem(
-                            text = { Text("${idx + 1}. ${MatchMakingCalculator.NAKSHATRAM_NAMES_TA[idx]}", fontSize = 12.sp) },
+                            text = { Text("${idx + 1}. ${nakshatramNames[idx]}", fontSize = 12.sp) },
                             onClick = {
                                 onNakshatraSelected(idx)
                                 starExpanded = false
@@ -883,7 +932,16 @@ fun PersonManualSelectorCard(
                     value = "$selectedMarsHouse-ஆம் இடம்",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("செவ்வாய்", fontSize = 10.sp) },
+                    label = {
+                        Text(
+                            when (currentLanguage) {
+                                AppLanguage.TAMIL -> "செவ்வாய்"
+                                AppLanguage.HINDI -> "मंगल भाव"
+                                AppLanguage.ENGLISH -> "Mars House"
+                            },
+                            fontSize = 10.sp
+                        )
+                    },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = marsExpanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
@@ -1189,16 +1247,23 @@ fun SevvayDoshamDetailCard(
                     )
                 ) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("👰 மணமகள்", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                         Text(
-                            text = analysis.brideDoshamSeverity,
+                            "👰 " + when (currentLanguage) {
+                                AppLanguage.TAMIL -> "மணமகள்"
+                                AppLanguage.HINDI -> "वधू"
+                                AppLanguage.ENGLISH -> "Bride"
+                            },
+                            fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = analysis.getBrideDoshamSeverity(currentLanguage),
                             fontWeight = FontWeight.Bold,
                             color = if (analysis.isBrideHasDosham) Color(0xFFC62828) else Color(0xFF2E7D32),
                             style = MaterialTheme.typography.bodySmall
                         )
-                        if (analysis.brideCancellationReasonTa != null) {
+                        analysis.getBrideCancellationReason(currentLanguage)?.let { reason ->
                             Text(
-                                text = analysis.brideCancellationReasonTa,
+                                text = reason,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(0xFF388E3C)
                             )
@@ -1215,16 +1280,23 @@ fun SevvayDoshamDetailCard(
                     )
                 ) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("🤵 மணமகன்", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                         Text(
-                            text = analysis.groomDoshamSeverity,
+                            "🤵 " + when (currentLanguage) {
+                                AppLanguage.TAMIL -> "மணமகன்"
+                                AppLanguage.HINDI -> "वर"
+                                AppLanguage.ENGLISH -> "Groom"
+                            },
+                            fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = analysis.getGroomDoshamSeverity(currentLanguage),
                             fontWeight = FontWeight.Bold,
                             color = if (analysis.isGroomHasDosham) Color(0xFFC62828) else Color(0xFF2E7D32),
                             style = MaterialTheme.typography.bodySmall
                         )
-                        if (analysis.groomCancellationReasonTa != null) {
+                        analysis.getGroomCancellationReason(currentLanguage)?.let { reason ->
                             Text(
-                                text = analysis.groomCancellationReasonTa,
+                                text = reason,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(0xFF388E3C)
                             )

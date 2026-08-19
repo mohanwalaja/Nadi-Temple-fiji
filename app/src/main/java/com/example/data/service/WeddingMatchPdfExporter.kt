@@ -356,18 +356,30 @@ object WeddingMatchPdfExporter {
 
         var sy = y + 16
         val sx = margin + 18
-        canvas.drawText("செவ்வாய் தோஷ விளக்கம் & தோஷ சாம்யம் (Kuja Dosha Analysis)", sx, sy, boldTextPaint.apply { color = Color.rgb(128, 0, 32); textSize = 10.5f })
+        canvas.drawText(getLabel("KujaDoshaTitle", lang), sx, sy, boldTextPaint.apply { color = Color.rgb(128, 0, 32); textSize = 10.5f })
         sy += 15
 
-        val brideSevTxt = "மணமகள்: ${result.sevvayDosham.brideDoshamSeverity} ${result.sevvayDosham.brideCancellationReasonTa ?: ""}"
+        val brideSevTxt = "${getLabel("Bride", lang)}: ${result.sevvayDosham.getBrideDoshamSeverity(lang)} ${result.sevvayDosham.getBrideCancellationReason(lang) ?: ""}"
         canvas.drawText(brideSevTxt, sx, sy, textPaint.apply { textSize = 9f })
         sy += 14
 
-        val groomSevTxt = "மணமகன்: ${result.sevvayDosham.groomDoshamSeverity} ${result.sevvayDosham.groomCancellationReasonTa ?: ""}"
+        val groomSevTxt = "${getLabel("Groom", lang)}: ${result.sevvayDosham.getGroomDoshamSeverity(lang)} ${result.sevvayDosham.getGroomCancellationReason(lang) ?: ""}"
         canvas.drawText(groomSevTxt, sx, sy, textPaint.apply { textSize = 9f })
         sy += 14
 
-        val samyamTxt = "தோஷ சமநிலை: ${result.sevvayDosham.doshaSamyamStatusTa} • ${result.sevvayDosham.recommendationTa}"
+        val samyamTxt = "${getLabel("DoshaBalance", lang)}: ${
+            when (lang) {
+                AppLanguage.TAMIL -> result.sevvayDosham.doshaSamyamStatusTa
+                AppLanguage.HINDI -> result.sevvayDosham.doshaSamyamStatusHi
+                AppLanguage.ENGLISH -> result.sevvayDosham.doshaSamyamStatusEn
+            }
+        } • ${
+            when (lang) {
+                AppLanguage.TAMIL -> result.sevvayDosham.recommendationTa
+                AppLanguage.HINDI -> result.sevvayDosham.recommendationHi
+                AppLanguage.ENGLISH -> result.sevvayDosham.recommendationEn
+            }
+        }"
         canvas.drawText(samyamTxt.take(85), sx, sy, boldTextPaint.apply { color = Color.rgb(40, 40, 40); textSize = 9f })
 
         // 6. Footer
@@ -421,6 +433,26 @@ object WeddingMatchPdfExporter {
             AppLanguage.TAMIL -> "மொத்த பொருத்தம்"
             AppLanguage.HINDI -> "कुल मिलान"
             AppLanguage.ENGLISH -> "Total Match Score"
+        }
+        "KujaDoshaTitle" -> when (lang) {
+            AppLanguage.TAMIL -> "செவ்வாய் தோஷ விளக்கம் & தோஷ சாம்யம்"
+            AppLanguage.HINDI -> "मंगल दोष विश्लेषण एवं दोष साम्य"
+            AppLanguage.ENGLISH -> "Kuja Dosha Analysis & Balance"
+        }
+        "Bride" -> when (lang) {
+            AppLanguage.TAMIL -> "மணமகள்"
+            AppLanguage.HINDI -> "वधू"
+            AppLanguage.ENGLISH -> "Bride"
+        }
+        "Groom" -> when (lang) {
+            AppLanguage.TAMIL -> "மணமகன்"
+            AppLanguage.HINDI -> "वर"
+            AppLanguage.ENGLISH -> "Groom"
+        }
+        "DoshaBalance" -> when (lang) {
+            AppLanguage.TAMIL -> "தோஷ சமநிலை"
+            AppLanguage.HINDI -> "दोष संतुलन"
+            AppLanguage.ENGLISH -> "Dosha Balance"
         }
         else -> key
     }

@@ -10,12 +10,20 @@ import java.time.LocalDate
  */
 object RasiPalanEngine {
 
-    // Current Ephemeris planetary transit positions (Epoch 2026/2027)
-    private val CURRENT_GURU_RASI = Rasi.MITHUNAM  // Guru (Jupiter) in Mithunam
-    private val CURRENT_SANI_RASI = Rasi.MEENAM    // Sani (Saturn) in Meenam
-    private val CURRENT_RAHU_RASI = Rasi.KUMBAM    // Rahu in Kumbham
-    private val CURRENT_KETU_RASI = Rasi.SIMHAM    // Ketu in Simham
-    private val CURRENT_SURYA_RASI = Rasi.SIMHAM   // Sun in Simham (Avani month)
+    // Planetary transit positions are now looked up live from TransitEphemerisProvider
+    // (ingress-date tables + a solar-longitude formula) instead of frozen constants, so
+    // they stay correct as Guru/Sani/Rahu/Ketu/Surya actually move through the signs.
+    private val CURRENT_GURU_RASI: Rasi get() = TransitEphemerisProvider.currentGuruRasi().rasi
+    private val CURRENT_SANI_RASI: Rasi get() = TransitEphemerisProvider.currentSaniRasi().rasi
+    private val CURRENT_RAHU_RASI: Rasi get() = TransitEphemerisProvider.currentRahuRasi().rasi
+    private val CURRENT_KETU_RASI: Rasi get() = TransitEphemerisProvider.currentKetuRasi().rasi
+    private val CURRENT_SURYA_RASI: Rasi get() = TransitEphemerisProvider.currentSuryaRasi()
+
+    /** Rolling "current + next" label, e.g. "2026–2027", instead of a string baked in at build time. */
+    private fun currentYearRangeLabel(): String {
+        val y = LocalDate.now().year
+        return "$y\u2013${y + 1}"
+    }
 
     fun generate(
         jathagam: HoroscopeResult,
@@ -123,7 +131,7 @@ object RasiPalanEngine {
                 PalanTimeframe.DAILY -> "இன்றைய பலன் (Today / दैनिक)"
                 PalanTimeframe.WEEKLY -> "இந்த வார பலன் (This Week / साप्ताहिक)"
                 PalanTimeframe.MONTHLY -> "இந்த மாத பலன் (This Month / मासिक)"
-                PalanTimeframe.YEARLY -> "2026–2027 வருட பலன் (Annual)"
+                PalanTimeframe.YEARLY -> "${currentYearRangeLabel()} வருட பலன் (Annual)"
             },
             elementTa = vedicAttrs.elementTa,
             elementEn = vedicAttrs.elementEn,
@@ -248,7 +256,7 @@ object RasiPalanEngine {
                 PalanTimeframe.DAILY -> "இன்றைய பலன் (Today / दैनिक)"
                 PalanTimeframe.WEEKLY -> "இந்த வார பலன் (This Week / साप्ताहिक)"
                 PalanTimeframe.MONTHLY -> "இந்த மாத பலன் (This Month / मासिक)"
-                PalanTimeframe.YEARLY -> "2026–2027 வருட பலன் (Annual)"
+                PalanTimeframe.YEARLY -> "${currentYearRangeLabel()} வருட பலன் (Annual)"
             },
             elementTa = vedicAttrs.elementTa,
             elementEn = vedicAttrs.elementEn,
@@ -408,11 +416,11 @@ object RasiPalanEngine {
             PalanTimeframe.WEEKLY -> "இந்த வாரம் $rasiTa ராசி அன்பர்களுக்கு கிரக நிலைகள் அனுகூலமாக அமைந்துள்ளன. திட்டமிட்ட சுப முயற்சிகள் வெற்றி பெறும். உறவினர்கள் மற்றும் நண்பர்களின் ஆதரவு கிட்டும்."
             PalanTimeframe.MONTHLY -> "இந்த மாதத்தில் $rasiTa ராசிக்கு குருவின் சுப பார்வையும் கிரகச் சேர்க்கைகளும் சாதகமான பலன்களைத் தரும். பொருளாதார வளர்ச்சி மற்றும் குடும்ப மகிழ்ச்சி உண்டாகும்."
             PalanTimeframe.YEARLY -> if (isGuruBenefic) {
-                "2026-2027 வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு குரு பகவான் $guruHouse-ஆம் இடத்தில் சுப பலம் பெற்று விளங்குவதால் காரிய சித்தி, தெய்வ கடாட்சம் மற்றும் சமூகத்தில் கௌரவம் உயரும் ஆண்டாக அமையும்."
+                "${currentYearRangeLabel()} வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு குரு பகவான் $guruHouse-ஆம் இடத்தில் சுப பலம் பெற்று விளங்குவதால் காரிய சித்தி, தெய்வ கடாட்சம் மற்றும் சமூகத்தில் கௌரவம் உயரும் ஆண்டாக அமையும்."
             } else if (isEzharai || isAshtama) {
-                "2026-2027 வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு சனி பகவானின் சஞ்சாரம் பொறுமையையும் விவேகத்தையும் கோருகிறது. இறை வழிபாடும் திட்டமிட்ட செயல்பாடுகளும் நற்பலன்களைத் தரும்."
+                "${currentYearRangeLabel()} வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு சனி பகவானின் சஞ்சாரம் பொறுமையையும் விவேகத்தையும் கோருகிறது. இறை வழிபாடும் திட்டமிட்ட செயல்பாடுகளும் நற்பலன்களைத் தரும்."
             } else {
-                "2026-2027 வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு இவ்வாண்டு மிதமான நற்பலன்களையும் தொழில் முன்னேற்றத்தையும் தரும். விடாமுயற்சிக்கு உரிய வெற்றி கிடைக்கும்."
+                "${currentYearRangeLabel()} வருட பலன்: $rasiTa ராசி அன்பர்களுக்கு இவ்வாண்டு மிதமான நற்பலன்களையும் தொழில் முன்னேற்றத்தையும் தரும். விடாமுயற்சிக்கு உரிய வெற்றி கிடைக்கும்."
             }
         }
 
@@ -421,11 +429,11 @@ object RasiPalanEngine {
             PalanTimeframe.WEEKLY -> "This week favors $rasiEn natives with positive transit alignment. Scheduled endeavors progress smoothly with encouraging support from peers and family."
             PalanTimeframe.MONTHLY -> "Monthly astrological overview indicates progressive trends for $rasiEn. Benefic aspects promote financial stability and domestic peace."
             PalanTimeframe.YEARLY -> if (isGuruBenefic) {
-                "Yearly Transit (2026–2027): With Jupiter positioned beneficially in the ${guruHouse}th House from Janma Rasi $rasiEn, this period heralds exceptional divine grace, achievement, and elevated respect."
+                "Yearly Transit (${currentYearRangeLabel()}): With Jupiter positioned beneficially in the ${guruHouse}th House from Janma Rasi $rasiEn, this period heralds exceptional divine grace, achievement, and elevated respect."
             } else if (isEzharai || isAshtama) {
-                "Yearly Transit (2026–2027): For $rasiEn, Saturn's current transit advises deliberate patience, ethical focus, and diligent temple worship to transform challenges into spiritual strength."
+                "Yearly Transit (${currentYearRangeLabel()}): For $rasiEn, Saturn's current transit advises deliberate patience, ethical focus, and diligent temple worship to transform challenges into spiritual strength."
             } else {
-                "Yearly Transit (2026–2027): A steady, productive year for $rasiEn with steady professional advancement through consistent perseverance."
+                "Yearly Transit (${currentYearRangeLabel()}): A steady, productive year for $rasiEn with steady professional advancement through consistent perseverance."
             }
         }
 
@@ -434,11 +442,11 @@ object RasiPalanEngine {
             PalanTimeframe.WEEKLY -> "इस सप्ताह $rasiHi राशि के जातकों को ग्रह गोचर का अनुकूल सहयोग प्राप्त होगा। योजनाबद्ध कार्यों में सफलता मिलेगी।"
             PalanTimeframe.MONTHLY -> "इस माह $rasiHi राशि के लिए आर्थिक स्थिरता और पारिवारिक सौहार्द के उत्तम योग बन रहे हैं।"
             PalanTimeframe.YEARLY -> if (isGuruBenefic) {
-                "वार्षिक राशिफल (2026–2027): गुरु के ${guruHouse}वें भाव में शुभ गोचर से $rasiHi राशि के लिए भाग्योदय, पद-प्रतिष्ठा और दैवीय कृपा में वृद्धि होगी।"
+                "वार्षिक राशिफल (${currentYearRangeLabel()}): गुरु के ${guruHouse}वें भाव में शुभ गोचर से $rasiHi राशि के लिए भाग्योदय, पद-प्रतिष्ठा और दैवीय कृपा में वृद्धि होगी।"
             } else if (isEzharai || isAshtama) {
-                "वार्षिक राशिफल (2026–2027): शनि गोचर के प्रभाव से धैर्य, संयम और श्री शिव सुब्रमण्य स्वामी की नियमित आराधना से सभी कार्य निर्विघ्न संपन्न होंगे।"
+                "वार्षिक राशिफल (${currentYearRangeLabel()}): शनि गोचर के प्रभाव से धैर्य, संयम और श्री शिव सुब्रमण्य स्वामी की नियमित आराधना से सभी कार्य निर्विघ्न संपन्न होंगे।"
             } else {
-                "वार्षिक राशिफल (2026–2027): $rasiHi राशि के लिए यह वर्ष प्रगतिशील और कर्मक्षेत्र में स्थिरता प्रदान करने वाला रहेगा।"
+                "वार्षिक राशिफल (${currentYearRangeLabel()}): $rasiHi राशि के लिए यह वर्ष प्रगतिशील और कर्मक्षेत्र में स्थिरता प्रदान करने वाला रहेगा।"
             }
         }
 
