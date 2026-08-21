@@ -40,16 +40,16 @@ object HoroscopePdfExporter {
             // Paint objects
             val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = COLOR_DARK_TEXT
-                textSize = 9.5f
+                textSize = 10.5f
             }
             val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = COLOR_MAROON
-                textSize = 14f
+                textSize = 16f
                 typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
             }
             val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = COLOR_MAROON
-                textSize = 11f
+                textSize = 12f
                 typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             }
             val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -85,17 +85,17 @@ object HoroscopePdfExporter {
             // Temple Header
             titlePaint.textAlign = Paint.Align.CENTER
             titlePaint.color = COLOR_MAROON
-            titlePaint.textSize = 14f
+            titlePaint.textSize = 15.5f
             val templeTitle = when (lang) {
                 AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்ரமணிய சுவாமி திருக்கோயில்"
                 AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर"
                 AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Temple"
             }
             canvas1.drawText(templeTitle, (PAGE_WIDTH / 2).toFloat(), y, titlePaint)
-            y += 14f
+            y += 15f
 
             textPaint.textAlign = Paint.Align.CENTER
-            textPaint.textSize = 9f
+            textPaint.textSize = 10f
             textPaint.color = COLOR_GOLD
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             val templeLocation = when (lang) {
@@ -104,9 +104,9 @@ object HoroscopePdfExporter {
                 AppLanguage.ENGLISH -> "Nadi, Fiji Islands"
             }
             canvas1.drawText(templeLocation, (PAGE_WIDTH / 2).toFloat(), y, textPaint)
-            y += 14f
+            y += 15f
 
-            textPaint.textSize = 10.5f
+            textPaint.textSize = 11.5f
             textPaint.color = COLOR_DARK_TEXT
             textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
             val docTitle = when (lang) {
@@ -121,27 +121,27 @@ object HoroscopePdfExporter {
             borderPaint.color = COLOR_GOLD
             borderPaint.strokeWidth = 1f
             canvas1.drawLine(35f, y, (PAGE_WIDTH - 35).toFloat(), y, borderPaint)
-            y += 15f
+            y += 13f
 
             // Devotee Information Box
             val boxLeft = 32f
             val boxRight = (PAGE_WIDTH - 32).toFloat()
             val boxTop = y
-            val boxHeight = 70f
+            val boxHeight = 74f
             fillPaint.color = Color.WHITE
             canvas1.drawRoundRect(RectF(boxLeft, boxTop, boxRight, boxTop + boxHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_BORDER
             canvas1.drawRoundRect(RectF(boxLeft, boxTop, boxRight, boxTop + boxHeight), 6f, 6f, borderPaint)
 
             textPaint.textAlign = Paint.Align.LEFT
-            textPaint.textSize = 9f
+            textPaint.textSize = 10f
             val timeFmt = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
             val dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH)
 
-            val row1Y = boxTop + 15f
-            val row2Y = boxTop + 31f
-            val row3Y = boxTop + 47f
-            val row4Y = boxTop + 62f
+            val row1Y = boxTop + 16f
+            val row2Y = boxTop + 33f
+            val row3Y = boxTop + 50f
+            val row4Y = boxTop + 67f
 
             // Labels for Personal Info
             val lblName = when (lang) { AppLanguage.TAMIL -> "பெயர் (Name):"; AppLanguage.HINDI -> "नाम (Name):"; AppLanguage.ENGLISH -> "Name:" }
@@ -291,7 +291,7 @@ object HoroscopePdfExporter {
 
                 // Rasi Short Tag
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 6.5f
+                textPaint.textSize = 7.5f
                 textPaint.color = COLOR_GRAY_TEXT
                 textPaint.typeface = Typeface.DEFAULT
                 val rasiTag = when (lang) {
@@ -305,7 +305,7 @@ object HoroscopePdfExporter {
                 var pY = cY + 18f
                 if (result.lagnaRasi == rasi) {
                     textPaint.textAlign = Paint.Align.LEFT
-                    textPaint.textSize = 7.5f
+                    textPaint.textSize = 8.5f
                     textPaint.color = COLOR_KUMKUM
                     textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                     val lagText = when (lang) {
@@ -321,7 +321,7 @@ object HoroscopePdfExporter {
                 val planetsInRasi = result.planetPositions.filter { it.rasi == rasi }
                 planetsInRasi.forEach { p ->
                     textPaint.textAlign = Paint.Align.LEFT
-                    textPaint.textSize = 7f
+                    textPaint.textSize = 8f
                     textPaint.color = if (p.graha == Graha.SURYA || p.graha == Graha.CHANDRA) COLOR_MAROON else COLOR_DARK_TEXT
                     textPaint.typeface = if (p.isRetrograde) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.DEFAULT
                     val shortGraha = when (lang) {
@@ -340,7 +340,7 @@ object HoroscopePdfExporter {
             val tableRight = boxRight
             val tableTop = chartTop
 
-            headerPaint.textSize = 10f
+            headerPaint.textSize = 10.5f
             headerPaint.color = COLOR_MAROON
             val tableTitle = when (lang) {
                 AppLanguage.TAMIL -> "நவக்கிரக நிலைகள் (Planetary Positions)"
@@ -363,7 +363,7 @@ object HoroscopePdfExporter {
             val colStatus = when (lang) { AppLanguage.TAMIL -> "நிலை"; AppLanguage.HINDI -> "स्थिति"; AppLanguage.ENGLISH -> "Status" }
 
             textPaint.textAlign = Paint.Align.LEFT
-            textPaint.textSize = 7.5f
+            textPaint.textSize = 8.5f
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
             canvas1.drawText(colPlanet, tableLeft + 4f, tY, textPaint)
@@ -376,7 +376,7 @@ object HoroscopePdfExporter {
             result.planetPositions.forEach { p ->
                 textPaint.typeface = Typeface.DEFAULT
                 textPaint.color = COLOR_DARK_TEXT
-                textPaint.textSize = 7.5f
+                textPaint.textSize = 8.5f
 
                 canvas1.drawText(p.graha.getName(lang), tableLeft + 4f, tY, textPaint)
                 canvas1.drawText(p.rasi.getName(lang), tableLeft + 55f, tY, textPaint)
@@ -401,7 +401,7 @@ object HoroscopePdfExporter {
             y = chartTop + chartSize + 16f
 
             // Vimshottari Dasha Periods Box
-            headerPaint.textSize = 10.5f
+            headerPaint.textSize = 11f
             headerPaint.color = COLOR_MAROON
             val dashaHeader = when (lang) {
                 AppLanguage.TAMIL -> "விம்சோத்தரி மகாதிசை கால அட்டவணை (Vimshottari Dasha Timeline)"
@@ -418,12 +418,10 @@ object HoroscopePdfExporter {
 
             var dY = y + 14f
             val dashaTitle = when (lang) { AppLanguage.TAMIL -> "மகாதிசை:"; AppLanguage.HINDI -> "महादशा:"; AppLanguage.ENGLISH -> "Mahadasha:" }
-            val toText = when (lang) { AppLanguage.TAMIL -> "முதல்"; AppLanguage.HINDI -> "से"; AppLanguage.ENGLISH -> "to" }
-            val tillText = when (lang) { AppLanguage.TAMIL -> "வரை"; AppLanguage.HINDI -> "तक"; AppLanguage.ENGLISH -> "" }
 
             result.dashaPeriods.take(4).forEach { dasha ->
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 8f
+                textPaint.textSize = 9f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = COLOR_MAROON
                 val lordName = dasha.mahadashaLord.getName(lang)
@@ -442,7 +440,7 @@ object HoroscopePdfExporter {
             y += 75f
 
             // Sani Transit & Saturn Status Card
-            headerPaint.textSize = 10.5f
+            headerPaint.textSize = 11.5f
             headerPaint.color = COLOR_MAROON
             val saniHeader = when (lang) {
                 AppLanguage.TAMIL -> "சனிப் பெயர்ச்சி நிலை (Saturn Transit Status)"
@@ -455,9 +453,9 @@ object HoroscopePdfExporter {
             val sani = result.saniStatus
             val saniBgColor = if (sani.isEzharaiSani || sani.isAshtamaSani) Color.rgb(255, 240, 240) else Color.rgb(240, 250, 240)
             fillPaint.color = saniBgColor
-            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 42f), 6f, 6f, fillPaint)
+            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 44f), 6f, 6f, fillPaint)
             borderPaint.color = if (sani.isEzharaiSani || sani.isAshtamaSani) COLOR_KUMKUM else COLOR_GREEN
-            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 42f), 6f, 6f, borderPaint)
+            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 44f), 6f, 6f, borderPaint)
 
             val saniStatusText = if (sani.isEzharaiSani) {
                 when (lang) {
@@ -488,19 +486,19 @@ object HoroscopePdfExporter {
             val lblRemedy = when (lang) { AppLanguage.TAMIL -> "பரிகாரம்:"; AppLanguage.HINDI -> "उपाय:"; AppLanguage.ENGLISH -> "Remedy:" }
 
             textPaint.textAlign = Paint.Align.LEFT
-            textPaint.textSize = 8.5f
+            textPaint.textSize = 9.5f
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = if (sani.isEzharaiSani || sani.isAshtamaSani) COLOR_KUMKUM else COLOR_GREEN
-            canvas1.drawText(saniStatusText, 42f, y + 14f, textPaint)
+            canvas1.drawText(saniStatusText, 42f, y + 15f, textPaint)
 
             textPaint.typeface = Typeface.DEFAULT
-            textPaint.textSize = 8f
+            textPaint.textSize = 9f
             textPaint.color = COLOR_DARK_TEXT
-            canvas1.drawText("$lblRemedy ${sani.getRemedy(lang)}", 42f, y + 28f, textPaint)
+            canvas1.drawText("$lblRemedy ${sani.getRemedy(lang)}", 42f, y + 30f, textPaint)
 
             // Page 1 Footer
             textPaint.textAlign = Paint.Align.CENTER
-            textPaint.textSize = 7.5f
+            textPaint.textSize = 8.5f
             textPaint.color = COLOR_GRAY_TEXT
             val footerText1 = when (lang) {
                 AppLanguage.TAMIL -> "பக்கம் 1 / 2 • ஸ்ரீ சிவ சுப்ரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி"
@@ -543,35 +541,35 @@ object HoroscopePdfExporter {
             result.doshas.forEach { dosha ->
                 val doshaBg = if (dosha.isPresent) Color.rgb(255, 245, 245) else Color.rgb(245, 255, 245)
                 fillPaint.color = doshaBg
-                canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 38f), 5f, 5f, fillPaint)
+                canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 40f), 5f, 5f, fillPaint)
                 borderPaint.color = if (dosha.isPresent) COLOR_KUMKUM else COLOR_GREEN
                 borderPaint.strokeWidth = 0.8f
-                canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 38f), 5f, 5f, borderPaint)
+                canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 40f), 5f, 5f, borderPaint)
 
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 8.5f
+                textPaint.textSize = 9.5f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = if (dosha.isPresent) COLOR_KUMKUM else COLOR_GREEN
-                canvas2.drawText("${dosha.getName(lang)} - ${dosha.getSeverity(lang)}", 40f, y2 + 12f, textPaint)
+                canvas2.drawText("${dosha.getName(lang)} - ${dosha.getSeverity(lang)}", 40f, y2 + 13f, textPaint)
 
                 textPaint.typeface = Typeface.DEFAULT
-                textPaint.textSize = 7.5f
+                textPaint.textSize = 8.5f
                 textPaint.color = COLOR_DARK_TEXT
-                canvas2.drawText(dosha.getDescription(lang), 40f, y2 + 23f, textPaint)
+                canvas2.drawText(dosha.getDescription(lang), 40f, y2 + 25f, textPaint)
 
                 if (dosha.isPresent) {
                     textPaint.color = COLOR_MAROON
                     textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                    canvas2.drawText("$lblRemedy ${dosha.getRemedy(lang)}", 40f, y2 + 33f, textPaint)
+                    canvas2.drawText("$lblRemedy ${dosha.getRemedy(lang)}", 40f, y2 + 36f, textPaint)
                 }
 
-                y2 += 44f
+                y2 += 46f
             }
 
             y2 += 6f
 
             // Aspect Summaries
-            headerPaint.textSize = 11.5f
+            headerPaint.textSize = 12f
             headerPaint.color = COLOR_MAROON
             val lifeAspectTitle = when (lang) {
                 AppLanguage.TAMIL -> "திருக்கோயில் ஜாதக சுருக்கம் & முக்கிய பலன்கள் (Life Aspects Summary)"
@@ -601,14 +599,14 @@ object HoroscopePdfExporter {
             var aY = y2 + 14f
             aspects.forEach { (title, desc) ->
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 8.5f
+                textPaint.textSize = 9.5f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = COLOR_MAROON
                 canvas2.drawText("• $title", 40f, aY, textPaint)
-                aY += 10f
+                aY += 11f
 
                 textPaint.typeface = Typeface.DEFAULT
-                textPaint.textSize = 7.5f
+                textPaint.textSize = 8.5f
                 textPaint.color = COLOR_DARK_TEXT
 
                 // Wrap text
@@ -619,13 +617,13 @@ object HoroscopePdfExporter {
                         line = if (line.isEmpty()) word else "$line $word"
                     } else {
                         canvas2.drawText(line, 48f, aY, textPaint)
-                        aY += 9f
+                        aY += 10f
                         line = word
                     }
                 }
                 if (line.isNotEmpty()) {
                     canvas2.drawText(line, 48f, aY, textPaint)
-                    aY += 12f
+                    aY += 13f
                 }
                 borderPaint.color = Color.rgb(240, 240, 240)
                 canvas2.drawLine(40f, aY - 3f, boxRight - 10f, aY - 3f, borderPaint)
@@ -634,7 +632,7 @@ object HoroscopePdfExporter {
             // Temple Blessings & Disclaimer
             val discY = (PAGE_HEIGHT - 65).toFloat()
             textPaint.textAlign = Paint.Align.CENTER
-            textPaint.textSize = 8f
+            textPaint.textSize = 9f
             textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
             val blessingText = when (lang) {
@@ -645,7 +643,7 @@ object HoroscopePdfExporter {
             canvas2.drawText(blessingText, (PAGE_WIDTH / 2).toFloat(), discY, textPaint)
 
             textPaint.typeface = Typeface.DEFAULT
-            textPaint.textSize = 6.5f
+            textPaint.textSize = 7.5f
             textPaint.color = COLOR_GRAY_TEXT
             canvas2.drawText(summ.getDisclaimer(lang), (PAGE_WIDTH / 2).toFloat(), discY + 11f, textPaint)
 

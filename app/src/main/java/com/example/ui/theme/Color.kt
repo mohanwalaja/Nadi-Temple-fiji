@@ -3,65 +3,67 @@ package com.example.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ============================================================================
-// COHESIVE TWO-TONE SACRED PALETTE
-// Tone 1: Royal Devotional Crimson / Maroon (Primary)
-// Tone 2: Burnished Temple Gold (Secondary / Accent)
+// TWO-THEME SYSTEM:
+// 1. White & Black Day Mode
+// 2. Black & White Dark Mode
 // ============================================================================
 
-// --- Tone 1: Royal Devotional Crimson (Primary Standard) ---
-val TempleMaroon = Color(0xFF9F1239)          // Primary Royal Crimson
-val TempleMaroonBright = Color(0xFFBE123C)    // Luminous bright red
-val TempleMaroonDark = Color(0xFF881337)      // Deep regal crimson
-val TempleMaroonLight = Color(0xFFFDA4AF)     // Soft crimson accent (for dark theme)
-val TempleMaroonText = Color(0xFF881337)      // High contrast crimson text
-val TempleMaroonContainer = Color(0xFFFFE4E6) // Soft rose container
-val TempleMaroonOnContainer = Color(0xFF4C0519)
+// --- High Contrast Day Mode Colors (White & Black) ---
+val PureWhite = Color(0xFFFFFFFF)
+val PureBlack = Color(0xFF000000)
+val JetBlack = Color(0xFF09090B)
+val SlateDark = Color(0xFF18181B)
+val SlateMedium = Color(0xFF27272A)
+val SlateLight = Color(0xFF71717A)
+val SlateSubtle = Color(0xFF52525B)
+val BorderLight = Color(0xFFE4E4E7)
+val SurfaceLight = Color(0xFFFAFAFA)
+val SurfaceVariantLight = Color(0xFFF4F4F5)
 
-// --- Tone 2: Sacred Temple Gold (Secondary Standard) ---
-val TempleGold = Color(0xFFB45309)            // Primary Burnished Gold
-val TempleGoldDark = Color(0xFF92400E)        // Deep bronze gold for text/icons
-val TempleGoldLight = Color(0xFFFDE68A)       // Luminous light champagne gold
-val TempleGoldText = Color(0xFF78350F)        // Readable golden-brown text
-val TempleGoldContainer = Color(0xFFFEF3C7)   // Warm sandalwood silk container
-val TempleGoldOnContainer = Color(0xFF451A03)
+// --- High Contrast Dark Mode Colors (Black & White) ---
+val PitchBlack = Color(0xFF000000)
+val DarkSurface = Color(0xFF121214)
+val DarkSurfaceVariant = Color(0xFF1C1C1F)
+val DarkCardSurface = Color(0xFF18181B)
+val DarkBorder = Color(0xFF27272A)
+val DarkBorderSubtle = Color(0xFF3F3F46)
+val TextLight = Color(0xFFFFFFFF)
+val TextLightSecondary = Color(0xFFA1A1AA)
 
-// Harmonized Aliases for Two-Tone Cohesion
-val TempleSaffron = Color(0xFFB45309)         // Unified to Tone 2 (Gold)
-val TempleSaffronDark = Color(0xFF92400E)
-val TempleSaffronLight = Color(0xFFFDE68A)
-val TempleSaffronText = Color(0xFF78350F)
-val TempleSaffronContainer = Color(0xFFFEF3C7)
-val TempleSaffronOnContainer = Color(0xFF451A03)
+// Devotional & Contrast Color Accents for UI compatibility
+val TempleMaroon = Color(0xFF18181B)          // Black-dominant primary
+val TempleMaroonBright = Color(0xFF27272A)
+val TempleMaroonDark = Color(0xFF09090B)
+val TempleMaroonLight = Color(0xFFE4E4E7)
+val TempleMaroonText = Color(0xFF09090B)
+val TempleMaroonContainer = Color(0xFFF4F4F5)
+val TempleMaroonOnContainer = Color(0xFF09090B)
 
-val TempleKumkum = Color(0xFF9F1239)          // Unified to Tone 1 (Crimson)
-val TempleKumkumLight = Color(0xFFFFE4E6)
-val TempleKumkumText = Color(0xFF881337)
+val TempleGold = Color(0xFF27272A)            // High contrast neutral dark
+val TempleGoldDark = Color(0xFF18181B)
+val TempleGoldLight = Color(0xFFF4F4F5)
+val TempleGoldText = Color(0xFF18181B)
+val TempleGoldContainer = Color(0xFFF4F4F5)
+val TempleGoldOnContainer = Color(0xFF09090B)
 
-val TempleSandal = Color(0xFFFAF8F5)
+val TempleSaffron = Color(0xFF27272A)
+val TempleSaffronDark = Color(0xFF18181B)
+val TempleSaffronLight = Color(0xFFF4F4F5)
+val TempleSaffronText = Color(0xFF18181B)
+val TempleSaffronContainer = Color(0xFFF4F4F5)
+val TempleSaffronOnContainer = Color(0xFF09090B)
+
+val TempleKumkum = Color(0xFF18181B)
+val TempleKumkumLight = Color(0xFFF4F4F5)
+val TempleKumkumText = Color(0xFF09090B)
+
+val TempleSandal = Color(0xFFFFFFFF)
 val TempleSandalCard = Color(0xFFFFFFFF)
-val TempleSandalDark = Color(0xFFE7DFD8)
-val TempleVibhuti = Color(0xFFFAF8F5)
-val TempleVibhutiBorder = Color(0xFFE7DFD8)
+val TempleSandalDark = Color(0xFFE4E4E7)
+val TempleVibhuti = Color(0xFFFFFFFF)
+val TempleVibhutiBorder = Color(0xFFE4E4E7)
 
-// --- Light Theme Background & Surface Tones (Day Mode) ---
-val TempleLightBackground = Color(0xFFFAF8F5)      // Warm sacred off-white canvas
-val TempleLightSurface = Color(0xFFFFFFFF)         // Pure crisp white card surface
-val TempleLightSurfaceVariant = Color(0xFFF5EFEB)  // Soft sandalwood silk tint
-val TempleLightOnSurface = Color(0xFF1C1917)       // Deep warm charcoal text (15:1 contrast)
-val TempleLightOnSurfaceVariant = Color(0xFF57534E)// Readable stone gray text
-val TempleLightOutline = Color(0xFFE7DFD8)         // Elegant subtle card border
-val TempleLightOutlineVariant = Color(0xFFF0E9E2)
-
-// --- Dark Theme Background & Surface Tones (Dark Mode) ---
-val TempleDarkBackground = Color(0xFF120E10)       // Deep obsidian canvas
-val TempleDarkSurface = Color(0xFF1C1619)          // Refined dark slate-maroon card
-val TempleDarkSurfaceVariant = Color(0xFF2B2226)   // Subtle elevated surface
-val TempleDarkOnSurface = Color(0xFFF5F5F4)        // Crisp ivory text
-val TempleDarkOnSurfaceVariant = Color(0xFFD6D3D1) // Soft warm gray text
-val TempleDarkOutline = Color(0xFF44373C)          // Dark card outline
-val TempleDarkOutlineVariant = Color(0xFF2B2226)
-
-// --- Harmonized Status Accents (Mapped into the Two-Tone System) ---
+// Status Indicators
 val SacredGreen = Color(0xFF15803D)
 val SacredGreenDark = Color(0xFF14532D)
 val SacredGreenLight = Color(0xFFDCFCE7)
@@ -69,19 +71,20 @@ val SacredGreenText = Color(0xFF14532D)
 val SacredGreenContainer = Color(0xFFF0FDF4)
 val SacredGreenOnContainer = Color(0xFF14532D)
 
-val SacredBlue = Color(0xFF9F1239)                 // Mapped to Tone 1
-val SacredBlueDark = Color(0xFF881337)
-val SacredBlueLight = Color(0xFFFFE4E6)
-val SacredBlueText = Color(0xFF881337)
-val SacredBlueContainer = Color(0xFFFFE4E6)
+val SacredBlue = Color(0xFF18181B)
+val SacredBlueDark = Color(0xFF09090B)
+val SacredBlueLight = Color(0xFFF4F4F5)
+val SacredBlueText = Color(0xFF09090B)
+val SacredBlueContainer = Color(0xFFF4F4F5)
 
-val SacredOrange = Color(0xFFB45309)               // Mapped to Tone 2
-val SacredOrangeDark = Color(0xFF92400E)
-val SacredOrangeLight = Color(0xFFFDE68A)
-val SacredOrangeContainer = Color(0xFFFEF3C7)
+val SacredOrange = Color(0xFF27272A)
+val SacredOrangeDark = Color(0xFF18181B)
+val SacredOrangeLight = Color(0xFFF4F4F5)
+val SacredOrangeContainer = Color(0xFFF4F4F5)
 
-val WarningRed = Color(0xFF9F1239)                 // Mapped to Tone 1
-val WarningRedLight = Color(0xFFFFE4E6)
-val WarningRedContainer = Color(0xFFFFE4E6)
-val WarningRedOnContainer = Color(0xFF4C0519)
+val WarningRed = Color(0xFFDC2626)
+val WarningRedLight = Color(0xFFFEE2E2)
+val WarningRedContainer = Color(0xFFFEF2F2)
+val WarningRedOnContainer = Color(0xFF7F1D1D)
+
 

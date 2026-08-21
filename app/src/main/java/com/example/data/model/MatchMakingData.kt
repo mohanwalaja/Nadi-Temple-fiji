@@ -20,14 +20,28 @@ enum class PoruthamStatus(
 enum class RajjuType(
     val nameTa: String,
     val nameEn: String,
+    val nameHi: String,
     val significanceTa: String,
-    val significanceEn: String
+    val significanceEn: String,
+    val significanceHi: String
 ) {
-    SIRO("சிரோ ரஜ்ஜு (தலை)", "Siro Rajju (Head)", "கணவருக்கு ஆயுள் பலம்", "Longevity of husband"),
-    KANDA("கண்ட ரஜ்ஜு (கழுத்து)", "Kanda Rajju (Neck)", "மனைவிக்கு மாங்கல்ய பலம்", "Mangalya protection for wife"),
-    UDHARA("உதர ரஜ்ஜு (வயிறு)", "Udhara / Kati Rajju (Stomach)", "புத்திர பாக்கியம்", "Progeny and children"),
-    URU("ஊரு ரஜ்ஜு (தொடை)", "Uru Rajju (Thighs)", "தன தான்ய விருத்தி மற்றும் செல்வம்", "Wealth and prosperity"),
-    PADA("பாத ரஜ்ஜு (பாதம்)", "Pada Rajju (Feet)", "பயண சௌக்கியம் மற்றும் அமைதி", "Domestic peace & travel harmony")
+    SIRO("சிரோ ரஜ்ஜு (தலை)", "Siro Rajju (Head)", "शिरो रज्जु (सिर)", "கணவருக்கு ஆயுள் பலம்", "Longevity of husband", "पति की दीर्घायु"),
+    KANDA("கண்ட ரஜ்ஜு (கழுத்து)", "Kanda Rajju (Neck)", "कंठ रज्जु (गला)", "மனைவிக்கு மாங்கல்ய பலம்", "Mangalya protection for wife", "पत्नी का अखंड सौभाग्य"),
+    UDHARA("உதர ரஜ்ஜு (வயிறு)", "Udhara / Kati Rajju (Stomach)", "उदर रज्जु (नाभि/पेट)", "புத்திர பாக்கியம்", "Progeny and children", "संतान वृद्धि"),
+    URU("ஊரு ரஜ்ஜு (தொடை)", "Uru Rajju (Thighs)", "ऊरु रज्जु (जांघ)", "தன தான்ய விருத்தி மற்றும் செல்வம்", "Wealth and prosperity", "धन-धान्य समृद्धि"),
+    PADA("பாத ரஜ்ஜு (பாதம்)", "Pada Rajju (Feet)", "पाद रज्जु (पैर)", "பயண சௌக்கியம் மற்றும் அமைதி", "Domestic peace & travel harmony", "गृह शांति एवं सुख");
+
+    fun getName(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> nameTa
+        AppLanguage.HINDI -> nameHi
+        AppLanguage.ENGLISH -> nameEn
+    }
+
+    fun getSignificance(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> significanceTa
+        AppLanguage.HINDI -> significanceHi
+        AppLanguage.ENGLISH -> significanceEn
+    }
 }
 
 data class SinglePoruthamResult(
@@ -118,5 +132,28 @@ data class WeddingMatchResult(
     val overallVerdictHi: String,
     val verdictStatus: PoruthamStatus,
     val rajjuMatch: Boolean,
-    val sevvayDosham: SevvayDoshamAnalysis
-)
+    val sevvayDosham: SevvayDoshamAnalysis,
+    val brideNakshatramEn: String = brideNakshatram,
+    val brideNakshatramHi: String = brideNakshatram,
+    val groomNakshatramEn: String = groomNakshatram,
+    val groomNakshatramHi: String = groomNakshatram
+) {
+    fun getBrideNakshatram(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> brideNakshatram
+        AppLanguage.HINDI -> brideNakshatramHi
+        AppLanguage.ENGLISH -> brideNakshatramEn
+    }
+
+    fun getGroomNakshatram(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> groomNakshatram
+        AppLanguage.HINDI -> groomNakshatramHi
+        AppLanguage.ENGLISH -> groomNakshatramEn
+    }
+
+    fun getOverallVerdict(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> overallVerdictTa
+        AppLanguage.HINDI -> overallVerdictHi
+        AppLanguage.ENGLISH -> overallVerdictEn
+    }
+}
+

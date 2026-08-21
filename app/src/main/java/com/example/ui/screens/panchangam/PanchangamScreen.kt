@@ -362,10 +362,12 @@ fun PanchangamScreen(
                 }
             }
 
-            // 3. Complete Drik Panchangam 10 Core Limbs Card
+            // 3. Complete Drik Panchangam 10 Core Limbs Card (Clean compact text format)
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("card_panchangam_10_angams"),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -378,7 +380,7 @@ fun PanchangamScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "த்ரிக் பஞ்சாங்கம் (10 முக்கிய அங்கங்கள்)" else "Drik Panchangam (10 Limbs)",
+                                text = if (lang == AppLanguage.TAMIL) "பஞ்சாங்கம் (10 அங்கங்கள்)" else if (lang == AppLanguage.HINDI) "पंचांग (10 अंग)" else "Drik Panchangam (10 Limbs)",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -396,136 +398,53 @@ fun PanchangamScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        // 1. Tamil Year (Samvatsara)
-                        DrikAngamItem(
-                            number = "1",
-                            titleTa = "தமிழ் வருடம் (Samvatsara)",
-                            titleEn = "Tamil Year (Samvatsara)",
-                            value = panchangam.samvatsaraName,
-                            subValue = "60 வருட சுழற்சி (60 Year Vedic Cycle)",
-                            icon = Icons.Default.AutoAwesome,
-                            color = TempleMaroon,
-                            lang = lang
+                        val angamsList = listOf(
+                            Triple("1", if (lang == AppLanguage.TAMIL) "சம்வத்சரம் (Samvatsaram)" else if (lang == AppLanguage.HINDI) "संवत्सर (Samvatsaram)" else "Samvatsaram (Tamil Year)", panchangam.samvatsaraName),
+                            Triple("2", if (lang == AppLanguage.TAMIL) "அயனம் (Ayanam)" else if (lang == AppLanguage.HINDI) "अयन (Ayanam)" else "Ayanam (Solar Movement)", panchangam.ayanam),
+                            Triple("3", if (lang == AppLanguage.TAMIL) "ருது (Rithu)" else if (lang == AppLanguage.HINDI) "ऋतु (Rithu)" else "Rithu (Season)", panchangam.ritu),
+                            Triple("4", if (lang == AppLanguage.TAMIL) "மாசம் (Masam)" else if (lang == AppLanguage.HINDI) "मास (Masam)" else "Masam (Solar Month)", panchangam.sanskritMonth),
+                            Triple("5", if (lang == AppLanguage.TAMIL) "பக்ஷம் (Paksham)" else if (lang == AppLanguage.HINDI) "पक्ष (Paksham)" else "Paksham (Fortnight)", panchangam.paksha),
+                            Triple("6", if (lang == AppLanguage.TAMIL) "திதி (Tithi)" else if (lang == AppLanguage.HINDI) "तिथि (Tithi)" else "Tithi (Lunar Day)", "${panchangam.tithi} (${panchangam.tithiEndTime} வரை)"),
+                            Triple("7", if (lang == AppLanguage.TAMIL) "வாசரம் (Vasaram)" else if (lang == AppLanguage.HINDI) "वासर (Vasaram)" else "Vasaram (Weekday)", "${panchangam.vasaram} (${panchangam.dayOfWeek})"),
+                            Triple("8", if (lang == AppLanguage.TAMIL) "நட்சத்திரம் (Nakshatram)" else if (lang == AppLanguage.HINDI) "नक्षत्र (Nakshatram)" else "Nakshatram (Asterism)", "${panchangam.nakshatram} பாதம் ${panchangam.pada} (${panchangam.nakshatramEndTime} வரை)"),
+                            Triple("9", if (lang == AppLanguage.TAMIL) "யோகம் (Yogam)" else if (lang == AppLanguage.HINDI) "योग (Yogam)" else "Yogam (Nithya / Dina Yoga)", "${panchangam.yogam} / ${panchangam.dinaYogam} (${panchangam.yogamEndTime} வரை)"),
+                            Triple("10", if (lang == AppLanguage.TAMIL) "கரணம் (Karanam)" else if (lang == AppLanguage.HINDI) "करण (Karanam)" else "Karanam (Half-Tithi)", "${panchangam.karanam} (${panchangam.karanamEndTime} வரை)")
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-                        // 2. Ayanam (Dakshinayanam / Uttarayanam)
-                        DrikAngamItem(
-                            number = "2",
-                            titleTa = "அயனம் (Ayanam)",
-                            titleEn = "Ayanam (Solar Movement)",
-                            value = panchangam.ayanam,
-                            subValue = if (panchangam.ayanam.contains("தக்ஷிணாயணம்")) "சூரியனின் தெற்கு நோக்கிய நகர்வு" else "சூரியனின் வடக்கு நோக்கிய நகர்வு",
-                            icon = Icons.Default.Explore,
-                            color = TempleGoldDark,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 3. Rithu (Season)
-                        DrikAngamItem(
-                            number = "3",
-                            titleTa = "ருது (Rithu - பருவகாலம்)",
-                            titleEn = "Rithu (Vedic Season)",
-                            value = panchangam.ritu,
-                            subValue = "வேத கால 6 ருதுக்கள் (6 Vedic Seasons)",
-                            icon = Icons.Default.Eco,
-                            color = SacredGreen,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 4. Tamil Masam in Sanskrit (Mesha / Simha Masa)
-                        DrikAngamItem(
-                            number = "4",
-                            titleTa = "மாதம் & சமஸ்கிருத மாசம் (Solar Month)",
-                            titleEn = "Solar Month (Sanskrit & Tamil Masa)",
-                            value = panchangam.sanskritMonth,
-                            subValue = "தேதி: ${panchangam.tamilDate} (Sidereal Solar Day)",
-                            icon = Icons.Default.WbSunny,
-                            color = TempleSaffron,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 5. Paksham (Shukla / Krishna)
-                        DrikAngamItem(
-                            number = "5",
-                            titleTa = "பக்ஷம் (Paksham)",
-                            titleEn = "Paksham (Lunar Fortnight)",
-                            value = panchangam.paksha,
-                            subValue = if (panchangam.paksha.contains("சுக்ல")) "வளர்பிறை காலம் (Waxing Moon)" else "தேய்பிறை காலம் (Waning Moon)",
-                            icon = Icons.Default.NightlightRound,
-                            color = TempleMaroonLight,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 6. Tithi
-                        DrikAngamItem(
-                            number = "6",
-                            titleTa = "திதி (Tithi)",
-                            titleEn = "Tithi (Lunar Day)",
-                            value = panchangam.tithi,
-                            subValue = "${panchangam.tithiEndTime} வரை (Next: ${panchangam.nextTithi ?: "-"})",
-                            icon = Icons.Default.BrightnessMedium,
-                            color = TempleMaroon,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 7. Vasaram (Vedic Weekday)
-                        DrikAngamItem(
-                            number = "7",
-                            titleTa = "வாசரம் (Vasaram / கிழமை)",
-                            titleEn = "Vasaram (Vedic Weekday / Vara)",
-                            value = panchangam.vasaram,
-                            subValue = panchangam.dayOfWeek,
-                            icon = Icons.Default.CalendarToday,
-                            color = TempleGoldDark,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 8. Nakshatram
-                        DrikAngamItem(
-                            number = "8",
-                            titleTa = "நட்சத்திரம் (Nakshatram)",
-                            titleEn = "Nakshatram (Asterism)",
-                            value = "${panchangam.nakshatram} (பாதம் ${panchangam.pada})",
-                            subValue = "${panchangam.nakshatramEndTime} வரை (Next: ${panchangam.nextNakshatram ?: "-"})",
-                            icon = Icons.Default.Star,
-                            color = TempleSaffron,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 9. Yogam (Nithya Yoga & Dina Yoga)
-                        DrikAngamItem(
-                            number = "9",
-                            titleTa = "யோகம் (Yogam)",
-                            titleEn = "Yogam (Nithya & Dina Yoga)",
-                            value = "${panchangam.yogam}\n${panchangam.dinaYogam}",
-                            subValue = "${panchangam.yogamEndTime} வரை",
-                            icon = Icons.Default.SelfImprovement,
-                            color = SacredGreen,
-                            lang = lang
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                        // 10. Karanam
-                        DrikAngamItem(
-                            number = "10",
-                            titleTa = "கரணம் (Karanam)",
-                            titleEn = "Karanam (Half-Tithi)",
-                            value = panchangam.karanam,
-                            subValue = "${panchangam.karanamEndTime} வரை (Next: ${panchangam.nextKaranam ?: "-"})",
-                            icon = Icons.Default.HourglassBottom,
-                            color = TempleMaroonLight,
-                            lang = lang
-                        )
+                        angamsList.forEachIndexed { index, (num, label, value) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Text(
+                                    text = "$num. $label",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.weight(1.1f)
+                                )
+                                Text(
+                                    text = value,
+                                    fontSize = 12.5.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1.4f)
+                                )
+                            }
+                            if (index < angamsList.size - 1) {
+                                HorizontalDivider(
+                                    thickness = 0.5.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

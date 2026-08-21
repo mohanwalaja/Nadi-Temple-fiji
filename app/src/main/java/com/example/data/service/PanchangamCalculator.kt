@@ -105,7 +105,10 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     private val rasiNamesEn = listOf("Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces")
     private val rasiNamesHi = listOf("मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुम्भ", "मीन")
 
-    private val sanskritMonthsTa = listOf("சைத்ர", "வைசாக", "ஜ்யேஷ்ட", "ஆஷாட", "ஸ்ராவண", "பாத்ரபத", "ஆஸ்வின", "கார்திக", "மார்கசீர்ஷ", "பௌஷ", "மாக", "பல்குன")
+    private val sauraMasaTa = listOf("மேஷ மாசம்", "ரிஷப மாசம்", "மிதுன மாசம்", "கடக மாசம்", "சிம்ம மாசம்", "கன்யா மாசம்", "துலா மாசம்", "விருச்சிக மாசம்", "தனுர் மாசம்", "மகர மாசம்", "கும்ப மாசம்", "மீன மாசம்")
+    private val sauraMasaEn = listOf("Mesha Masa", "Rishabha Masa", "Mithuna Masa", "Kataka Masa", "Simha Masa", "Kanya Masa", "Tula Masa", "Vrischika Masa", "Dhanu Masa", "Makara Masa", "Kumbha Masa", "Meena Masa")
+    private val sauraMasaHi = listOf("मेष मास", "वृषभ मास", "मिथुन मास", "कर्क मास", "सिंह मास", "कन्या मास", "तुला मास", "वृश्चिक मास", "धनु मास", "मकर मास", "कुम्भ मास", "मीन मास")
+
     private val ritusTa = listOf("வசந்த ருது", "கிரீஷ்ம ருது", "வர்ஷ ருது", "சரத் ருது", "ஹேமந்த ருது", "சிசிர ருது")
     private val ritusEn = listOf("Vasanta Ritu (Spring)", "Grishma Ritu (Summer)", "Varsha Ritu (Monsoon)", "Sharad Ritu (Autumn)", "Hemanta Ritu (Pre-Winter)", "Shishira Ritu (Winter)")
     private val ritusHi = listOf("वसन्त ऋतु", "ग्रीष्म ऋतु", "वर्षा ऋतु", "शरद् ऋतु", "हेमन्त ऋतु", "शिशिर ऋतु")
@@ -229,7 +232,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val samvatsaraName = tamilSamvatsara.tamilName
 
         // 2. Sanskrit Month & Vedic Season (Ritu)
-        val sanskritMonth = sanskritMonthsTa[sunRasiIndex]
+        val sanskritMonth = sauraMasaTa[sunRasiIndex]
         val rituIndex = (sunRasiIndex / 2) % 6
         val (rituTa, rituEn, rituHi) = Triple(ritusTa[rituIndex], ritusEn[rituIndex], ritusHi[rituIndex])
 

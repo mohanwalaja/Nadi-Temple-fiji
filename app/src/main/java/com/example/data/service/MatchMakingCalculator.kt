@@ -126,6 +126,9 @@ object MatchMakingCalculator {
                 explanationEn = if (dinaStatus == PoruthamStatus.UTTHAMAM) "Highly favorable for marital health, long life, and prosperity."
                 else if (dinaStatus == PoruthamStatus.MADHYAMAM) "Moderate health compatibility; generally acceptable."
                 else "Unfavorable star distance. Requires support from other primary poruthams.",
+                explanationHi = if (dinaStatus == PoruthamStatus.UTTHAMAM) "दंपति के दीर्घायु, उत्तम स्वास्थ्य एवं शारीरिक सुख के लिए अत्यंत शुभ।"
+                else if (dinaStatus == PoruthamStatus.MADHYAMAM) "मध्यम स्वास्थ्य अनुकूलता; सामान्यतः ग्राह्य।"
+                else "नक्षत्र दूरी प्रतिकूल है; अन्य मुख्य गुणों का समर्थन आवश्यक है।",
                 isCrucial = true
             )
         )
@@ -143,6 +146,7 @@ object MatchMakingCalculator {
         }
         val ganaNamesTa = listOf("தேவ கணம்", "மனுஷ்ய கணம்", "ராட்சச கணம்")
         val ganaNamesEn = listOf("Deva Gana", "Manushya Gana", "Rakshasa Gana")
+        val ganaNamesHi = listOf("देव गण", "मनुष्य गण", "राक्षस गण")
         poruthams.add(
             SinglePoruthamResult(
                 id = "gana",
@@ -159,7 +163,11 @@ object MatchMakingCalculator {
                 explanationEn = "Bride: ${ganaNamesEn[bGana]}, Groom: ${ganaNamesEn[gGana]}. " +
                         if (ganaStatus == PoruthamStatus.UTTHAMAM) "Excellent psychological and emotional compatibility."
                         else if (ganaStatus == PoruthamStatus.MADHYAMAM) "Average temperament compatibility."
-                        else "Divergent natural temperaments."
+                        else "Divergent natural temperaments.",
+                explanationHi = "वधू: ${ganaNamesHi[bGana]}, वर: ${ganaNamesHi[gGana]}। " +
+                        if (ganaStatus == PoruthamStatus.UTTHAMAM) "उत्तम मानसिक अनुकूलता एवं स्वभाव सामंजस्य।"
+                        else if (ganaStatus == PoruthamStatus.MADHYAMAM) "मध्यम स्वभाव अनुकूलता; सामंजस्य आवश्यक।"
+                        else "भिन्न स्वभाव एवं विचारधारा।"
             )
         )
 
@@ -177,7 +185,9 @@ object MatchMakingCalculator {
                 explanationTa = if (mahendraStatus == PoruthamStatus.UTTHAMAM) "வம்ச விருத்தி, புத்திர பாக்கியம் மற்றும் குடும்ப பொருளாதார மேன்மை தரும் உன்னத பொருத்தம்."
                 else "மகேந்திர அமைப்பு அமையவில்லை (மற்ற புத்திர ஸ்தான பலன்கள் மூலம் ஆராயப்பட வேண்டும்).",
                 explanationEn = if (mahendraStatus == PoruthamStatus.UTTHAMAM) "Auspicious for offspring, family lineage, and prosperity."
-                else "Neutral; progeny is evaluated from 5th house in the birth charts."
+                else "Neutral; progeny is evaluated from 5th house in the birth charts.",
+                explanationHi = if (mahendraStatus == PoruthamStatus.UTTHAMAM) "संतान सुख, वंश वृद्धि एवं पारिवारिक समृद्धि प्रदान करने वाला उत्तम योग।"
+                else "महेंद्र योग नहीं बन रहा है; कुंडली के पंचम भाव से संतान विचार करें।"
             )
         )
 
@@ -201,7 +211,10 @@ object MatchMakingCalculator {
                 else "நட்சத்திர இடைவெளி குறைவான அமைப்பு.",
                 explanationEn = if (sthreeStatus == PoruthamStatus.UTTHAMAM) "Ensures prosperity, long life, and happiness for the bride."
                 else if (sthreeStatus == PoruthamStatus.MADHYAMAM) "Moderate distance compatibility."
-                else "Star distance is below classical threshold."
+                else "Star distance is below classical threshold.",
+                explanationHi = if (sthreeStatus == PoruthamStatus.UTTHAMAM) "स्त्री को दीर्घायु, अखंड सौभाग्य एवं पारिवारिक सुख-समृद्धि देने वाला योग।"
+                else if (sthreeStatus == PoruthamStatus.MADHYAMAM) "मध्यम अनुकूलता।"
+                else "नक्षत्र दूरी कम है।"
             )
         )
 
@@ -228,7 +241,10 @@ object MatchMakingCalculator {
                 else "பகை யோனி அமைப்பு; பரஸ்பர புரிந்துணர்வு தேவை.",
                 explanationEn = if (yoniStatus == PoruthamStatus.UTTHAMAM) "Harmonious physical and emotional intimacy."
                 else if (yoniStatus == PoruthamStatus.MADHYAMAM) "Neutral/Friendly biological compatibility."
-                else "Inimical animal yoni pair."
+                else "Inimical animal yoni pair.",
+                explanationHi = if (yoniStatus == PoruthamStatus.UTTHAMAM) "दंपति के बीच परस्पर आकर्षण, स्नेह एवं सुखी दांपत्य जीवन प्रदान करता है।"
+                else if (yoniStatus == PoruthamStatus.MADHYAMAM) "सामान्य एवं मित्र योनि अनुकूलता।"
+                else "शत्रु योनि संबंध; परस्पर समझदारी आवश्यक।"
             )
         )
 
@@ -260,6 +276,9 @@ object MatchMakingCalculator {
                 explanationEn = if (rasiStatus == PoruthamStatus.UTTHAMAM) "Fosters unity, lineage prosperity, and family bliss."
                 else if (rasiStatus == PoruthamStatus.MADHYAMAM) "Moderate sign compatibility."
                 else "Shashtashtaka (6/8) distance; requires supportive planetary aspects.",
+                explanationHi = if (rasiStatus == PoruthamStatus.UTTHAMAM) "पारिवारिक एकता, सुख-शांति एवं वंश वृद्धि के लिए श्रेष्ठ राशि मिलान।"
+                else if (rasiStatus == PoruthamStatus.MADHYAMAM) "मध्यम राशि अनुकूलता।"
+                else "षडाष्टक (6/8) संबंध; अन्य ग्रहों के शुभ प्रभाव आवश्यक।",
                 isCrucial = true
             )
         )
@@ -292,7 +311,11 @@ object MatchMakingCalculator {
                 explanationEn = "Bride Lord: $bLord, Groom Lord: $gLord. " +
                         if (rasiAdhipathiStatus == PoruthamStatus.UTTHAMAM) "Planetary rulers are mutual friends; fosters enduring companionship."
                         else if (rasiAdhipathiStatus == PoruthamStatus.MADHYAMAM) "Neutral planetary affinity."
-                        else "Inimical planetary rulers."
+                        else "Inimical planetary rulers.",
+                explanationHi = "वधू राशि स्वामी: ${brideRasi.lordHi}, वर राशि स्वामी: ${groomRasi.lordHi}। " +
+                        if (rasiAdhipathiStatus == PoruthamStatus.UTTHAMAM) "राश्याधिपति में मित्रता होने से आजीवन प्रेम एवं सौहार्द रहेगा।"
+                        else if (rasiAdhipathiStatus == PoruthamStatus.MADHYAMAM) "राश्याधिपति सम भाव रखते हैं।"
+                        else "राश्याधिपति में शत्रुता या भिन्न प्रकृति है।"
             )
         )
 
@@ -325,7 +348,9 @@ object MatchMakingCalculator {
                 explanationTa = if (isVasiya) "தம்பதியரிடையே ஈடு இணையற்ற அன்பும், ஒருவரை ஒருவர் வசீகரிக்கும் நேசமும் தரும் உத்தமப் பொருத்தம்."
                 else "சாதாரண வசிய நிலை. மற்ற மன ஒற்றுமை பொருத்தங்கள் நன்று அமைந்தால் சிறப்பு.",
                 explanationEn = if (isVasiya) "Special mutual magnet and lifelong adoration between partners."
-                else "Standard affection compatibility."
+                else "Standard affection compatibility.",
+                explanationHi = if (isVasiya) "दंपति के बीच अगाध प्रेम, परस्पर आकर्षण एवं निष्ठा प्रदान करता है।"
+                else "सामान्य वश्य संबंध।"
             )
         )
 
@@ -348,6 +373,8 @@ object MatchMakingCalculator {
                 else "ஏக ரஜ்ஜு (இருவருக்கும் ஒரே ரஜ்ஜு: ${rajjuTypes[bRajju].nameTa}). ரஜ்ஜு தோஷம் உள்ளதால் ஜோதிட அறிஞரின் சிறப்பு ஆலோசனை அவசியம்.",
                 explanationEn = if (!isSameRajju) "Excellent! Different Rajjus (Bride: ${rajjuTypes[bRajju].nameEn}, Groom: ${rajjuTypes[gRajju].nameEn}). Bestows long and blessed married life."
                 else "Same Rajju (${rajjuTypes[bRajju].nameEn}). Classical Rajju affliction requires expert astrological mitigation.",
+                explanationHi = if (!isSameRajju) "उत्तम रज्जु मिलान (अलग-अलग रज्जु: वधू - ${rajjuTypes[bRajju].nameHi}, वर - ${rajjuTypes[gRajju].nameHi})। अखंड सौभाग्य एवं दीर्घायु योग।"
+                else "एक ही रज्जु (${rajjuTypes[bRajju].nameHi}) होने से रज्जु दोष है; विशेषज्ञ ज्योतिषी परामर्श आवश्यक।",
                 isCrucial = true
             )
         )
@@ -368,6 +395,8 @@ object MatchMakingCalculator {
                 else "நட்சத்திரங்களுக்கு இடையே வேதை (பகைத் தாக்குதல்) தோஷம் உள்ளது.",
                 explanationEn = if (!isVedhaAfflicted) "No Vedha affliction. Safeguards against sorrow, dispute, and discord."
                 else "Vedha obstruction exists between the chosen nakshatrams.",
+                explanationHi = if (!isVedhaAfflicted) "वेधा दोष रहित। दांपत्य जीवन में सुख, शांति एवं कलह से मुक्ति।"
+                else "दोनों नक्षत्रों में वेधा (बाधा) दोष विद्यमान है।",
                 isCrucial = true
             )
         )
@@ -485,7 +514,11 @@ object MatchMakingCalculator {
             overallVerdictHi = verdictHi,
             verdictStatus = verdictStatus,
             rajjuMatch = rajjuOk,
-            sevvayDosham = sevvayAnalysis
+            sevvayDosham = sevvayAnalysis,
+            brideNakshatramEn = NAKSHATRAM_NAMES_EN[bStar],
+            brideNakshatramHi = NAKSHATRAM_NAMES_HI[bStar],
+            groomNakshatramEn = NAKSHATRAM_NAMES_EN[gStar],
+            groomNakshatramHi = NAKSHATRAM_NAMES_HI[gStar]
         )
     }
 }

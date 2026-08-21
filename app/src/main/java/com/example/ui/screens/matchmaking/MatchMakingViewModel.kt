@@ -257,8 +257,16 @@ class MatchMakingViewModel(
 
     fun exportAndSharePdf(context: Context, language: AppLanguage) {
         val current = _uiState.value
-        val brideStarName = MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(current.brideNakshatraIndex) { "" }
-        val groomStarName = MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(current.groomNakshatraIndex) { "" }
+        val brideStarName = when (language) {
+            AppLanguage.TAMIL -> MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(current.brideNakshatraIndex) { "" }
+            AppLanguage.HINDI -> MatchMakingCalculator.NAKSHATRAM_NAMES_HI.getOrElse(current.brideNakshatraIndex) { "" }
+            AppLanguage.ENGLISH -> MatchMakingCalculator.NAKSHATRAM_NAMES_EN.getOrElse(current.brideNakshatraIndex) { "" }
+        }
+        val groomStarName = when (language) {
+            AppLanguage.TAMIL -> MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(current.groomNakshatraIndex) { "" }
+            AppLanguage.HINDI -> MatchMakingCalculator.NAKSHATRAM_NAMES_HI.getOrElse(current.groomNakshatraIndex) { "" }
+            AppLanguage.ENGLISH -> MatchMakingCalculator.NAKSHATRAM_NAMES_EN.getOrElse(current.groomNakshatraIndex) { "" }
+        }
 
         val pdfData = WeddingMatchPdfData(
             brideName = current.brideName,

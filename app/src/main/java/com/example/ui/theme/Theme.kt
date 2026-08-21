@@ -9,68 +9,73 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 // ============================================================================
-// SRI SIVA SUBRAMANIYA SWAMI KOVIL - COHESIVE TWO-TONE PALETTE
-// Tone 1: Royal Devotional Crimson / Maroon (Primary)
-// Tone 2: Burnished Temple Gold (Secondary / Accent)
+// TWO THEMES ONLY:
+// 1. White and Black Day Mode
+// 2. Black and White Dark Mode
 // ============================================================================
 
-// 1. Signature Auspicious Day Theme (Two-Tone: Crimson & Burnished Gold on Warm Sandal Canvas)
-val TempleDayColorScheme: ColorScheme = lightColorScheme(
-    primary = Color(0xFF9F1239),           // Tone 1: Royal Devotional Crimson
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFE4E6),  // Soft rose container
-    onPrimaryContainer = Color(0xFF4C0519),
-    secondary = Color(0xFFB45309),         // Tone 2: Burnished Temple Gold
+// 1. Day Mode (White & Black)
+val DayColorScheme: ColorScheme = lightColorScheme(
+    primary = Color(0xFF18181B),          // Bold Jet Black
+    onPrimary = Color.White,              // Crisp White
+    primaryContainer = Color(0xFFF4F4F5), // Light Gray/Silver Container
+    onPrimaryContainer = Color(0xFF09090B),
+    secondary = Color(0xFF27272A),        // Dark Slate Accent
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFFEF3C7), // Warm sandalwood silk
-    onSecondaryContainer = Color(0xFF451A03),
-    tertiary = Color(0xFFB45309),          // Tone 2: Unified Gold Accent
+    secondaryContainer = Color(0xFFF4F4F5),
+    onSecondaryContainer = Color(0xFF18181B),
+    tertiary = Color(0xFF3F3F46),
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFEF3C7),
-    onTertiaryContainer = Color(0xFF451A03),
-    background = Color(0xFFFAF8F5),        // Warm sacred off-white canvas
-    onBackground = Color(0xFF1C1917),      // Deep charcoal text
-    surface = Color.White,                 // Crisp pure white card surface
-    onSurface = Color(0xFF1C1917),
-    surfaceVariant = Color(0xFFF5EFEB),    // Sandalwood silk tint
-    onSurfaceVariant = Color(0xFF57534E),  // Clear readable subtitle
-    outline = Color(0xFFE7DFD8),           // Elegant card border
-    outlineVariant = Color(0xFFF0E9E2),
-    error = Color(0xFF9F1239)
+    tertiaryContainer = Color(0xFFF4F4F5),
+    onTertiaryContainer = Color(0xFF18181B),
+    background = Color(0xFFFFFFFF),       // Pure White Canvas
+    onBackground = Color(0xFF09090B),     // Jet Black Text
+    surface = Color(0xFFFFFFFF),          // Pure White Surface
+    onSurface = Color(0xFF09090B),        // Jet Black Text
+    surfaceVariant = Color(0xFFF4F4F5),   // Clean Neutral Light Container
+    onSurfaceVariant = Color(0xFF52525B), // Slate Subtitle
+    outline = Color(0xFFE4E4E7),          // Clean Border
+    outlineVariant = Color(0xFFF4F4F5),
+    error = Color(0xFFDC2626),
+    onError = Color.White
 )
 
-// 2. Signature Sacred Dark Theme (Two-Tone: Luminous Rose Crimson & Radiant Gold on Deep Obsidian Canvas)
-val TempleDarkColorScheme: ColorScheme = darkColorScheme(
-    primary = Color(0xFFFDA4AF),           // Tone 1: Soft Radiant Rose Crimson
-    onPrimary = Color(0xFF4C0519),
-    primaryContainer = Color(0xFF881337),
-    onPrimaryContainer = Color(0xFFFFE4E6),
-    secondary = Color(0xFFFBBF24),         // Tone 2: Radiant Temple Gold
-    onSecondary = Color(0xFF451A03),
-    secondaryContainer = Color(0xFF78350F),
-    onSecondaryContainer = Color(0xFFFEF3C7),
-    tertiary = Color(0xFFFBBF24),          // Tone 2: Unified Gold Accent
-    onTertiary = Color(0xFF451A03),
-    tertiaryContainer = Color(0xFF78350F),
-    onTertiaryContainer = Color(0xFFFEF3C7),
-    background = Color(0xFF120E10),        // Deep obsidian canvas
-    onBackground = Color(0xFFF5F5F4),      // Crisp ivory text
-    surface = Color(0xFF1C1619),           // Refined dark slate-maroon card
-    onSurface = Color(0xFFF5F5F4),
-    surfaceVariant = Color(0xFF2B2226),    // Warm dark surface
-    onSurfaceVariant = Color(0xFFD6D3D1),  // Soft gray subtitle
-    outline = Color(0xFF44373C),
-    outlineVariant = Color(0xFF2B2226),
-    error = Color(0xFFFDA4AF),
-    onError = Color(0xFF881337)
+// 2. Dark Mode (Black & White)
+val DarkColorScheme: ColorScheme = darkColorScheme(
+    primary = Color(0xFFFFFFFF),          // Pure Crisp White
+    onPrimary = Color(0xFF000000),        // Pitch Black
+    primaryContainer = Color(0xFF27272A), // Dark Slate Container
+    onPrimaryContainer = Color(0xFFFFFFFF),
+    secondary = Color(0xFFE4E4E7),        // Light Slate Accent
+    onSecondary = Color(0xFF000000),
+    secondaryContainer = Color(0xFF27272A),
+    onSecondaryContainer = Color(0xFFFFFFFF),
+    tertiary = Color(0xFFD4D4D8),
+    onTertiary = Color(0xFF000000),
+    tertiaryContainer = Color(0xFF27272A),
+    onTertiaryContainer = Color(0xFFFFFFFF),
+    background = Color(0xFF000000),       // Pure Pitch Black Canvas
+    onBackground = Color(0xFFFFFFFF),     // Pure White Text
+    surface = Color(0xFF121214),          // Deep Charcoal Black Card Surface
+    onSurface = Color(0xFFFFFFFF),        // Pure White Text
+    surfaceVariant = Color(0xFF1C1C1F),   // Dark Elevated Container
+    onSurfaceVariant = Color(0xFFA1A1AA), // Silver Gray Subtitle
+    outline = Color(0xFF27272A),          // Subtle Dark Border
+    outlineVariant = Color(0xFF1C1C1F),
+    error = Color(0xFFF87171),
+    onError = Color(0xFF450A0A)
 )
+
+// Aliases for compatibility
+val TempleDayColorScheme = DayColorScheme
+val TempleDarkColorScheme = DarkColorScheme
 
 @Composable
 fun SriSivaKovilTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = if (darkTheme) TempleDarkColorScheme else TempleDayColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else DayColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -88,3 +93,4 @@ fun MyApplicationTheme(
 ) {
     SriSivaKovilTheme(darkTheme = darkTheme, content = content)
 }
+
