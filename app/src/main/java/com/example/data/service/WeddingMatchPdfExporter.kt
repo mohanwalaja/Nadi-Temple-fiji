@@ -78,7 +78,7 @@ object WeddingMatchPdfExporter {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/pdf"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "Wedding Match Report - Mohan Gurukkal (+6797607465)")
+            putExtra(Intent.EXTRA_SUBJECT, "Wedding Match Certificate - Head Priest Mohan Gurukkal (+6797607465)")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
@@ -221,17 +221,17 @@ object WeddingMatchPdfExporter {
         y += 14f
 
         val priestText = when (lang) {
-            AppLanguage.TAMIL -> "ஜோதிட ஆச்சாரியார்: மோகன் குருக்கள் (Mohan Gurukkal) • Mobile: +6797607465"
-            AppLanguage.HINDI -> "ज्योतिषाचार्य: मोहन गुरुक्कल (Mohan Gurukkal) • Mobile: +6797607465"
-            AppLanguage.ENGLISH -> "Vedic Astrologer: Mohan Gurukkal • Mobile: +6797607465"
+            AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
+            AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
+            AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
         }
         canvas.drawText(priestText, PAGE_WIDTH / 2f, y, priestPaint)
         y += 12f
 
         val subtitle = when (lang) {
-            AppLanguage.TAMIL -> "நாடி, பிஜி தீவுகள் • துல்லிய திருக்கணித பஞ்சாங்க திருமணப் பொருத்த அறிக்கை"
-            AppLanguage.HINDI -> "नादी, फिजी द्वीप • वैदिक ज्योतिष विवाह मिलान प्रमाण पत्र"
-            AppLanguage.ENGLISH -> "Nadi, Fiji Islands • Vedic Astrological Matchmaking Certificate"
+            AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • திருமணப் பொருத்த அறிக்கை"
+            AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप • विवाह मिलान प्रमाण पत्र"
+            AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji • Vedic Matchmaking Certificate"
         }
         canvas.drawText(subtitle, PAGE_WIDTH / 2f, y, subHeaderPaint)
         y += 12f
@@ -486,14 +486,14 @@ object WeddingMatchPdfExporter {
         var py = y + 14f
         val px = tableLeft + 10
         val endorseTitle = when (lang) {
-            AppLanguage.TAMIL -> "ஜோதிட ஆலோசனை & திருமண அறிக்கை தயாரித்தவர்:"
-            AppLanguage.HINDI -> "ज्योतिषीय परामर्श एवं मिलान पत्र प्रदाता:"
-            AppLanguage.ENGLISH -> "Astrological Consultation & Certificate Issued By:"
+            AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கை & ஆசிகள் வழங்கியவர்:"
+            AppLanguage.HINDI -> "विवाह मिलान प्रमाण पत्र एवं शुभाशीर्वाद प्रदाता:"
+            AppLanguage.ENGLISH -> "Matchmaking Certificate & Blessings Issued By:"
         }
         canvas.drawText(endorseTitle, px, py, textPaint.apply { textSize = 8f; color = textMuted })
         py += 13f
 
-        val priestSigText = "மோகன் குருக்கள் (Mohan Gurukkal) • Mobile: +6797607465 • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
+        val priestSigText = "மோகன் குருக்கள் (Mohan Gurukkal) • Head Priest, Sri Siva Subramaniya Swami Kovil, Nadi, Fiji • Ph: +6797607465"
         canvas.drawText(priestSigText, px, py, boldTextPaint.apply { textSize = 8.8f; color = deepMaroon })
         py += 12f
 
@@ -618,7 +618,7 @@ object WeddingMatchPdfExporter {
         "MarsRemedyNeeded" -> when (lang) {
             AppLanguage.TAMIL -> "⚠ தோஷ நிவர்த்தி தேவை"
             AppLanguage.HINDI -> "⚠ दोष निवारण आवश्यक"
-            AppLanguage.ENGLISH -> "⚠ Astrological Review Advised"
+            AppLanguage.ENGLISH -> "⚠ Remedy / Review Advised"
         }
         "KujaDoshaTitle" -> when (lang) {
             AppLanguage.TAMIL -> "செவ்வாய் தோஷ விளக்கம் & தோஷ சாம்யம் (Kuja Dosha Analysis)"
@@ -651,9 +651,9 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Porutham Name"
         }
         "ColSignificance" -> when (lang) {
-            AppLanguage.TAMIL -> "ஜோதிட பலன் விளக்கம்"
-            AppLanguage.HINDI -> "ज्योतिषीय फल विवरण"
-            AppLanguage.ENGLISH -> "Astrological Significance"
+            AppLanguage.TAMIL -> "பொருத்த பலன் விளக்கம்"
+            AppLanguage.HINDI -> "महत्व एवं फल विवरण"
+            AppLanguage.ENGLISH -> "Significance & Blessing"
         }
         "ColVerdict" -> when (lang) {
             AppLanguage.TAMIL -> "முடிவு"

@@ -201,9 +201,9 @@ data class TempleJathagaSummary(
     val familyHi: String = familyEn,
     val foreignTravelHi: String = foreignTravelEn,
     val currentPeriodGuidanceHi: String = currentPeriodGuidanceEn,
-    val disclaimerTa: String = "பாரம்பரிய ஜோதிட குறிப்பு மட்டுமே. அறிவார்ந்த ஜோதிடர் வழிகாட்டுதலுடன் அறிந்து கொள்ளவும்.",
-    val disclaimerEn: String = "Traditional Jyotisha indication only. Requires verified astrologer interpretation.",
-    val disclaimerHi: String = "यह केवल पारंपरिक ज्योतिषीय मार्गदर्शन है। पूर्ण फलकथन के लिए योग्य ज्योतिषाचार्य से परामर्श लें।"
+    val disclaimerTa: String = "பாரம்பரிய திருக்கணித ஜோதிடக் கணிப்பு மட்டுமே. தலைமை குருக்கள் மற்றும் திருக்கோயில் ஆசியுடன் வழிபடவும்.",
+    val disclaimerEn: String = "Traditional Thirkkanitha Jyotisha indication only. Blessed by Head Priest for temple worship and guidance.",
+    val disclaimerHi: String = "पारंपरिक वैदिक ज्योतिषीय मार्गदर्शन। मुख्य पुजारी एवं मंदिर की कृपा से शुभ फल प्राप्त करें।"
 ) {
     fun getHealth(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> healthTa; AppLanguage.HINDI -> healthHi; AppLanguage.ENGLISH -> healthEn }
     fun getWealth(lang: AppLanguage): String = when (lang) { AppLanguage.TAMIL -> wealthTa; AppLanguage.HINDI -> wealthHi; AppLanguage.ENGLISH -> wealthEn }

@@ -80,48 +80,63 @@ object HoroscopePdfExporter {
             borderPaint.strokeWidth = 0.8f
             canvas1.drawRect(22f, 22f, (PAGE_WIDTH - 22).toFloat(), (PAGE_HEIGHT - 22).toFloat(), borderPaint)
 
-            var y = 44f
+            var y = 36f
+
+            // Auspicious Invocation
+            val invocationPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = COLOR_MAROON
+                textSize = 9.5f
+                textAlign = Paint.Align.CENTER
+                typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+            }
+            val invocationText = when (lang) {
+                AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||   || குருப்யோ நம: ||"
+                AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥   ॥ श्री गुरुभ्यो नमः ॥"
+                AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||   || Gurubhyo Namah ||"
+            }
+            canvas1.drawText(invocationText, (PAGE_WIDTH / 2).toFloat(), y, invocationPaint)
+            y += 14f
 
             // Temple Header
             titlePaint.textAlign = Paint.Align.CENTER
             titlePaint.color = COLOR_MAROON
-            titlePaint.textSize = 15.5f
+            titlePaint.textSize = 14.5f
             val templeTitle = when (lang) {
-                AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்ரமணிய சுவாமி திருக்கோயில்"
+                AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில்"
                 AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर"
-                AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Temple"
+                AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil"
             }
             canvas1.drawText(templeTitle, (PAGE_WIDTH / 2).toFloat(), y, titlePaint)
-            y += 15f
+            y += 13f
 
+            val priestText = when (lang) {
+                AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
+                AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
+                AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
+            }
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.textSize = 10f
-            textPaint.color = COLOR_GOLD
+            textPaint.color = COLOR_MAROON
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            canvas1.drawText(priestText, (PAGE_WIDTH / 2).toFloat(), y, textPaint)
+            y += 12f
+
+            textPaint.textSize = 8.5f
+            textPaint.color = COLOR_GRAY_TEXT
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
             val templeLocation = when (lang) {
-                AppLanguage.TAMIL -> "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)"
-                AppLanguage.HINDI -> "नादी, फिजी द्वीप समूह (Nadi, Fiji Islands)"
-                AppLanguage.ENGLISH -> "Nadi, Fiji Islands"
+                AppLanguage.TAMIL -> "நாடி, பிஜி தீவுகள் • துல்லிய திருக்கணித பஞ்சாங்க ஜாதகக் கணிப்பு அறிக்கை"
+                AppLanguage.HINDI -> "नादी, फिजी द्वीप • वैदिक जन्मकुंडली फलकथन रिपोर्ट"
+                AppLanguage.ENGLISH -> "Nadi, Fiji Islands • Vedic Horoscope Assessment Report"
             }
             canvas1.drawText(templeLocation, (PAGE_WIDTH / 2).toFloat(), y, textPaint)
-            y += 15f
-
-            textPaint.textSize = 11.5f
-            textPaint.color = COLOR_DARK_TEXT
-            textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
-            val docTitle = when (lang) {
-                AppLanguage.TAMIL -> "திருக்கோயில் ஜாதகக் கணிப்பு அறிக்கை (Horoscope Report)"
-                AppLanguage.HINDI -> "वैदिक जन्मकुंडली फलकथन रिपोर्ट (Horoscope Report)"
-                AppLanguage.ENGLISH -> "Vedic Horoscope & Astrological Assessment Report"
-            }
-            canvas1.drawText(docTitle, (PAGE_WIDTH / 2).toFloat(), y, textPaint)
-            y += 8f
+            y += 10f
 
             // Divider
             borderPaint.color = COLOR_GOLD
-            borderPaint.strokeWidth = 1f
+            borderPaint.strokeWidth = 1.2f
             canvas1.drawLine(35f, y, (PAGE_WIDTH - 35).toFloat(), y, borderPaint)
-            y += 13f
+            y += 11f
 
             // Devotee Information Box
             val boxLeft = 32f
@@ -569,7 +584,7 @@ object HoroscopePdfExporter {
             y2 += 6f
 
             // Aspect Summaries
-            headerPaint.textSize = 12f
+            headerPaint.textSize = 11.5f
             headerPaint.color = COLOR_MAROON
             val lifeAspectTitle = when (lang) {
                 AppLanguage.TAMIL -> "திருக்கோயில் ஜாதக சுருக்கம் & முக்கிய பலன்கள் (Life Aspects Summary)"
@@ -577,7 +592,7 @@ object HoroscopePdfExporter {
                 AppLanguage.ENGLISH -> "Life Aspects Analysis & Astrological Summary"
             }
             canvas2.drawText(lifeAspectTitle, 32f, y2, headerPaint)
-            y2 += 10f
+            y2 += 8f
 
             val summ = result.summary
             val aspects = listOf(
@@ -591,22 +606,23 @@ object HoroscopePdfExporter {
                 Pair(when (lang) { AppLanguage.TAMIL -> "தற்போதைய வழிகாட்டல் (Guidance)"; AppLanguage.HINDI -> "वर्तमान मार्गदर्शन (Guidance)"; AppLanguage.ENGLISH -> "Current Period Guidance" }, summ.getCurrentPeriodGuidance(lang))
             )
 
+            val aspectBoxTop = y2
             fillPaint.color = Color.WHITE
-            canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 340f), 6f, 6f, fillPaint)
+            canvas2.drawRoundRect(RectF(32f, aspectBoxTop, boxRight, aspectBoxTop + 240f), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_BORDER
-            canvas2.drawRoundRect(RectF(32f, y2, boxRight, y2 + 340f), 6f, 6f, borderPaint)
+            canvas2.drawRoundRect(RectF(32f, aspectBoxTop, boxRight, aspectBoxTop + 240f), 6f, 6f, borderPaint)
 
-            var aY = y2 + 14f
+            var aY = aspectBoxTop + 12f
             aspects.forEach { (title, desc) ->
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 9.5f
+                textPaint.textSize = 8.8f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = COLOR_MAROON
                 canvas2.drawText("• $title", 40f, aY, textPaint)
-                aY += 11f
+                aY += 10f
 
                 textPaint.typeface = Typeface.DEFAULT
-                textPaint.textSize = 8.5f
+                textPaint.textSize = 8f
                 textPaint.color = COLOR_DARK_TEXT
 
                 // Wrap text
@@ -617,27 +633,60 @@ object HoroscopePdfExporter {
                         line = if (line.isEmpty()) word else "$line $word"
                     } else {
                         canvas2.drawText(line, 48f, aY, textPaint)
-                        aY += 10f
+                        aY += 9.5f
                         line = word
                     }
                 }
                 if (line.isNotEmpty()) {
                     canvas2.drawText(line, 48f, aY, textPaint)
-                    aY += 13f
+                    aY += 11f
                 }
                 borderPaint.color = Color.rgb(240, 240, 240)
-                canvas2.drawLine(40f, aY - 3f, boxRight - 10f, aY - 3f, borderPaint)
+                canvas2.drawLine(40f, aY - 2f, boxRight - 10f, aY - 2f, borderPaint)
             }
 
+            // Priest Endorsement & Blessings Card
+            val priestCardTop = aspectBoxTop + 248f
+            val priestCardHeight = 44f
+            val priestCardRect = RectF(32f, priestCardTop, boxRight, priestCardTop + priestCardHeight)
+            val priestCardBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(250, 245, 235); style = Paint.Style.FILL }
+            canvas2.drawRoundRect(priestCardRect, 6f, 6f, priestCardBg)
+            borderPaint.color = COLOR_GOLD
+            borderPaint.strokeWidth = 1f
+            canvas2.drawRoundRect(priestCardRect, 6f, 6f, borderPaint)
+
+            var py = priestCardTop + 14f
+            val endorseTitle = when (lang) {
+                AppLanguage.TAMIL -> "ஜாதகக் கணிப்பு அறிக்கை & ஆசிகள் வழங்கியவர்:"
+                AppLanguage.HINDI -> "जन्मकुंडली फलकथन एवं शुभाशीर्वाद प्रदाता:"
+                AppLanguage.ENGLISH -> "Horoscope Assessment & Divine Blessings Issued By:"
+            }
+            textPaint.textAlign = Paint.Align.LEFT
+            textPaint.textSize = 8f
+            textPaint.color = COLOR_GRAY_TEXT
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+            canvas2.drawText(endorseTitle, 42f, py, textPaint)
+            py += 14f
+
+            val priestSigText = when (lang) {
+                AppLanguage.TAMIL -> "மோகன் குருக்கள் (Mohan Gurukkal) • தலைமை குருக்கள், ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி • Mobile: +6797607465"
+                AppLanguage.HINDI -> "मोहन गुरुक्कल (Mohan Gurukkal) • मुख्य पुजारी, श्री शिव सुब्रमण्य स्वामी मंदिर, नादी • Mobile: +6797607465"
+                AppLanguage.ENGLISH -> "Mohan Gurukkal • Head Priest, Sri Siva Subramaniya Swami Kovil, Nadi, Fiji • Mobile: +6797607465"
+            }
+            textPaint.textSize = 8.5f
+            textPaint.color = COLOR_MAROON
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            canvas2.drawText(priestSigText, 42f, py, textPaint)
+
             // Temple Blessings & Disclaimer
-            val discY = (PAGE_HEIGHT - 65).toFloat()
+            val discY = (PAGE_HEIGHT - 55).toFloat()
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.textSize = 9f
             textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
             val blessingText = when (lang) {
-                AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்ரமணிய சுவாமி திருவருள் துணை!"
-                AppLanguage.HINDI -> "ॐ नमः शिवाय • भगवान मुरुगन एवं श्री शिव सुब्रमण्य स्वामी की कृपा आप पर बनी रहे!"
+                AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருவருள் துணை! • லோகா சமஸ்தா சுகினோ பவந்து"
+                AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ लोकाः समस्ताः सुखिनो भवन्तु ॥ शुभम् ॥"
                 AppLanguage.ENGLISH -> "May Lord Murugan & Sri Siva Subramaniya Swami Bestow Divine Blessings & Prosperity!"
             }
             canvas2.drawText(blessingText, (PAGE_WIDTH / 2).toFloat(), discY, textPaint)
@@ -649,11 +698,11 @@ object HoroscopePdfExporter {
 
             // Page 2 Footer
             val footerText2 = when (lang) {
-                AppLanguage.TAMIL -> "பக்கம் 2 / 2 • ஸ்ரீ சிவ சுப்ரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி"
+                AppLanguage.TAMIL -> "பக்கம் 2 / 2 • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி"
                 AppLanguage.HINDI -> "पृष्ठ 2 / 2 • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी"
-                AppLanguage.ENGLISH -> "Page 2 / 2 • Sri Siva Subramaniya Swami Temple, Nadi, Fiji"
+                AppLanguage.ENGLISH -> "Page 2 / 2 • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
             }
-            canvas2.drawText(footerText2, (PAGE_WIDTH / 2).toFloat(), (PAGE_HEIGHT - 26).toFloat(), textPaint)
+            canvas2.drawText(footerText2, (PAGE_WIDTH / 2).toFloat(), (PAGE_HEIGHT - 22).toFloat(), textPaint)
 
             pdfDocument.finishPage(page2)
 
