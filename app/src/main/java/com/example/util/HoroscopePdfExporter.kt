@@ -725,6 +725,259 @@ object HoroscopePdfExporter {
         }
     }
 
+    fun generateHoroscopeA4Html(result: HoroscopeResult, lang: AppLanguage = AppLanguage.TAMIL): String {
+        val isTa = lang == AppLanguage.TAMIL
+        val isHi = lang == AppLanguage.HINDI
+
+        // Map planets to Rasi (D1)
+        val rasiPlanets = mutableMapOf<Rasi, MutableList<String>>()
+        Rasi.entries.forEach { rasiPlanets[it] = mutableListOf() }
+        val lagnaDegFormatted = String.format(Locale.US, "%02d° %02d'", result.lagnaDegrees.toInt(), ((result.lagnaDegrees - result.lagnaDegrees.toInt()) * 60).toInt())
+        rasiPlanets[result.lagnaRasi]?.add(if (isTa) "லக் ($lagnaDegFormatted)" else "Lagna ($lagnaDegFormatted)")
+        result.planetPositions.forEach { p ->
+            val pName = if (isTa) p.graha.shortTa else p.graha.shortEn
+            val suffix = if (p.isRetrograde) "(R)" else ""
+            val degText = String.format(Locale.US, " %02d°%02d'", p.degrees.toInt(), ((p.degrees - p.degrees.toInt()) * 60).toInt())
+            rasiPlanets[p.rasi]?.add("$pName$suffix$degText")
+        }
+
+        // Map planets to Navamsa (D9)
+        val navamsaPlanets = mutableMapOf<Rasi, MutableList<String>>()
+        Rasi.entries.forEach { navamsaPlanets[it] = mutableListOf() }
+
+        val lagnaNavIndex = (((result.lagnaRasi.index - 1) * 9 + (result.lagnaDegrees / (30.0 / 9.0)).toInt()) % 12)
+        val lagnaNavamsaRasi = Rasi.entries.getOrElse(lagnaNavIndex) { result.lagnaRasi }
+        navamsaPlanets[lagnaNavamsaRasi]?.add(if (isTa) "லக் (L)" else "Lagna")
+
+        result.planetPositions.forEach { p ->
+            val navRasi = result.navamsaPositions[p.graha] ?: p.rasi
+            val pName = if (isTa) p.graha.shortTa else p.graha.shortEn
+            val suffix = if (p.isRetrograde) "(R)" else ""
+            navamsaPlanets[navRasi]?.add("$pName$suffix")
+        }
+
+        fun buildChartGrid(planetsMap: Map<Rasi, List<String>>, chartTitle: String): String {
+            // South Indian 4x4 Grid layout order:
+            // Row 1: Pisces (0,0), Aries (0,1), Taurus (0,2), Gemini (0,3)
+            // Row 2: Aquarius (1,0), [Center 2x2], Cancer (1,3)
+            // Row 3: Capricorn (2,0), [Center], Leo (2,3)
+            // Row 4: Sagittarius (3,0), Scorpio (3,1), Libra (3,2), Virgo (3,3)
+            val rasiGridConfig = listOf(
+                Triple(Rasi.MEENAM, "1", "1"),
+                Triple(Rasi.MESHAM, "2", "1"),
+                Triple(Rasi.RISHABAM, "3", "1"),
+                Triple(Rasi.MITHUNAM, "4", "1"),
+                Triple(Rasi.KADAGAM, "4", "2"),
+                Triple(Rasi.SIMHAM, "4", "3"),
+                Triple(Rasi.KANNI, "4", "4"),
+                Triple(Rasi.THULAM, "3", "4"),
+                Triple(Rasi.VIRUCHIGAM, "2", "4"),
+                Triple(Rasi.DHANUSU, "1", "4"),
+                Triple(Rasi.MAGARAM, "1", "3"),
+                Triple(Rasi.KUMBAM, "1", "2")
+            )
+
+            val cellsHtml = StringBuilder()
+            for (item in rasiGridConfig) {
+                val rasi = item.first
+                val col = item.second
+                val row = item.third
+                val pList = planetsMap[rasi] ?: emptyList()
+                val planetsHtml = pList.joinToString("") { "<div class=\"planet\">$it</div>" }
+                val signName = if (isTa) rasi.nameTa else rasi.nameEn
+                cellsHtml.append(
+                    """
+      <div class="cell" style="grid-column: $col; grid-row: $row;">
+        $planetsHtml
+        <span class="sign-name">$signName</span>
+      </div>
+                    """.trimIndent()
+                )
+            }
+
+            return """
+    <div class="chart-container">
+      <div class="chart-title">$chartTitle</div>
+      <div class="south-indian-chart">
+        <div class="center-box">
+          <div>$chartTitle</div>
+          <div style="font-size: 10px; color: #555; margin-top: 4px;">திருக்கணிதம் / Lahiri</div>
+        </div>
+        $cellsHtml
+      </div>
+    </div>
+            """.trimIndent()
+        }
+
+        val rasiChartHtml = buildChartGrid(rasiPlanets, if (isTa) "ராசிக் கட்டம் (Rasi D1)" else "Rasi Chart (D1)")
+        val navamsaChartHtml = buildChartGrid(navamsaPlanets, if (isTa) "நவாம்சக் கட்டம் (Navamsa D9)" else "Navamsa Chart (D9)")
+
+        val planetRows = StringBuilder()
+        result.planetPositions.forEach { p ->
+            val gName = if (isTa) p.graha.nameTa else p.graha.nameEn
+            val rName = if (isTa) p.rasi.nameTa else p.rasi.nameEn
+            val nName = p.nakshatram
+            val degFormatted = String.format(Locale.US, "%02d° %02d'", p.degrees.toInt(), ((p.degrees - p.degrees.toInt()) * 60).toInt())
+            val lordName = if (isTa) p.rasi.lordTa else p.rasi.lordEn
+            val retroStatus = if (p.isRetrograde) (if (isTa) "வக்ரம் (Retrograde)" else "Retrograde") else (if (isTa) "நேர்கதி (Direct)" else "Direct")
+            val statusColor = if (p.isRetrograde) "#b91c1c" else "#15803d"
+
+            planetRows.append(
+                """
+    <tr>
+      <td><strong>$gName</strong></td>
+      <td>$rName</td>
+      <td>$degFormatted</td>
+      <td>$nName (பாதம் ${p.pada})</td>
+      <td>$lordName</td>
+      <td style="color: $statusColor; font-weight: bold;">$retroStatus</td>
+    </tr>
+                """.trimIndent()
+            )
+        }
+
+        // Lagna Row
+        val lagnaRow = """
+    <tr style="background-color: #fffaf0;">
+      <td><strong>${if (isTa) "லக்னம் (Lagna)" else "Ascendant (Lagna)"}</strong></td>
+      <td>${if (isTa) result.lagnaRasi.nameTa else result.lagnaRasi.nameEn}</td>
+      <td>$lagnaDegFormatted</td>
+      <td>${result.janmaNakshatram} (பாதம் ${result.janmaPada})</td>
+      <td>${if (isTa) result.lagnaRasi.lordTa else result.lagnaRasi.lordEn}</td>
+      <td style="font-weight: bold; color: #800000;">${if (isTa) "உதயம்" else "Ascendant"}</td>
+    </tr>
+        """.trimIndent()
+
+        val formattedDob = result.dob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        val formattedTob = result.tob.format(DateTimeFormatter.ofPattern("hh:mm a"))
+        val firstDasha = result.dashaPeriods.firstOrNull()
+        val dashaBalanceStr = if (firstDasha != null) {
+            val lordName = if (isTa) firstDasha.mahadashaLord.nameTa else firstDasha.mahadashaLord.nameEn
+            "$lordName தசை இருப்பு: ${firstDasha.startDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} முதல் ${firstDasha.endDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} வரை"
+        } else {
+            "திருக்கணித தசா கணக்கீடு"
+        }
+
+        return """
+<!DOCTYPE html>
+<html lang="${if (isTa) "ta" else "en"}">
+<head>
+  <meta charset="UTF-8">
+  <title>Horoscope Report - ${result.devoteeName}</title>
+  <style>
+    @page { size: A4 portrait; margin: 10mm; }
+    body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif; color: #1a1a1a; margin: 0; padding: 0; background: #fff; line-height: 1.4; }
+    .container { max-width: 850px; margin: 0 auto; border: 2px solid #800000; padding: 15px; box-sizing: border-box; }
+    .title-banner { text-align: center; background: #800000; color: #fff; padding: 8px; font-size: 16px; font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; border-radius: 4px; }
+    .header-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 12.5px; }
+    .header-table td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+    .header-label { font-weight: bold; color: #800000; width: 18%; }
+    .header-val { width: 32%; color: #222; }
+    .charts-wrapper { display: flex; justify-content: space-between; gap: 14px; margin: 12px 0; }
+    .chart-container { flex: 1; }
+    .chart-title { text-align: center; font-weight: bold; font-size: 13.5px; color: #800000; margin-bottom: 6px; border-bottom: 2px solid #800000; padding-bottom: 3px; }
+    .south-indian-chart { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 78px); border: 1.5px solid #800000; background-color: #fff; }
+    .cell { border: 1px solid #800000; padding: 4px; font-size: 10.5px; box-sizing: border-box; position: relative; overflow: hidden; }
+    .sign-name { font-size: 8.5px; color: #777; position: absolute; bottom: 2px; right: 3px; font-weight: bold; }
+    .planet { font-size: 10px; font-weight: bold; color: #1a1a1a; margin-bottom: 1px; line-height: 1.2; }
+    .center-box { grid-column: 2 / 4; grid-row: 2 / 4; border: 1px solid #800000; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #fffaf0; text-align: center; font-weight: bold; color: #800000; font-size: 12.5px; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11.5px; }
+    .data-table th { background-color: #800000; color: white; text-align: left; padding: 5px 6px; font-weight: 600; }
+    .data-table td { border: 1px solid #ddd; padding: 4px 6px; }
+    .dasha-box { margin-top: 10px; padding: 8px 10px; background-color: #fffaf0; border: 1px solid #e2d2b8; border-radius: 4px; font-size: 12px; }
+    .footer-note { margin-top: 10px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #eee; padding-top: 6px; }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .container { border: 1.5px solid #800000; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="title-banner">${if (isTa) "ஜாதகக் கணிப்பு அறிக்கை (Vedic Horoscope Report)" else "Vedic Horoscope Calculation Report"}</div>
+  
+  <!-- Populated Header Table -->
+  <table class="header-table">
+    <tr>
+      <td class="header-label">${if (isTa) "பெயர் (Name):" else "Name:"}</td>
+      <td class="header-val"><strong>${result.devoteeName}</strong></td>
+      <td class="header-label">${if (isTa) "பிறந்த தேதி (DOB):" else "Date of Birth:"}</td>
+      <td class="header-val">$formattedDob</td>
+    </tr>
+    <tr>
+      <td class="header-label">${if (isTa) "பிறந்த நேரம் (TOB):" else "Time of Birth:"}</td>
+      <td class="header-val">$formattedTob</td>
+      <td class="header-label">${if (isTa) "பிறந்த இடம் (Place):" else "Birth Place:"}</td>
+      <td class="header-val">${result.birthPlace}</td>
+    </tr>
+    <tr>
+      <td class="header-label">${if (isTa) "லக்னம் (Lagna):" else "Lagna (Ascendant):"}</td>
+      <td class="header-val"><strong>${if (isTa) result.lagnaRasi.nameTa else result.lagnaRasi.nameEn}</strong> ($lagnaDegFormatted)</td>
+      <td class="header-label">${if (isTa) "ஜன்ம ராசி (Rasi):" else "Janma Rasi:"}</td>
+      <td class="header-val"><strong>${if (isTa) result.chandraRasi.nameTa else result.chandraRasi.nameEn}</strong></td>
+    </tr>
+    <tr>
+      <td class="header-label">${if (isTa) "நட்சத்திரம் (Nakshatra):" else "Nakshatra:"}</td>
+      <td class="header-val"><strong>${result.janmaNakshatram}</strong> (பாதம் ${result.janmaPada})</td>
+      <td class="header-label">${if (isTa) "அயனாம்சம் (Ayanamsa):" else "Ayanamsa:"}</td>
+      <td class="header-val">லகிரி (Lahiri Chitra Paksha)</td>
+    </tr>
+  </table>
+
+  <!-- Side-by-Side Dual Charts (D1 & D9) -->
+  <div class="charts-wrapper">
+    $rasiChartHtml
+    $navamsaChartHtml
+  </div>
+
+  <!-- Planetary Positions Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>${if (isTa) "கிரகம் (Planet)" else "Planet"}</th>
+        <th>${if (isTa) "ராசி (Rasi)" else "Rasi"}</th>
+        <th>${if (isTa) "பாகை (Degree)" else "Degree"}</th>
+        <th>${if (isTa) "நட்சத்திரம் (Star/Pada)" else "Nakshatra / Pada"}</th>
+        <th>${if (isTa) "அதிபதி (Lord)" else "Rasi Lord"}</th>
+        <th>${if (isTa) "நிலை (Status)" else "Status"}</th>
+      </tr>
+    </thead>
+    <tbody>
+      $lagnaRow
+      $planetRows
+    </tbody>
+  </table>
+
+  <!-- Vimshottari Dasha Balance -->
+  <div class="dasha-box">
+    <strong>${if (isTa) "விம்சோத்தரி தசா இருப்பு (Vimshottari Dasha Balance):" else "Vimshottari Dasha Balance at Birth:"}</strong>
+    <span style="color: #800000; font-weight: bold; margin-left: 6px;">$dashaBalanceStr</span>
+  </div>
+
+  <div class="footer-note">
+    ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji Islands
+  </div>
+</div>
+</body>
+</html>
+        """.trimIndent()
+    }
+
+    fun exportHoroscopeToHtml(context: Context, result: HoroscopeResult, lang: AppLanguage = AppLanguage.TAMIL): File? {
+        return try {
+            val htmlContent = generateHoroscopeA4Html(result, lang)
+            val fileName = "Horoscope_${result.devoteeName.replace(" ", "_")}_${lang.code}_${System.currentTimeMillis()}.html"
+            val outputDir = File(context.cacheDir, "html_reports")
+            if (!outputDir.exists()) outputDir.mkdirs()
+            val outputFile = File(outputDir, fileName)
+            outputFile.writeText(htmlContent, Charsets.UTF_8)
+            outputFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     fun shareOrOpenPdf(context: Context, pdfFile: File, title: String = "Jathagam Horoscope PDF") {
         try {
             val uri: Uri = FileProvider.getUriForFile(
@@ -749,3 +1002,4 @@ object HoroscopePdfExporter {
         }
     }
 }
+

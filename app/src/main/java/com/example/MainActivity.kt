@@ -109,6 +109,8 @@ fun MainAppContainer(
         Screen.BabyNames.route
     )
 
+    val isDark = if (userPrefs.useSystemTheme) isSystemInDarkTheme() else userPrefs.isDarkMode
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -123,7 +125,11 @@ fun MainAppContainer(
                         }
                         preferencesRepository.setLanguage(nextLang)
                     },
-                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                    isDarkMode = isDark,
+                    onToggleDarkMode = {
+                        preferencesRepository.setDarkMode(!isDark, useSystem = false)
+                    }
                 )
             }
         },

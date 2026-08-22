@@ -35,14 +35,14 @@ fun SouthIndianRasiChart(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .border(1.5.dp, TempleGold.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
+            .border(1.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = chartTitle,
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = TempleMaroon,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -56,7 +56,7 @@ fun SouthIndianRasiChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
-                .border(1.dp, TempleGold.copy(alpha = 0.7f))
+                .border(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             // Row 0
             Row(modifier = Modifier.weight(1f)) {
@@ -102,8 +102,8 @@ private fun ChartCell(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .border(0.5.dp, TempleGold.copy(alpha = 0.5f))
-            .background(if (isLagna) TempleGold.copy(alpha = 0.18f) else Color.Transparent)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline)
+            .background(if (isLagna) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
             .padding(3.dp)
     ) {
         // Rasi Name
@@ -141,17 +141,11 @@ private fun ChartCell(
             planetsInRasi.forEach { p ->
                 val planetText = if (lang == AppLanguage.TAMIL) p.graha.shortTa else p.graha.shortEn
                 val suffix = if (p.isRetrograde) "(R)" else ""
-                val planetColor = when (p.graha) {
-                    Graha.SURYA, Graha.CHANDRA -> MaterialTheme.colorScheme.primary
-                    Graha.SANI, Graha.RAHU, Graha.KETU -> MaterialTheme.colorScheme.error
-                    Graha.GURU, Graha.SUKRA -> MaterialTheme.colorScheme.tertiary
-                    else -> MaterialTheme.colorScheme.onSurface
-                }
                 Text(
                     text = "$planetText$suffix",
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    color = planetColor,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
             }
@@ -164,8 +158,8 @@ private fun CenterCell(lagna: Rasi, lang: AppLanguage, modifier: Modifier = Modi
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f))
-            .border(0.5.dp, TempleGold.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline)
             .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -193,15 +187,15 @@ private fun CenterCellBottom(lang: AppLanguage, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f))
-            .border(0.5.dp, TempleGold.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline)
             .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = if (lang == AppLanguage.TAMIL) "திருவருள் துணை ॐ" else "Divine Blessings ॐ",
             fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.tertiary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
     }

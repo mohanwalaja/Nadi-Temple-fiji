@@ -3,6 +3,7 @@ package com.example.ui.screens.matchmaking
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -323,6 +324,56 @@ fun MatchMakingScreen(
                 }
             }
 
+            // Temple & Head Priest Certificate Header Badge
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth().testTag("card_matchmaking_temple_header"),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, TempleGold.copy(alpha = 0.5f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||"
+                                AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥"
+                                AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||"
+                            },
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TempleMaroon
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
+                                AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
+                                AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
+                            },
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TempleMaroon
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
+                                AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
+                                AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
+                            },
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TempleMaroon
+                        )
+                    }
+                }
+            }
+
             // Verdict / Score Banner
             item {
                 VerdictCard(
@@ -401,6 +452,74 @@ fun MatchMakingScreen(
                         analysis = result.sevvayDosham,
                         currentLanguage = currentLanguage
                     )
+                }
+            }
+
+            // Head Priest Endorsement & Blessing Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth().testTag("card_matchmaking_priest_endorsement"),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, TempleGold),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கை & ஆசிகள் வழங்கியவர்:"
+                                AppLanguage.HINDI -> "विवाह मिलान प्रमाण पत्र एवं शुभाशीर्वाद प्रदाता:"
+                                AppLanguage.ENGLISH -> "Matchmaking Certificate & Blessings Issued By:"
+                            },
+                            fontSize = 11.5.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "மோகன் குருக்கள் (Mohan Gurukkal)"
+                                AppLanguage.HINDI -> "मोहन गुरुक्कल (Mohan Gurukkal)"
+                                AppLanguage.ENGLISH -> "Mohan Gurukkal"
+                            },
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TempleMaroon
+                        )
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
+                                AppLanguage.HINDI -> "मुख्य पुजारी • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
+                                AppLanguage.ENGLISH -> "Head Priest • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
+                            },
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Mobile: +6797607465",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TempleMaroon
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(color = TempleGold.copy(alpha = 0.3f))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருவருள் துணை! • சுபமஸ்து"
+                                AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ शुभमस्तु ॥"
+                                AppLanguage.ENGLISH -> "May Lord Murugan & Sri Siva Subramaniya Swami Bless the Divine Union!"
+                            },
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TempleMaroon,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -747,7 +866,7 @@ fun PersonBirthInputCard(
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) Color(0xFFFFEBEE) else Color(0xFFE8F5E9),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.weight(1f)
                 ) {
                     Column(modifier = Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -767,7 +886,7 @@ fun PersonBirthInputCard(
                             } + " " + (if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) "⚠️" else "✓"),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (calculatedMarsHouse in listOf(2, 4, 7, 8, 12)) Color(0xFFC62828) else Color(0xFF2E7D32)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -977,19 +1096,14 @@ fun VerdictCard(
     result: WeddingMatchResult,
     currentLanguage: AppLanguage
 ) {
-    val (bgColor, textColor, _) = when (result.verdictStatus) {
-        PoruthamStatus.UTTHAMAM -> Triple(Color(0xFFE8F5E9), Color(0xFF2E7D32), "உத்தமப் பொருத்தம்")
-        PoruthamStatus.MADHYAMAM -> Triple(Color(0xFFFFF3E0), Color(0xFFE65100), "மத்திமப் பொருத்தம்")
-        PoruthamStatus.PORUNDHADHU -> Triple(Color(0xFFFFEBEE), Color(0xFFC62828), "பொருந்தாது")
-    }
+    val containerBg = MaterialTheme.colorScheme.surfaceVariant
+    val textColor = MaterialTheme.colorScheme.onSurface
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = bgColor),
-        border = CardDefaults.outlinedCardBorder().copy(
-            brush = androidx.compose.ui.graphics.SolidColor(textColor.copy(alpha = 0.4f))
-        )
+        colors = CardDefaults.cardColors(containerColor = containerBg),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -1008,7 +1122,7 @@ fun VerdictCard(
                             AppLanguage.ENGLISH -> "Total Match Score"
                         },
                         style = MaterialTheme.typography.labelMedium,
-                        color = textColor
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "${result.totalPoruthamsMatched} / 10 பொருத்தம் (${result.totalScore} / 10.0)",
@@ -1020,8 +1134,8 @@ fun VerdictCard(
 
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = textColor,
-                    contentColor = Color.White
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Text(
                         text = result.verdictStatus.getName(currentLanguage),
@@ -1032,7 +1146,7 @@ fun VerdictCard(
                 }
             }
 
-            HorizontalDivider(color = textColor.copy(alpha = 0.2f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
             // Rajju & Sevvay highlights
             Row(
@@ -1042,7 +1156,8 @@ fun VerdictCard(
                 // Rajju tag
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = if (result.rajjuMatch) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     modifier = Modifier.weight(1f)
                 ) {
                     Row(
@@ -1050,12 +1165,12 @@ fun VerdictCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text(if (result.rajjuMatch) "✅" else "❌", fontSize = 14.sp)
+                        Text(if (result.rajjuMatch) "✓" else "✗", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         Text(
                             text = if (result.rajjuMatch) "ரஜ்ஜு சுபம்" else "ரஜ்ஜு தோஷம்",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (result.rajjuMatch) Color(0xFF1B5E20) else Color(0xFFB71C1C)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -1063,7 +1178,8 @@ fun VerdictCard(
                 // Sevvay tag
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) Color(0xFFC8E6C9) else Color(0xFFFFF9C4),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     modifier = Modifier.weight(1f)
                 ) {
                     Row(
@@ -1076,7 +1192,7 @@ fun VerdictCard(
                             text = if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) "செவ்வாய் சமநிலை" else "தோஷ நிவர்த்தி தேவை",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF37474F)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -1100,16 +1216,17 @@ fun PoruthamDetailCard(
     porutham: SinglePoruthamResult,
     currentLanguage: AppLanguage
 ) {
-    val (statusColor, badgeBg, iconText) = when (porutham.status) {
-        PoruthamStatus.UTTHAMAM -> Triple(Color(0xFF2E7D32), Color(0xFFE8F5E9), "✓")
-        PoruthamStatus.MADHYAMAM -> Triple(Color(0xFFE65100), Color(0xFFFFF3E0), "≈")
-        PoruthamStatus.PORUNDHADHU -> Triple(Color(0xFFC62828), Color(0xFFFFEBEE), "✗")
+    val iconText = when (porutham.status) {
+        PoruthamStatus.UTTHAMAM -> "✓"
+        PoruthamStatus.MADHYAMAM -> "≈"
+        PoruthamStatus.PORUNDHADHU -> "✗"
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
@@ -1127,11 +1244,11 @@ fun PoruthamDetailCard(
                 ) {
                     Surface(
                         shape = CircleShape,
-                        color = badgeBg,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                         modifier = Modifier.size(24.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Text(iconText, color = statusColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(iconText, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                     Text(
@@ -1143,12 +1260,12 @@ fun PoruthamDetailCard(
                     if (porutham.isCrucial) {
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = TempleGold.copy(alpha = 0.2f)
+                            color = MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Text(
                                 text = "மகா பொருத்தம்",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TempleMaroon,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 10.sp,
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                             )
@@ -1158,13 +1275,13 @@ fun PoruthamDetailCard(
 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = badgeBg
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Text(
                         text = porutham.status.getName(currentLanguage),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = statusColor,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -1189,6 +1306,7 @@ fun SevvayDoshamDetailCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -1201,7 +1319,7 @@ fun SevvayDoshamDetailCard(
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFFFEBEE),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(36.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -1243,8 +1361,9 @@ fun SevvayDoshamDetailCard(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (analysis.isBrideHasDosham) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
-                    )
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
@@ -1258,14 +1377,14 @@ fun SevvayDoshamDetailCard(
                         Text(
                             text = analysis.getBrideDoshamSeverity(currentLanguage),
                             fontWeight = FontWeight.Bold,
-                            color = if (analysis.isBrideHasDosham) Color(0xFFC62828) else Color(0xFF2E7D32),
+                            color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.bodySmall
                         )
                         analysis.getBrideCancellationReason(currentLanguage)?.let { reason ->
                             Text(
                                 text = reason,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFF388E3C)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -1276,8 +1395,9 @@ fun SevvayDoshamDetailCard(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (analysis.isGroomHasDosham) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
-                    )
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
@@ -1291,14 +1411,14 @@ fun SevvayDoshamDetailCard(
                         Text(
                             text = analysis.getGroomDoshamSeverity(currentLanguage),
                             fontWeight = FontWeight.Bold,
-                            color = if (analysis.isGroomHasDosham) Color(0xFFC62828) else Color(0xFF2E7D32),
+                            color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.bodySmall
                         )
                         analysis.getGroomCancellationReason(currentLanguage)?.let { reason ->
                             Text(
                                 text = reason,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFF388E3C)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -1308,10 +1428,8 @@ fun SevvayDoshamDetailCard(
             // Dosha Samyam Verdict
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = TempleGold.copy(alpha = 0.12f),
-                border = CardDefaults.outlinedCardBorder().copy(
-                    brush = androidx.compose.ui.graphics.SolidColor(TempleGold)
-                ),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1319,7 +1437,7 @@ fun SevvayDoshamDetailCard(
                         text = "தோஷ சாம்யம் (Dosha Samyam Balance):",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium,
-                        color = TempleMaroon
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = when (currentLanguage) {

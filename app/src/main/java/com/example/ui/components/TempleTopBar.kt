@@ -4,7 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,6 +25,8 @@ fun TempleTopBar(
     currentLanguage: AppLanguage,
     onToggleLanguage: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    isDarkMode: Boolean = false,
+    onToggleDarkMode: (() -> Unit)? = null,
     title: String? = null
 ) {
     Column {
@@ -44,6 +48,20 @@ fun TempleTopBar(
                 }
             },
             actions = {
+                // Day Mode / Dark Mode Toggle button
+                if (onToggleDarkMode != null) {
+                    IconButton(
+                        onClick = onToggleDarkMode,
+                        modifier = Modifier.testTag("top_bar_dark_mode_toggle_btn")
+                    ) {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = if (isDarkMode) "Switch to Day Mode" else "Switch to Dark Mode",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
                 // Language Toggle pill button
                 Surface(
                     onClick = onToggleLanguage,

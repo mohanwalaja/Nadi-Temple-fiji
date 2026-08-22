@@ -583,6 +583,56 @@ fun JathagamScreen(
 
                 // 2. Horoscope Results View (Clean High-Contrast Cards)
                 state.horoscopeResult?.let { result ->
+                    // Temple & Head Priest Certificate Header Badge
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().testTag("card_temple_head_priest_header"),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(14.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||"
+                                        AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥"
+                                        AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||"
+                                    },
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TempleMaroon
+                                )
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
+                                        AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
+                                        AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
+                                    },
+                                    fontSize = 13.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
+                                        AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
+                                        AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
+                                    },
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = TempleMaroon
+                                )
+                            }
+                        }
+                    }
+
                     // Summary Banner Card
                     item {
                         Card(
@@ -735,6 +785,49 @@ fun JathagamScreen(
                                             }
                                         }
                                     }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // HTML A4 Web/Printable Export
+                                OutlinedButton(
+                                    onClick = {
+                                        val htmlFile = HoroscopePdfExporter.exportHoroscopeToHtml(context, result, lang)
+                                        if (htmlFile != null) {
+                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "A4 HTML அறிக்கை உருவாக்கப்பட்டது!" else "A4 HTML Report Generated!", Toast.LENGTH_SHORT).show()
+                                            try {
+                                                val uri = androidx.core.content.FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.fileprovider",
+                                                    htmlFile
+                                                )
+                                                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                                    type = "text/html"
+                                                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                                    putExtra(android.content.Intent.EXTRA_SUBJECT, "${result.devoteeName} - Horoscope Report (A4 HTML)")
+                                                    putExtra(android.content.Intent.EXTRA_TEXT, HoroscopePdfExporter.generateHoroscopeA4Html(result, lang))
+                                                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                }
+                                                val chooser = android.content.Intent.createChooser(intent, "Share A4 HTML Report")
+                                                chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                context.startActivity(chooser)
+                                            } catch (e: Exception) {
+                                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag("btn_export_html_a4"),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                                ) {
+                                    Text(
+                                        text = if (lang == AppLanguage.TAMIL) "🌐 ஒற்றைப் பக்க A4 HTML அறிக்கை (Single-Page A4 Web Report)" else "🌐 Single-Page A4 HTML Report (Web/Print)",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                             }
                         }
@@ -1075,6 +1168,74 @@ fun JathagamScreen(
                                         AppLanguage.ENGLISH -> "Current Planetary Guidance"
                                     },
                                     text = summ.getCurrentPeriodGuidance(lang)
+                                )
+                            }
+                        }
+                    }
+
+                    // 8. Temple Endorsement & Head Priest Blessings Card
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().testTag("card_jathagam_priest_endorsement"),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            border = androidx.compose.foundation.BorderStroke(1.5.dp, TempleGold),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "ஜாதகக் கணிப்பு அறிக்கை & ஆசிகள் வழங்கியவர்:"
+                                        AppLanguage.HINDI -> "जन्मकुंडली फलकथन एवं शुभाशीर्वाद प्रदाता:"
+                                        AppLanguage.ENGLISH -> "Horoscope Assessment & Divine Blessings Issued By:"
+                                    },
+                                    fontSize = 11.5.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "மோகன் குருக்கள் (Mohan Gurukkal)"
+                                        AppLanguage.HINDI -> "मोहन गुरुक्कल (Mohan Gurukkal)"
+                                        AppLanguage.ENGLISH -> "Mohan Gurukkal"
+                                    },
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TempleMaroon
+                                )
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
+                                        AppLanguage.HINDI -> "मुख्य पुजारी • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
+                                        AppLanguage.ENGLISH -> "Head Priest • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
+                                    },
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "Mobile: +6797607465",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TempleMaroon
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                HorizontalDivider(color = TempleGold.copy(alpha = 0.3f))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருவருள் துணை!"
+                                        AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ शुभम् ॥"
+                                        AppLanguage.ENGLISH -> "May Lord Murugan & Sri Siva Subramaniya Swami Bestow Divine Blessings & Prosperity!"
+                                    },
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TempleMaroon,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
                         }

@@ -209,28 +209,16 @@ fun RasiPalanScreen(
             palan?.let { palanResult ->
                 val rasiTransit2026 = RasiTransit2026Repository.getPalanForRasi(palanResult.rasi)
 
-                // 2A. 2026 Planetary Transit Alert Banner (Red Alert / High Priority Transits)
+                // 2A. 2026 Planetary Transit Alert Banner (High Priority Transits)
                 item {
                     val alertSeverity = rasiTransit2026.severity
-                    val alertCardBg = when (alertSeverity) {
-                        AlertSeverity.HIGH_ALERT -> Color(0xFFFFF3F3)
-                        AlertSeverity.PERIOD_ALERT -> Color(0xFFFFF7ED)
-                        AlertSeverity.STANDARD_WATCH -> Color(0xFFF0FDF4)
-                    }
-                    val alertBorderColor = when (alertSeverity) {
-                        AlertSeverity.HIGH_ALERT -> Color(0xFFC62828)
-                        AlertSeverity.PERIOD_ALERT -> Color(0xFFD84315)
-                        AlertSeverity.STANDARD_WATCH -> Color(0xFF2E7D32)
-                    }
-                    val alertAccentColor = when (alertSeverity) {
-                        AlertSeverity.HIGH_ALERT -> Color(0xFFB71C1C)
-                        AlertSeverity.PERIOD_ALERT -> Color(0xFFBF360C)
-                        AlertSeverity.STANDARD_WATCH -> Color(0xFF1B5E20)
-                    }
+                    val alertCardBg = MaterialTheme.colorScheme.surfaceVariant
+                    val alertBorderColor = MaterialTheme.colorScheme.outline
+                    val alertAccentColor = MaterialTheme.colorScheme.primary
                     val alertHeaderTag = when (alertSeverity) {
-                        AlertSeverity.HIGH_ALERT -> if (lang == AppLanguage.TAMIL) "🔴 மிக முக்கிய கிரக எச்சரிக்கை" else if (lang == AppLanguage.HINDI) "🔴 अति महत्वपूर्ण ग्रह अलर्ट" else "🔴 Critical Planetary Alert"
-                        AlertSeverity.PERIOD_ALERT -> if (lang == AppLanguage.TAMIL) "🟠 காலப்பகுதி சார்ந்த எச்சரிக்கை" else if (lang == AppLanguage.HINDI) "🟠 समयानुसार ग्रह अलर्ट" else "🟠 Period-wise Transit Watch"
-                        AlertSeverity.STANDARD_WATCH -> if (lang == AppLanguage.TAMIL) "🟢 கோச்சார வழிகாட்டல்" else if (lang == AppLanguage.HINDI) "🟢 गोचर मार्गदर्शन" else "🟢 Transit Watch"
+                        AlertSeverity.HIGH_ALERT -> if (lang == AppLanguage.TAMIL) "முக்கிய கிரக எச்சரிக்கை" else if (lang == AppLanguage.HINDI) "अति महत्वपूर्ण ग्रह अलर्ट" else "Critical Planetary Alert"
+                        AlertSeverity.PERIOD_ALERT -> if (lang == AppLanguage.TAMIL) "காலப்பகுதி சார்ந்த எச்சரிக்கை" else if (lang == AppLanguage.HINDI) "समयानुसार ग्रह अलर्ट" else "Period-wise Transit Watch"
+                        AlertSeverity.STANDARD_WATCH -> if (lang == AppLanguage.TAMIL) "கோச்சார வழிகாட்டல்" else if (lang == AppLanguage.HINDI) "गोचर मार्गदर्शन" else "Transit Watch"
                     }
 
                     Card(
@@ -717,7 +705,7 @@ fun RasiPalanScreen(
                         },
                         description = careerText,
                         icon = Icons.Default.Work,
-                        iconTint = Color(0xFF1E88E5)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -733,7 +721,7 @@ fun RasiPalanScreen(
                         },
                         description = eduText,
                         icon = Icons.Default.School,
-                        iconTint = Color(0xFF43A047)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -749,7 +737,7 @@ fun RasiPalanScreen(
                         },
                         description = familyText,
                         icon = Icons.Default.Home,
-                        iconTint = Color(0xFF8E24AA)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -765,7 +753,7 @@ fun RasiPalanScreen(
                         },
                         description = marriageText,
                         icon = Icons.Default.Favorite,
-                        iconTint = Color(0xFFE91E63)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -781,7 +769,7 @@ fun RasiPalanScreen(
                         },
                         description = healthText,
                         icon = Icons.Default.Healing,
-                        iconTint = Color(0xFFD32F2F)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -795,7 +783,7 @@ fun RasiPalanScreen(
                         },
                         description = palanResult.getTravel(lang),
                         icon = Icons.Default.Flight,
-                        iconTint = Color(0xFF00ACC1)
+                        iconTint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -806,13 +794,13 @@ fun RasiPalanScreen(
                             .fillMaxWidth()
                             .testTag("card_palan_pariharam"),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = TempleMaroonDark),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                        border = BorderStroke(1.dp, TempleGold)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(imageVector = Icons.Default.Lightbulb, contentDescription = null, tint = TempleGoldLight, modifier = Modifier.size(20.dp))
+                                Icon(imageVector = Icons.Default.Lightbulb, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = when (lang) {
@@ -821,7 +809,7 @@ fun RasiPalanScreen(
                                         AppLanguage.ENGLISH -> "Temple Pariharam & Remedies"
                                     },
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = TempleGoldLight
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
 
@@ -831,7 +819,7 @@ fun RasiPalanScreen(
                                 text = palanResult.getPariharam(lang),
                                 fontSize = 13.sp,
                                 lineHeight = 20.sp,
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onSurface
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -839,7 +827,7 @@ fun RasiPalanScreen(
                             Text(
                                 text = "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்",
                                 fontSize = 11.sp,
-                                color = TempleGoldLight,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                             )
                         }

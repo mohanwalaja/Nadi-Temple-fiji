@@ -36,7 +36,7 @@ val DayColorScheme: ColorScheme = lightColorScheme(
     onSurfaceVariant = Color(0xFF52525B), // Slate Subtitle
     outline = Color(0xFFE4E4E7),          // Clean Border
     outlineVariant = Color(0xFFF4F4F5),
-    error = Color(0xFFDC2626),
+    error = Color(0xFF18181B),
     onError = Color.White
 )
 
@@ -62,8 +62,8 @@ val DarkColorScheme: ColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xFFA1A1AA), // Silver Gray Subtitle
     outline = Color(0xFF27272A),          // Subtle Dark Border
     outlineVariant = Color(0xFF1C1C1F),
-    error = Color(0xFFF87171),
-    onError = Color(0xFF450A0A)
+    error = Color(0xFFFFFFFF),
+    onError = Color(0xFF000000)
 )
 
 // Aliases for compatibility

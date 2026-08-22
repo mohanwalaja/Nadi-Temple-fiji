@@ -63,13 +63,13 @@ val TempleSandalDark = Color(0xFFE4E4E7)
 val TempleVibhuti = Color(0xFFFFFFFF)
 val TempleVibhutiBorder = Color(0xFFE4E4E7)
 
-// Status Indicators
-val SacredGreen = Color(0xFF15803D)
-val SacredGreenDark = Color(0xFF14532D)
-val SacredGreenLight = Color(0xFFDCFCE7)
-val SacredGreenText = Color(0xFF14532D)
-val SacredGreenContainer = Color(0xFFF0FDF4)
-val SacredGreenOnContainer = Color(0xFF14532D)
+// Status Indicators - Pure Monochrome High Contrast
+val SacredGreen = Color(0xFF18181B)
+val SacredGreenDark = Color(0xFF09090B)
+val SacredGreenLight = Color(0xFFF4F4F5)
+val SacredGreenText = Color(0xFF09090B)
+val SacredGreenContainer = Color(0xFFF4F4F5)
+val SacredGreenOnContainer = Color(0xFF09090B)
 
 val SacredBlue = Color(0xFF18181B)
 val SacredBlueDark = Color(0xFF09090B)
@@ -82,9 +82,9 @@ val SacredOrangeDark = Color(0xFF18181B)
 val SacredOrangeLight = Color(0xFFF4F4F5)
 val SacredOrangeContainer = Color(0xFFF4F4F5)
 
-val WarningRed = Color(0xFFDC2626)
-val WarningRedLight = Color(0xFFFEE2E2)
-val WarningRedContainer = Color(0xFFFEF2F2)
-val WarningRedOnContainer = Color(0xFF7F1D1D)
+val WarningRed = Color(0xFF18181B)
+val WarningRedLight = Color(0xFFF4F4F5)
+val WarningRedContainer = Color(0xFFF4F4F5)
+val WarningRedOnContainer = Color(0xFF09090B)
 
 
