@@ -1,0 +1,2 @@
+- name: Restore debug keystore
+        run: echo "${{ secrets.DEBUG_KEYSTORE_B64 }}" | base64 -d > debug.keystore
