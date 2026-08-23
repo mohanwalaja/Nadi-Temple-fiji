@@ -1,5 +1,8 @@
 package com.example.data.model
 
+import java.time.LocalDate
+import java.time.LocalTime
+
 data class PadaLetterInfo(
     val padaNumber: Int, // 1, 2, 3, 4
     val letterTa: String,
@@ -78,3 +81,16 @@ data class NakshatraBabyLetters(
         AppLanguage.ENGLISH -> allLettersSummaryEn
     }
 }
+
+data class BabyNamingBirthResult(
+    val babyName: String,
+    val gender: String, // "M" or "F"
+    val dob: LocalDate,
+    val tob: LocalTime,
+    val birthPlace: String,
+    val nakshatraLetters: NakshatraBabyLetters,
+    val janmaPada: Int,
+    val primaryPadaInfo: PadaLetterInfo,
+    val chandraRasi: Rasi,
+    val lagnaRasi: Rasi
+)

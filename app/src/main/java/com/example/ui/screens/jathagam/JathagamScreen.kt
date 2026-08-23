@@ -32,7 +32,6 @@ import com.example.data.model.AppLanguage
 import com.example.data.model.DoshaCheckResult
 import com.example.data.model.Graha
 import com.example.data.model.HoroscopeResult
-import com.example.data.model.PalanTimeframe
 import com.example.data.repository.AppStrings
 import com.example.data.service.GpsLocationHelper
 import com.example.ui.components.SouthIndianRasiChart
@@ -50,7 +49,7 @@ import java.time.format.DateTimeFormatter
 fun JathagamScreen(
     viewModel: JathagamViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRasiPalanWithTimeframe: ((PalanTimeframe) -> Unit)? = null
+    onNavigateToBabyNames: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -893,63 +892,16 @@ fun JathagamScreen(
                                         }
                                     }
                                 }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                // HTML A4 Web/Printable Export
-                                OutlinedButton(
-                                    onClick = {
-                                        val htmlFile = HoroscopePdfExporter.exportHoroscopeToHtml(context, result, lang)
-                                        if (htmlFile != null) {
-                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "A4 HTML அறிக்கை உருவாக்கப்பட்டது!" else if (lang == AppLanguage.HINDI) "A4 HTML रिपोर्ट तैयार है!" else "A4 HTML Report Generated!", Toast.LENGTH_SHORT).show()
-                                            try {
-                                                val uri = androidx.core.content.FileProvider.getUriForFile(
-                                                    context,
-                                                    "${context.packageName}.fileprovider",
-                                                    htmlFile
-                                                )
-                                                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                                    type = "text/html"
-                                                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
-                                                    putExtra(android.content.Intent.EXTRA_SUBJECT, "${result.devoteeName} - Horoscope Report (A4 HTML)")
-                                                    putExtra(android.content.Intent.EXTRA_TEXT, HoroscopePdfExporter.generateHoroscopeA4Html(result, lang))
-                                                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                                }
-                                                val chooser = android.content.Intent.createChooser(intent, "Share A4 HTML Report")
-                                                chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                context.startActivity(chooser)
-                                            } catch (e: Exception) {
-                                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("btn_export_html_a4"),
-                                    shape = RoundedCornerShape(10.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-                                ) {
-                                    Text(
-                                        text = when (lang) {
-                                            AppLanguage.TAMIL -> "🌐 ஒற்றைப் பக்க A4 HTML அறிக்கை"
-                                            AppLanguage.HINDI -> "🌐 एक-पृष्ठीय A4 HTML रिपोर्ट"
-                                            AppLanguage.ENGLISH -> "🌐 Single-Page A4 HTML Report (Web/Print)"
-                                        },
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
                             }
                         }
                     }
 
-                    // Jathagam-Based Rasi Palan Quick Access Card
+                    // Baby Naming Letters Quick Access Card (Vedic Panchangam)
                     item {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .testTag("card_jathagam_rasi_palan"),
+                                .testTag("card_jathagam_baby_letters"),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -961,17 +913,17 @@ fun JathagamScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.AutoAwesome,
+                                        imageVector = Icons.Default.ChildCare,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = when (lang) {
-                                            AppLanguage.TAMIL -> "ஜன்ம ராசி பலன்கள் (${result.chandraRasi.nameTa})"
-                                            AppLanguage.HINDI -> "जन्म राशि फल (${result.chandraRasi.nameHi})"
-                                            AppLanguage.ENGLISH -> "Janma Rasi Predictions (${result.chandraRasi.nameEn})"
+                                            AppLanguage.TAMIL -> "குழந்தை பெயர் ஆரம்ப எழுத்துக்கள்"
+                                            AppLanguage.HINDI -> "शिशु नामकरण शुभ अक्षर"
+                                            AppLanguage.ENGLISH -> "Baby Name Initial Letters"
                                         },
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                         color = MaterialTheme.colorScheme.primary
@@ -981,9 +933,9 @@ fun JathagamScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = when (lang) {
-                                        AppLanguage.TAMIL -> "உங்கள் ஜாதகத்தின்படி கணிக்கப்பட்ட ராசிபலன் விவரங்கள்"
-                                        AppLanguage.HINDI -> "आपकी जन्मकुंडली के आधार पर गणना किया गया राशिफल"
-                                        AppLanguage.ENGLISH -> "Personalized astrological forecast generated from your horoscope"
+                                        AppLanguage.TAMIL -> "இந்த ஜாதகத்தின் நட்சத்திரம் (${result.getJanmaNakshatram(lang)}) மற்றும் ${result.janmaPada}-ஆம் பாதத்திற்குரிய சுப ஆரம்ப அட்சரங்கள் & சான்றிதழ் PDF"
+                                        AppLanguage.HINDI -> "इस कुंडली के नक्षत्र (${result.getJanmaNakshatram(lang)}) चरण ${result.janmaPada} के शुभ नामकरण अक्षर एवं प्रमाण पत्र PDF"
+                                        AppLanguage.ENGLISH -> "Auspicious naming syllables & PDF certificate for ${result.getJanmaNakshatram(lang)} (Pada ${result.janmaPada})"
                                     },
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -992,10 +944,10 @@ fun JathagamScreen(
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Button(
-                                    onClick = { onNavigateToRasiPalanWithTimeframe?.invoke(PalanTimeframe.YEARLY) },
+                                    onClick = { onNavigateToBabyNames?.invoke() },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .testTag("btn_palan_yearly"),
+                                        .testTag("btn_navigate_baby_letters"),
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                     shape = RoundedCornerShape(12.dp),
                                     contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
@@ -1005,7 +957,7 @@ fun JathagamScreen(
                                         horizontalArrangement = Arrangement.Center
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.Stars,
+                                            imageVector = Icons.Default.AutoAwesome,
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             modifier = Modifier.size(18.dp)
@@ -1013,9 +965,9 @@ fun JathagamScreen(
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = when (lang) {
-                                                AppLanguage.TAMIL -> "📖 2026 வருட ராசிபலன் & கிரக எச்சரிக்கைகள்"
-                                                AppLanguage.HINDI -> "📖 2026 वार्षिक राशिफल एवं ग्रह गोचर अलर्ट"
-                                                AppLanguage.ENGLISH -> "📖 2026 Yearly Rasi Palan & Transit Alerts"
+                                                AppLanguage.TAMIL -> "👶 சுப பெயர் எழுத்துக்கள் & சான்றிதழ் காண்க"
+                                                AppLanguage.HINDI -> "👶 शुभ नामकरण अक्षर एवं प्रमाण पत्र देखें"
+                                                AppLanguage.ENGLISH -> "👶 View Baby Letters & Certificate"
                                             },
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
@@ -1061,44 +1013,68 @@ fun JathagamScreen(
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 4.dp),
+                                            .padding(vertical = 5.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = p.graha.getName(lang),
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 13.sp,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.weight(1.2f)
-                                        )
-                                        Text(
-                                            text = p.rasi.getName(lang),
-                                            fontSize = 12.sp,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        Text(
-                                            text = "${String.format("%.1f", p.degrees)}° (${p.getNakshatram(lang)} - ${p.pada})",
-                                            fontSize = 11.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.weight(1.5f)
-                                        )
-                                        if (p.isRetrograde) {
-                                            Surface(
-                                                color = TempleKumkum.copy(alpha = 0.15f),
-                                                shape = RoundedCornerShape(4.dp)
-                                            ) {
-                                                Text(
-                                                    text = when (lang) {
-                                                        AppLanguage.TAMIL -> "வக்ரம்"
-                                                        AppLanguage.HINDI -> "वक्री"
-                                                        AppLanguage.ENGLISH -> "Retrograde"
-                                                    },
-                                                    fontSize = 9.sp,
-                                                    color = TempleKumkum,
-                                                    fontWeight = FontWeight.Bold,
-                                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                                                )
+                                        Column(modifier = Modifier.weight(1.1f)) {
+                                            val planetName = when (lang) {
+                                                AppLanguage.TAMIL -> p.graha.nameTa
+                                                AppLanguage.HINDI -> p.graha.nameHi.substringBefore(" (")
+                                                AppLanguage.ENGLISH -> p.graha.nameEn.substringBefore(" (")
+                                            }
+                                            val rasiName = when (lang) {
+                                                AppLanguage.TAMIL -> p.rasi.nameTa
+                                                AppLanguage.HINDI -> p.rasi.nameHi.substringBefore(" (")
+                                                AppLanguage.ENGLISH -> p.rasi.nameEn.substringBefore(" (")
+                                            }
+                                            Text(
+                                                text = planetName,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            Text(
+                                                text = rasiName,
+                                                fontSize = 11.sp,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+
+                                        Column(
+                                            modifier = Modifier.weight(1.4f),
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Text(
+                                                text = "${String.format("%.1f", p.degrees)}° (${p.getNakshatram(lang)} - ${p.pada})",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            if (p.isRetrograde) {
+                                                Spacer(modifier = Modifier.height(2.dp))
+                                                Surface(
+                                                    color = TempleKumkum.copy(alpha = 0.15f),
+                                                    shape = RoundedCornerShape(4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = when (lang) {
+                                                            AppLanguage.TAMIL -> "வக்ரம் (R)"
+                                                            AppLanguage.HINDI -> "वक्री (R)"
+                                                            AppLanguage.ENGLISH -> "Retrograde (R)"
+                                                        },
+                                                        fontSize = 9.sp,
+                                                        color = TempleKumkum,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                                    )
+                                                }
                                             }
                                         }
                                     }

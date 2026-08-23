@@ -114,8 +114,8 @@ private fun ChartCell(
         Text(
             text = when (lang) {
                 AppLanguage.TAMIL -> rasi.nameTa
-                AppLanguage.HINDI -> rasi.nameHi
-                AppLanguage.ENGLISH -> rasi.nameEn.take(4)
+                AppLanguage.HINDI -> rasi.nameHi.substringBefore(" (")
+                AppLanguage.ENGLISH -> rasi.nameEn.substringBefore(" (").take(4)
             },
             fontSize = 9.sp,
             fontWeight = FontWeight.SemiBold,
@@ -195,8 +195,8 @@ private fun CenterCell(lagna: Rasi, lang: AppLanguage, modifier: Modifier = Modi
             Text(
                 text = when (lang) {
                     AppLanguage.TAMIL -> "லக்னம்: ${lagna.nameTa}"
-                    AppLanguage.HINDI -> "लग्न: ${lagna.nameHi}"
-                    AppLanguage.ENGLISH -> "Lagna: ${lagna.nameEn}"
+                    AppLanguage.HINDI -> "लग्न: ${lagna.nameHi.substringBefore(" (")}"
+                    AppLanguage.ENGLISH -> "Lagna: ${lagna.nameEn.substringBefore(" (")}"
                 },
                 fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,

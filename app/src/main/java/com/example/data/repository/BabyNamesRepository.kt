@@ -823,6 +823,19 @@ class BabyNamesRepository {
         return allNakshatraLetters.firstOrNull { it.nakshatraIndex == index } ?: allNakshatraLetters[0]
     }
 
+    fun getByNakshatraName(name: String): NakshatraBabyLetters {
+        val clean = name.trim().lowercase()
+        return allNakshatraLetters.firstOrNull { star ->
+            star.nakshatraNameTa.lowercase() == clean ||
+            star.nakshatraNameEn.lowercase() == clean ||
+            star.nakshatraNameHi.lowercase() == clean ||
+            clean.contains(star.nakshatraNameTa.lowercase()) ||
+            star.nakshatraNameTa.lowercase().contains(clean) ||
+            clean.contains(star.nakshatraNameEn.lowercase()) ||
+            star.nakshatraNameEn.lowercase().contains(clean)
+        } ?: allNakshatraLetters[0]
+    }
+
     fun searchNakshatraByQuery(query: String): List<NakshatraBabyLetters> {
         val q = query.trim().lowercase()
         if (q.isEmpty()) return allNakshatraLetters
@@ -841,4 +854,222 @@ class BabyNamesRepository {
             }
         }
     }
+
+    fun getSuggestedNames(nakshatraIndex: Int, padaNumber: Int, gender: String = "ALL"): List<com.example.data.model.BabyNameSuggestion> {
+        val list = namesDatabase[nakshatraIndex] ?: emptyList()
+        return if (gender == "ALL") list else list.filter { it.gender.equals(gender, ignoreCase = true) }
+    }
+
+    private val namesDatabase: Map<Int, List<com.example.data.model.BabyNameSuggestion>> = mapOf(
+        1 to listOf( // Ashwini: Chu, Che, Cho, La
+            com.example.data.model.BabyNameSuggestion("சுதர்சன்", "Sudharsan", "M", "அழகான தோற்றம் உடையவர் / விஷ்ணுவின் சக்கரம்", "Handsome / Lord Vishnu's Discus"),
+            com.example.data.model.BabyNameSuggestion("சுரேஷ்", "Suresh", "M", "தேவர்களின் தலைவர்", "Ruler of the Gods"),
+            com.example.data.model.BabyNameSuggestion("சேதுராமன்", "Sethuraman", "M", "சேதுபாலத்தை அமைத்த ஸ்ரீராமர்", "Lord Rama"),
+            com.example.data.model.BabyNameSuggestion("சோமசுந்தரம்", "Somasundaram", "M", "சந்திரனை அணிந்த சிவபெருமான்", "Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("லக்ஷ்மணன்", "Lakshmanan", "M", "அதிர்ஷ்டம் நிறைந்தவர் / ஸ்ரீராமரின் சகோதரர்", "Prosperous / Lord Rama's Brother"),
+            com.example.data.model.BabyNameSuggestion("லோகேஷ்", "Lokesh", "M", "உலகை ஆளும் அரசன்", "King of the World"),
+            com.example.data.model.BabyNameSuggestion("சுபஸ்ரீ", "Subhashree", "F", "சுபகரமான மங்கல லட்சுமி", "Auspicious Goddess Lakshmi"),
+            com.example.data.model.BabyNameSuggestion("சுவாதி", "Swathi", "F", "தூய்மையான பிரகாசமான நட்சத்திரம்", "Pure and Radiant"),
+            com.example.data.model.BabyNameSuggestion("சேதுலட்சுமி", "Sethulakshmi", "F", "மங்கல லட்சுமி", "Goddess of Prosperity"),
+            com.example.data.model.BabyNameSuggestion("சோபனா", "Shobana", "F", "அழகும் கம்பீரமும் நிறைந்தவள்", "Splendid & Radiant"),
+            com.example.data.model.BabyNameSuggestion("லாவண்யா", "Lavanya", "F", "பேரழகு மற்றும் கருணை உடையவள்", "Grace and Elegance"),
+            com.example.data.model.BabyNameSuggestion("லலிதா", "Lalitha", "F", "அம்பிகையின் திவ்ய நாமரூபம்", "Goddess Lalitha Tripurasundari")
+        ),
+        2 to listOf( // Bharani: Lee, Loo, Le, Lo
+            com.example.data.model.BabyNameSuggestion("லீலாதரன்", "Leeladharan", "M", "திவ்ய லீலைகளைப் புரிபவர் (ஸ்ரீ கிருஷ்ணர்)", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("லோகநாதன்", "Loganathan", "M", "உலகத்தின் நாதன்", "Lord of the Universe"),
+            com.example.data.model.BabyNameSuggestion("லோகேஸ்வரன்", "Lokeshwaran", "M", "அகில உலகை ஆளும் ஈசன்", "Ruler of the Cosmos"),
+            com.example.data.model.BabyNameSuggestion("லோஹித்", "Lohith", "M", "செம்மையான சூரிய ஒளி", "Red radiant light / Sun"),
+            com.example.data.model.BabyNameSuggestion("லீலாவதி", "Leelavathi", "F", "அழகும் அறிவும் கொண்ட தெய்வீகப் பெண்", "Charming & Intelligent Goddess"),
+            com.example.data.model.BabyNameSuggestion("லோகநாயகி", "Loganayaki", "F", "அகில உலக நாயகி (அம்பாள்)", "Queen of the Universe"),
+            com.example.data.model.BabyNameSuggestion("லோபமுத்ரா", "Lopamudra", "F", "அகத்திய முனிவரின் தர்மபத்தினி", "Sage Agastya's Wife / Scholar"),
+            com.example.data.model.BabyNameSuggestion("லோகிதா", "Lohitha", "F", "பிரகாசமான அழகுடையவள்", "Bright and Beautiful")
+        ),
+        3 to listOf( // Krittika: A, I, U, E
+            com.example.data.model.BabyNameSuggestion("அஸ்வின்", "Ashwin", "M", "ஒளிரும் நட்சத்திரம்", "Bright Star"),
+            com.example.data.model.BabyNameSuggestion("அன்பரசன்", "Anbarasan", "M", "அன்பின் அரசன்", "King of Love"),
+            com.example.data.model.BabyNameSuggestion("இளங்கோவன்", "Ilangovan", "M", "இளவரசன் / சிலப்பதிகார ஆசிரியர்", "Prince / Ancient Poet"),
+            com.example.data.model.BabyNameSuggestion("உதயன்", "Udhayan", "M", "சூரிய உதயம் போன்ற பிரகாசம்", "Rising Sun"),
+            com.example.data.model.BabyNameSuggestion("எழிலரசன்", "Ezhilarasan", "M", "அழகின் அரசன்", "King of Beauty"),
+            com.example.data.model.BabyNameSuggestion("அபிராமி", "Abirami", "F", "என்றும் பேரருள் புரியும் அன்னை", "Goddess Abirami"),
+            com.example.data.model.BabyNameSuggestion("அகல்யா", "Agalya", "F", "தூய அழகுடையவள்", "Virtuous & Flawless"),
+            com.example.data.model.BabyNameSuggestion("இனியா", "Iniya", "F", "இனிமையான குணமுடையவள்", "Sweet and Lovely"),
+            com.example.data.model.BabyNameSuggestion("உமையாள்", "Umayal", "F", "பார்வதி தேவி", "Goddess Parvathi"),
+            com.example.data.model.BabyNameSuggestion("எழிலரசி", "Ezhilarasi", "F", "பேரழகின் ராணி", "Queen of Beauty")
+        ),
+        4 to listOf( // Rohini: O, Vaa, Vi, Vu
+            com.example.data.model.BabyNameSuggestion("ஓம்கார்", "Omkar", "M", "பிரணவ மந்திரத்தின் வடிவம்", "Sacred Sound of Om"),
+            com.example.data.model.BabyNameSuggestion("வாசுதேவன்", "Vasudevan", "M", "ஸ்ரீ கிருஷ்ணர்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("விஷ்ணு", "Vishnu", "M", "காக்கும் கடவுள்", "The Preserver Lord"),
+            com.example.data.model.BabyNameSuggestion("விக்னேஷ்", "Vignesh", "M", "விக்னங்களை நீக்கும் கணபதி", "Lord Ganesha"),
+            com.example.data.model.BabyNameSuggestion("விஜயன்", "Vijayan", "M", "எப்போதும் வெற்றி பெறுபவர்", "Victorious One"),
+            com.example.data.model.BabyNameSuggestion("ஓவியா", "Oviya", "F", "ஓவியம் போன்ற பேரழகு", "Beautiful Painting / Art"),
+            com.example.data.model.BabyNameSuggestion("வசுந்தரா", "Vasundhara", "F", "பூமித்தாய் / ஐஸ்வர்யம்", "Mother Earth / Wealth"),
+            com.example.data.model.BabyNameSuggestion("வித்யா", "Vidhya", "F", "ஞானக் கலைமகள்", "Knowledge & Wisdom"),
+            com.example.data.model.BabyNameSuggestion("வைஷ்ணவி", "Vaishnavi", "F", "மகாவிஷ்ணுவின் சக்தி", "Goddess Vaishnavi"),
+            com.example.data.model.BabyNameSuggestion("விமலா", "Vimala", "F", "மாசற்ற தூய்மையானவள்", "Pure and Spotless")
+        ),
+        5 to listOf( // Mrigashira: Ve, Vo, Kaa, Kee
+            com.example.data.model.BabyNameSuggestion("வேல்முருகன்", "Velmurugan", "M", "ஞானவேல் தாங்கிய கந்தன்", "Lord Murugan with Divine Spear"),
+            com.example.data.model.BabyNameSuggestion("வெற்றிவேல்", "Vetrivel", "M", "வெற்றி தரும் ஞானவேல்", "Victorious Spear of Murugan"),
+            com.example.data.model.BabyNameSuggestion("கார்த்திகேயன்", "Karthikeyan", "M", "முருகப்பெருமான்", "Lord Murugan"),
+            com.example.data.model.BabyNameSuggestion("கீர்த்திவாசன்", "Keerthivasan", "M", "புகழ்மிக்கவர்", "One with Eternal Fame"),
+            com.example.data.model.BabyNameSuggestion("வேதவல்லி", "Vedavalli", "F", "வேதங்களின் தத்துவ வடிவம்", "Goddess of Vedas"),
+            com.example.data.model.BabyNameSuggestion("கார்த்திகா", "Karthika", "F", "கார்த்திகை தீப ஒளி", "Radiant Lamp / Star"),
+            com.example.data.model.BabyNameSuggestion("காவ்யா", "Kavya", "F", "கவிதை நயம் மிக்கவள்", "Poetry and Art"),
+            com.example.data.model.BabyNameSuggestion("கீர்த்தனா", "Keerthana", "F", "பக்திப் பாடல் / புகழ்", "Devotional Song / Praise")
+        ),
+        6 to listOf( // Arudra: Ku, Gha, Nga, Cha
+            com.example.data.model.BabyNameSuggestion("குமரகுருபரன்", "Kumaragurubaran", "M", "முருகப்பெருமான்", "Lord Murugan"),
+            com.example.data.model.BabyNameSuggestion("குணசேகரன்", "Gunasekaran", "M", "நற்குணங்களின் சிகரம்", "Virtuous Leader"),
+            com.example.data.model.BabyNameSuggestion("சந்திரசேகர்", "Chandrasekar", "M", "பிறை சூடிய சிவன்", "Lord Shiva with Crescent Moon"),
+            com.example.data.model.BabyNameSuggestion("குமுதவல்லி", "Kumudhavalli", "F", "அல்லி மலர் போன்றவள்", "Lotus / Lily Blossom"),
+            com.example.data.model.BabyNameSuggestion("குணவதி", "Gunavathi", "F", "உயரிய குணங்கள் நிறைந்தவள்", "Virtuous & Noble"),
+            com.example.data.model.BabyNameSuggestion("சந்தியா", "Sandhiya", "F", "அந்தி மாலைப் பொழுது / தெய்வீகம்", "Twilight / Sacred Prayer")
+        ),
+        7 to listOf( // Punarvasu: Ke, Ko, Haa, Hee
+            com.example.data.model.BabyNameSuggestion("கேசவன்", "Keshavan", "M", "மகாவிஷ்ணு", "Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("கோகுலன்", "Gokulan", "M", "ஆயர்பாடி கண்ணன்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("ஹரிஹரன்", "Hariharan", "M", "ஹரியும் சிவனும் இணைந்த வடிவம்", "Lord Shiva & Vishnu"),
+            com.example.data.model.BabyNameSuggestion("ஹேமந்த்", "Hemanth", "M", "பொன் போன்ற ஒளி", "Golden Season / Radiance"),
+            com.example.data.model.BabyNameSuggestion("கோகிலா", "Kokila", "F", "இன்குரல் குயில்", "Nightingale / Sweet voice"),
+            com.example.data.model.BabyNameSuggestion("ஹேமாவதி", "Hemavathi", "F", "பொன் நிற அன்னை பார்வதி", "Golden Goddess Parvathi"),
+            com.example.data.model.BabyNameSuggestion("ஹரிணி", "Harini", "F", "மான் போன்ற அழகுடையவள்", "Gentle Deer-eyed Beauty")
+        ),
+        8 to listOf( // Pushya: Hu, He, Ho, Daa
+            com.example.data.model.BabyNameSuggestion("ஹேமராஜன்", "Hemarajan", "M", "பொன் அரசன்", "Golden King"),
+            com.example.data.model.BabyNameSuggestion("ஹோமேஷ்", "Homesh", "M", "யாகத்தின் புனித ஒளி", "Sacred Radiance"),
+            com.example.data.model.BabyNameSuggestion("தாமோதரன்", "Damodharan", "M", "ஸ்ரீ கிருஷ்ணர்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("ஹேமலதா", "Hemalatha", "F", "தங்கக் கொடி போன்ற அழகு", "Golden Vine"),
+            com.example.data.model.BabyNameSuggestion("தமயந்தி", "Damayanthi", "F", "அழகும் கற்பும் நிறைந்தவள்", "Queen of Virtue"),
+            com.example.data.model.BabyNameSuggestion("தாரணி", "Dharani", "F", "பூமித்தாய்", "Earth / Protector")
+        ),
+        9 to listOf( // Ashlesha: Dee, Doo, De, Do
+            com.example.data.model.BabyNameSuggestion("தீபக்", "Deepak", "M", "ஞான விளக்கு", "Lamp of Light"),
+            com.example.data.model.BabyNameSuggestion("தினேஷ்குமார்", "Dineshkumar", "M", "சூரியன்", "Sun God"),
+            com.example.data.model.BabyNameSuggestion("தேவராஜன்", "Devarajan", "M", "தேவர்களின் தலைவன்", "King of Gods"),
+            com.example.data.model.BabyNameSuggestion("தீபிகா", "Deepika", "F", "ஒளிச்சுடர்", "Ray of Light"),
+            com.example.data.model.BabyNameSuggestion("திவ்யா", "Divya", "F", "தெய்வீக ஒளி", "Divine Light"),
+            com.example.data.model.BabyNameSuggestion("தேவசேனா", "Devasena", "F", "முருகப்பெருமானின் தேவி", "Consort of Lord Murugan")
+        ),
+        10 to listOf( // Magha: Maa, Mee, Moo, Me
+            com.example.data.model.BabyNameSuggestion("மாதவன்", "Madhavan", "M", "மகாவிஷ்ணு", "Lord Krishna / Vishnu"),
+            com.example.data.model.BabyNameSuggestion("மணிகண்டன்", "Manikandan", "M", "ஸ்ரீ ஐயப்பன்", "Lord Ayyappan"),
+            com.example.data.model.BabyNameSuggestion("முகுந்தன்", "Mukundan", "M", "முக்தி அளிப்பவர்", "Lord Krishna / Giver of Liberation"),
+            com.example.data.model.BabyNameSuggestion("மகேஷ்வரன்", "Maheshwaran", "M", "பரமேஸ்வரன்", "Great Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("மகாலட்சுமி", "Mahalakshmi", "F", "செல்வத் திருமகள்", "Goddess of Wealth"),
+            com.example.data.model.BabyNameSuggestion("மீனாட்சி", "Meenakshi", "F", "மதுரை அன்னை", "Goddess Meenakshi"),
+            com.example.data.model.BabyNameSuggestion("மஞ்சுளா", "Manjula", "F", "அழகான மனம் கொண்டவள்", "Charming & Lovely")
+        ),
+        11 to listOf( // Purva Phalguni (Pooram): Mo, Taa, Tee, Too
+            com.example.data.model.BabyNameSuggestion("மோகன்", "Mohan", "M", "அனைவரையும் வசீகரிப்பவர்", "Charming Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("தாமோதரன்", "Damodaran", "M", "கண்ணபிரான்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("மோகனா", "Mohana", "F", "வசீகரமானவள்", "Attractive & Charming"),
+            com.example.data.model.BabyNameSuggestion("தாரிகா", "Tharika", "F", "நட்சத்திர ஒளி", "Star / Pearl")
+        ),
+        12 to listOf( // Uttara Phalguni (Uthiram): Te, To, Paa, Pee
+            com.example.data.model.BabyNameSuggestion("தேவநாதன்", "Devanathan", "M", "தேவர்களின் தலைவன்", "Lord of Celestials"),
+            com.example.data.model.BabyNameSuggestion("பார்த்தசாரதி", "Parthasarathy", "M", "ஸ்ரீ கிருஷ்ணர்", "Lord Krishna / Charioteer"),
+            com.example.data.model.BabyNameSuggestion("பாஸ்கரன்", "Bhaskaran", "M", "சூரிய பகவான்", "Sun God"),
+            com.example.data.model.BabyNameSuggestion("பவித்ரா", "Pavithra", "F", "பரிசுத்தமானவள்", "Pure and Holy"),
+            com.example.data.model.BabyNameSuggestion("பத்மாவதி", "Padmavathi", "F", "அலர்மேல்மங்கைத் தாயார்", "Goddess Padmavathi / Lakshmi")
+        ),
+        13 to listOf( // Hasta: Pu, Sha, Na, Taa
+            com.example.data.model.BabyNameSuggestion("புகழேந்தி", "Pugazhendhi", "M", "புகழ் பெற்ற கவிஞர்", "Famed Poet"),
+            com.example.data.model.BabyNameSuggestion("புருஷோத்தமன்", "Purushothaman", "M", "உயரிய புருஷன் / மகாவிஷ்ணு", "Supreme Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("நந்தகோபன்", "Nandhagopan", "M", "கண்ணனின் தந்தை", "Nanda"),
+            com.example.data.model.BabyNameSuggestion("புவனா", "Bhuvana", "F", "அகில உலகம் / அன்னை புவனேஸ்வரி", "Goddess of the Universe"),
+            com.example.data.model.BabyNameSuggestion("நந்தினி", "Nandhini", "F", "ஆனந்தம் அருள்பவள்", "Bringer of Joy")
+        ),
+        14 to listOf( // Chitra: Pe, Po, Raa, Ree
+            com.example.data.model.BabyNameSuggestion("பிரபாகரன்", "Prabhakaran", "M", "ஒளி வீசுபவர்", "Radiant Sun"),
+            com.example.data.model.BabyNameSuggestion("ராகவேந்திரன்", "Raghavendran", "M", "ஸ்ரீ ராகவேந்திரர் / ஸ்ரீராமர்", "Lord Rama / Saint Raghavendra"),
+            com.example.data.model.BabyNameSuggestion("ராஜராஜன்", "Rajarajan", "M", "மன்னர் மன்னன்", "King of Kings"),
+            com.example.data.model.BabyNameSuggestion("ராதிகா", "Radhika", "F", "ராதா பிராட்டி", "Beloved Radha"),
+            com.example.data.model.BabyNameSuggestion("ரேவதி", "Revathi", "F", "ஐஸ்வர்யம் நிறைந்தவள்", "Prosperity & Grace")
+        ),
+        15 to listOf( // Swathi: Ru, Re, Ro, Taa
+            com.example.data.model.BabyNameSuggestion("ருத்ரன்", "Rudhran", "M", "சிவபெருமான்", "Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("ரோஹித்", "Rohit", "M", "சூரியனின் முதல் ஒளிக்கதிர்", "First Ray of Sun"),
+            com.example.data.model.BabyNameSuggestion("ரூபிணி", "Roopini", "F", "அழகிய உருவமுடையவள்", "Goddess of Beauty"),
+            com.example.data.model.BabyNameSuggestion("ரோஷிணி", "Roshini", "F", "ஒளி மற்றும் பிரகாசம்", "Light & Brilliance")
+        ),
+        16 to listOf( // Vishakha: Tee, Too, Te, To
+            com.example.data.model.BabyNameSuggestion("தீனதயாளன்", "Deenadhayalan", "M", "எளியோரிடம் கருணை கொண்டவர்", "Merciful Lord"),
+            com.example.data.model.BabyNameSuggestion("தேவபிரசாத்", "Devaprasad", "M", "இறைவனின் பிரசாதம்", "God's Grace"),
+            com.example.data.model.BabyNameSuggestion("தீபிகா", "Deepika", "F", "ஒளி விளக்கு", "Radiant Lamp"),
+            com.example.data.model.BabyNameSuggestion("தேவகி", "Devaki", "F", "கண்ணனின் தாய்", "Mother of Lord Krishna")
+        ),
+        17 to listOf( // Anuradha: Naa, Nee, Noo, Ne
+            com.example.data.model.BabyNameSuggestion("நாராயணன்", "Narayanan", "M", "மகாவிஷ்ணு", "Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("நவீன்குமார்", "Naveenkumar", "M", "புதுமையானவர்", "Ever Fresh & Youthful"),
+            com.example.data.model.BabyNameSuggestion("நீலமேகம்", "Neelamegham", "M", "நீல மேகம் போன்ற கண்ணன்", "Blue Cloud / Krishna"),
+            com.example.data.model.BabyNameSuggestion("நளினி", "Nalini", "F", "தாமரை மலர்", "Lotus Flower"),
+            com.example.data.model.BabyNameSuggestion("நீலாம்பரி", "Neelambari", "F", "நீல வானம் போன்ற தெய்வீக ராகம்", "Divine Musical Melody")
+        ),
+        18 to listOf( // Jyeshtha: No, Yaa, Yee, Yoo
+            com.example.data.model.BabyNameSuggestion("யோகேஸ்வரன்", "Yogeshwaran", "M", "யோகிகளின் தலைவன் / சிவன்", "Lord of Yoga / Shiva"),
+            com.example.data.model.BabyNameSuggestion("யுவராஜ்", "Yuvaraj", "M", "இளவரசன்", "Crown Prince"),
+            com.example.data.model.BabyNameSuggestion("யசோதா", "Yasodha", "F", "கண்ணனை வளர்த்த அன்னை", "Mother Yashoda"),
+            com.example.data.model.BabyNameSuggestion("யமுனா", "Yamuna", "F", "புனித நதி", "Sacred River Yamuna")
+        ),
+        19 to listOf( // Mula: Ye, Yo, Bhaa, Bhee
+            com.example.data.model.BabyNameSuggestion("யோகேஷ்", "Yogesh", "M", "யோகத்தின் அதிபதி", "Master of Yoga"),
+            com.example.data.model.BabyNameSuggestion("பாரதி", "Bharathi", "M", "ஞானத்தின் வடிவம்", "Scholar / Sage"),
+            com.example.data.model.BabyNameSuggestion("பாக்யராஜ்", "Bhagyaraj", "M", "பாக்கியங்களின் அரசன்", "King of Luck"),
+            com.example.data.model.BabyNameSuggestion("பவானி", "Bhavani", "F", "அன்னை பராசக்தி", "Goddess Bhavani"),
+            com.example.data.model.BabyNameSuggestion("பாக்யலட்சுமி", "Bhagyalakshmi", "F", "அதிர்ஷ்ட லட்சுமி", "Goddess of Fortune")
+        ),
+        20 to listOf( // Purvashada: Bhoo, Dhaa, Phaa, Dhaa
+            com.example.data.model.BabyNameSuggestion("பூபதிராஜ்", "Boopathiraj", "M", "பூமியின் அரசன்", "King of the Earth"),
+            com.example.data.model.BabyNameSuggestion("தனுஷ்கோடி", "Dhanushkodi", "M", "புனித தலம் / ஸ்ரீராமரின் வில்", "Sacred Shore / Rama's Bow"),
+            com.example.data.model.BabyNameSuggestion("பூமிதா", "Bhumitha", "F", "பூமித்தாயின் அருள்", "Blessed by Mother Earth"),
+            com.example.data.model.BabyNameSuggestion("தன்யா", "Dhanya", "F", "பாக்கியசாலி", "Thankful and Blessed")
+        ),
+        21 to listOf( // Uttarashada: Bhe, Bho, Jaa, Jee
+            com.example.data.model.BabyNameSuggestion("ஜெயக்குமார்", "Jayakumar", "M", "வெற்றியின் மைந்தன்", "Victorious Son"),
+            com.example.data.model.BabyNameSuggestion("ஜனார்த்தனன்", "Janarthanan", "M", "மகாவிஷ்ணு", "Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("ஜெயஸ்ரீ", "Jayashree", "F", "வெற்றி தரும் லட்சுமி", "Goddess of Victory"),
+            com.example.data.model.BabyNameSuggestion("ஜானகி", "Janaki", "F", "சீதா பிராட்டி", "Goddess Sita")
+        ),
+        22 to listOf( // Shravana: Khee, Khoo, Khe, Kho
+            com.example.data.model.BabyNameSuggestion("ஜூஹித்", "Juhith", "M", "ஒளிர்பவர்", "Bright & Shining"),
+            com.example.data.model.BabyNameSuggestion("கேசவமூர்த்தி", "Kesavamoorthy", "M", "மகாவிஷ்ணுவின் திருவுருவம்", "Form of Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("கிருத்திகா", "Kiruthika", "F", "நட்சத்திர தீபம்", "Radiant Star")
+        ),
+        23 to listOf( // Dhanishta: Gaa, Gee, Goo, Ge
+            com.example.data.model.BabyNameSuggestion("கணேசன்", "Ganesan", "M", "விநாயகப் பெருமான்", "Lord Ganesha"),
+            com.example.data.model.BabyNameSuggestion("கிரிதரன்", "Giridharan", "M", "கோவர்த்தன மலையைத் தாங்கிய கண்ணன்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("காயத்ரி", "Gayathri", "F", "வேத மாதா காயத்ரி", "Mother of Vedas"),
+            com.example.data.model.BabyNameSuggestion("கீதாஞ்சலி", "Geethanjali", "F", "இசைப் பாமாலை", "Musical Offering")
+        ),
+        24 to listOf( // Shatabhisha: Go, Saa, See, Soo
+            com.example.data.model.BabyNameSuggestion("கோவிந்தன்", "Govindhan", "M", "பசுக்களைக் காக்கும் கண்ணன்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("சசிதரன்", "Sasidharan", "M", "சந்திரனை அணிந்த சிவன்", "Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("சாய்ராம்", "Sairam", "M", "ஸ்ரீ சாயிநாத்", "Lord Sai Baba"),
+            com.example.data.model.BabyNameSuggestion("சரஸ்வதி", "Saraswathi", "F", "கல்விக் கடவுள்", "Goddess of Knowledge"),
+            com.example.data.model.BabyNameSuggestion("சௌந்தர்யா", "Soundharya", "F", "பேரழகி", "Ultimate Beauty")
+        ),
+        25 to listOf( // Purvabhadrapada: Se, So, Daa, Dee
+            com.example.data.model.BabyNameSuggestion("சேதுபதி", "Sethupathi", "M", "சேதுவின் காவலர்", "Protector of the Bridge"),
+            com.example.data.model.BabyNameSuggestion("சோமேஷ்வர்", "Someshwar", "M", "சந்திர ஈஸ்வரன்", "Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("தினகரன்", "Dhinakaran", "M", "சூரிய பகவான்", "Sun God"),
+            com.example.data.model.BabyNameSuggestion("சௌமியா", "Sowmya", "F", "சாந்தமான அமைதி வடிவம்", "Gentle & Calm Goddess"),
+            com.example.data.model.BabyNameSuggestion("தீபிகா", "Deepika", "F", "ஒளிச்சுடர்", "Radiant Lamp")
+        ),
+        26 to listOf( // Uttarabhadrapada: Doo, Tha, Jha, Nya
+            com.example.data.model.BabyNameSuggestion("துரைமுருகன்", "Duraimurugan", "M", "தலைவன் முருகன்", "Lord Murugan"),
+            com.example.data.model.BabyNameSuggestion("தாமோதரன்", "Dhamodharan", "M", "ஸ்ரீ கிருஷ்ணர்", "Lord Krishna"),
+            com.example.data.model.BabyNameSuggestion("துர்காதேவி", "Durgadevi", "F", "துர்கா பரமேஸ்வரி", "Goddess Durga"),
+            com.example.data.model.BabyNameSuggestion("தன்விகா", "Thanvika", "F", "அழகிய தாமரை வடிவம்", "Goddess Lakshmi")
+        ),
+        27 to listOf( // Revati: De, Do, Chaa, Chee
+            com.example.data.model.BabyNameSuggestion("தேவராஜன்", "Devarajan", "M", "தேவ தலைவன்", "King of Devas"),
+            com.example.data.model.BabyNameSuggestion("சந்திரமௌலி", "Chandramouli", "M", "சிவன்", "Lord Shiva"),
+            com.example.data.model.BabyNameSuggestion("சாரங்கபாணி", "Sarangapani", "M", "வில்லேந்திய விஷ்ணு", "Lord Vishnu"),
+            com.example.data.model.BabyNameSuggestion("தேவகி", "Devaki", "F", "கண்ணனின் தாய்", "Mother Devaki"),
+            com.example.data.model.BabyNameSuggestion("சாருலதா", "Charulatha", "F", "அழகான கொடி போன்றவள்", "Beautiful Vine")
+        )
+    )
 }
+
