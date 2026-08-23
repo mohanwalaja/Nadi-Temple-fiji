@@ -94,3 +94,11 @@ data class BabyNamingBirthResult(
     val chandraRasi: Rasi,
     val lagnaRasi: Rasi
 )
+
+data class BabyNameSuggestion(
+    val nameTa: String,
+    val nameEn: String,
+    val gender: String,
+    val meaningTa: String,
+    val meaningEn: String
+)
