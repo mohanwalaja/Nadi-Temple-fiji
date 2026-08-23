@@ -91,7 +91,11 @@ fun RasiPalanScreen(
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = if (lang == AppLanguage.TAMIL) "காலப்பகுதி (Period):" else if (lang == AppLanguage.HINDI) "काल अवधि (Timeframe):" else "Timeframe / Period:",
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "காலப்பகுதி:"
+                        AppLanguage.HINDI -> "काल अवधि:"
+                        AppLanguage.ENGLISH -> "Timeframe / Period:"
+                    },
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = primaryColor
@@ -140,7 +144,11 @@ fun RasiPalanScreen(
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) "ராசி தேர்வு (Select Rasi):" else "Select Rasi / Sign:",
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "ராசி தேர்வு:"
+                            AppLanguage.HINDI -> "राशि चयन:"
+                            AppLanguage.ENGLISH -> "Select Rasi / Sign:"
+                        },
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = TempleMaroon
@@ -541,7 +549,11 @@ fun RasiPalanScreen(
                                 Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = TempleMaroon, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "பிறந்த விவரங்களை மாற்ற / புதிய நபர் ஜாதகம்" else "Change Birth Details / New Person Horoscope",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "பிறந்த விவரங்களை மாற்ற / புதிய நபர் ஜாதகம்"
+                                        AppLanguage.HINDI -> "जन्म विवरण बदलें / नई कुंडली बनाएं"
+                                        AppLanguage.ENGLISH -> "Change Birth Details / New Person Horoscope"
+                                    },
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = TempleMaroon
@@ -566,7 +578,7 @@ fun RasiPalanScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = when (lang) {
-                                        AppLanguage.TAMIL -> "கிரக கோச்சார நிலைகள் (Planetary Transits)"
+                                        AppLanguage.TAMIL -> "கிரக கோச்சார நிலைகள்"
                                         AppLanguage.HINDI -> "ग्रह गोचर स्थिति"
                                         AppLanguage.ENGLISH -> "Planetary Transits (Gochara)"
                                     },
@@ -667,7 +679,7 @@ fun RasiPalanScreen(
                     
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "பொது பலன் (General Overview)"
+                            AppLanguage.TAMIL -> "பொது பலன்"
                             AppLanguage.HINDI -> "सामान्य फल"
                             AppLanguage.ENGLISH -> "General Overview"
                         },
@@ -683,7 +695,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "தனம் & வரவு-செலவு (Finance)"
+                            AppLanguage.TAMIL -> "தனம் & வரவு-செலவு"
                             AppLanguage.HINDI -> "धन एवं आर्थिक स्थिति"
                             AppLanguage.ENGLISH -> "Finance & Wealth"
                         },
@@ -699,7 +711,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "தொழில் & உத்தியோகம் (Career)"
+                            AppLanguage.TAMIL -> "தொழில் & உத்தியோகம்"
                             AppLanguage.HINDI -> "व्यवसाय एवं आजीविका"
                             AppLanguage.ENGLISH -> "Career & Profession"
                         },
@@ -715,7 +727,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "கல்வி & வித்தை (Education)"
+                            AppLanguage.TAMIL -> "கல்வி & வித்தை"
                             AppLanguage.HINDI -> "शिक्षा एवं विद्या"
                             AppLanguage.ENGLISH -> "Education & Studies"
                         },
@@ -731,7 +743,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "குடும்பம் & அமைதி (Family)"
+                            AppLanguage.TAMIL -> "குடும்பம் & அமைதி"
                             AppLanguage.HINDI -> "परिवार एवं सुख-शांति"
                             AppLanguage.ENGLISH -> "Family & Peace"
                         },
@@ -747,7 +759,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "திருமணம் & உறவுகள் (Marriage)"
+                            AppLanguage.TAMIL -> "திருமணம் & உறவுகள்"
                             AppLanguage.HINDI -> "विवाह एवं संबंध"
                             AppLanguage.ENGLISH -> "Marriage & Relationships"
                         },
@@ -763,7 +775,7 @@ fun RasiPalanScreen(
 
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "ஆரோக்கியம் & உடல்திறன் (Health)"
+                            AppLanguage.TAMIL -> "ஆரோக்கியம் & உடல்திறன்"
                             AppLanguage.HINDI -> "स्वास्थ्य एवं ऊर्जा"
                             AppLanguage.ENGLISH -> "Health & Wellness"
                         },
@@ -777,7 +789,7 @@ fun RasiPalanScreen(
                 item {
                     PalanAspectCard(
                         title = when (lang) {
-                            AppLanguage.TAMIL -> "பயணம் & வெளிநாடு (Travel)"
+                            AppLanguage.TAMIL -> "பயணம் & வெளிநாடு"
                             AppLanguage.HINDI -> "यात्रा एवं विदेश योग"
                             AppLanguage.ENGLISH -> "Travel & Journeys"
                         },
@@ -825,7 +837,11 @@ fun RasiPalanScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
+                                    AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
+                                    AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Temple, Nadi, Fiji Islands"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic

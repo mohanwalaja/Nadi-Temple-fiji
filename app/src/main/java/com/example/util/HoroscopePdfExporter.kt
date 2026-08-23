@@ -107,18 +107,6 @@ object HoroscopePdfExporter {
                 AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil"
             }
             canvas1.drawText(templeTitle, (PAGE_WIDTH / 2).toFloat(), y, titlePaint)
-            y += 13f
-
-            val priestText = when (lang) {
-                AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
-                AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
-                AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
-            }
-            textPaint.textAlign = Paint.Align.CENTER
-            textPaint.textSize = 10f
-            textPaint.color = COLOR_MAROON
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas1.drawText(priestText, (PAGE_WIDTH / 2).toFloat(), y, textPaint)
             y += 12f
 
             textPaint.textSize = 8.5f
@@ -396,7 +384,7 @@ object HoroscopePdfExporter {
                 canvas1.drawText(p.graha.getName(lang), tableLeft + 4f, tY, textPaint)
                 canvas1.drawText(p.rasi.getName(lang), tableLeft + 55f, tY, textPaint)
                 canvas1.drawText(String.format(Locale.ENGLISH, "%.1f°", p.degrees), tableLeft + 115f, tY, textPaint)
-                val nakClean = p.nakshatram.substringBefore(" ")
+                val nakClean = p.getNakshatram(lang)
                 canvas1.drawText("$nakClean (${p.pada})", tableLeft + 160f, tY, textPaint)
                 val status = if (p.isRetrograde) {
                     when (lang) { AppLanguage.TAMIL -> "வக்ரம் (R)"; AppLanguage.HINDI -> "वक्री (R)"; AppLanguage.ENGLISH -> "Retrograde (R)" }
@@ -413,46 +401,76 @@ object HoroscopePdfExporter {
                 tY += 11.5f
             }
 
-            y = chartTop + chartSize + 16f
+            y = chartTop + chartSize + 14f
 
-            // Vimshottari Dasha Periods Box
+            // Vimshottari Dasha Periods Table Section
             headerPaint.textSize = 11f
             headerPaint.color = COLOR_MAROON
             val dashaHeader = when (lang) {
-                AppLanguage.TAMIL -> "விம்சோத்தரி மகாதிசை கால அட்டவணை (Vimshottari Dasha Timeline)"
-                AppLanguage.HINDI -> "विंशोत्तरी महादशा समय चक्र (Vimshottari Dasha Timeline)"
-                AppLanguage.ENGLISH -> "Vimshottari Mahadasha Timeline"
+                AppLanguage.TAMIL -> "விம்சோத்தரி மகாதிசை வரிசை அட்டவணை (Vimshottari Dasha Sequence)"
+                AppLanguage.HINDI -> "विंशोत्तरी महादशा क्रम सारणी (Vimshottari Dasha Sequence)"
+                AppLanguage.ENGLISH -> "Vimshottari Mahadasha Sequence"
             }
             canvas1.drawText(dashaHeader, 32f, y, headerPaint)
-            y += 8f
+            y += 7f
 
+            val dashaTableTop = y
+            val dashaTableHeight = 72f
             fillPaint.color = Color.WHITE
-            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 65f), 6f, 6f, fillPaint)
+            canvas1.drawRoundRect(RectF(32f, dashaTableTop, boxRight, dashaTableTop + dashaTableHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_BORDER
-            canvas1.drawRoundRect(RectF(32f, y, boxRight, y + 65f), 6f, 6f, borderPaint)
+            borderPaint.strokeWidth = 0.8f
+            canvas1.drawRoundRect(RectF(32f, dashaTableTop, boxRight, dashaTableTop + dashaTableHeight), 6f, 6f, borderPaint)
 
-            var dY = y + 14f
-            val dashaTitle = when (lang) { AppLanguage.TAMIL -> "மகாதிசை:"; AppLanguage.HINDI -> "महादशा:"; AppLanguage.ENGLISH -> "Mahadasha:" }
+            // Dasha Table Header Row
+            fillPaint.color = Color.rgb(254, 243, 199) // Soft warm gold/amber header
+            canvas1.drawRoundRect(RectF(32f, dashaTableTop, boxRight, dashaTableTop + 14f), 5f, 5f, fillPaint)
+            canvas1.drawRect(32f, dashaTableTop + 8f, boxRight, dashaTableTop + 14f, fillPaint)
 
-            result.dashaPeriods.take(4).forEach { dasha ->
+            textPaint.textSize = 8.5f
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            textPaint.color = COLOR_MAROON
+            textPaint.textAlign = Paint.Align.LEFT
+            val colLord = when (lang) { AppLanguage.TAMIL -> "மகாதிசை அதிபதி (Lord)"; AppLanguage.HINDI -> "महादशा स्वामी (Lord)"; AppLanguage.ENGLISH -> "Mahadasha Lord" }
+            val colStart = when (lang) { AppLanguage.TAMIL -> "தொடக்க நாள் (Start Date)"; AppLanguage.HINDI -> "प्रारंभ तिथि (Start)"; AppLanguage.ENGLISH -> "Start Date" }
+            val colEnd = when (lang) { AppLanguage.TAMIL -> "முடிவு நாள் (End Date)"; AppLanguage.HINDI -> "समाप्ति तिथि (End)"; AppLanguage.ENGLISH -> "End Date" }
+            val colDur = when (lang) { AppLanguage.TAMIL -> "கால அளவு (Duration)"; AppLanguage.HINDI -> "अवधि (Duration)"; AppLanguage.ENGLISH -> "Duration" }
+
+            canvas1.drawText(colLord, 42f, dashaTableTop + 10f, textPaint)
+            canvas1.drawText(colStart, 185f, dashaTableTop + 10f, textPaint)
+            canvas1.drawText(colEnd, 305f, dashaTableTop + 10f, textPaint)
+            canvas1.drawText(colDur, 425f, dashaTableTop + 10f, textPaint)
+
+            borderPaint.color = Color.rgb(230, 230, 230)
+            canvas1.drawLine(32f, dashaTableTop + 14f, boxRight, dashaTableTop + 14f, borderPaint)
+
+            var dY = dashaTableTop + 25f
+            result.dashaPeriods.take(4).forEachIndexed { idx, dasha ->
                 textPaint.textAlign = Paint.Align.LEFT
-                textPaint.textSize = 9f
+                textPaint.textSize = 8.5f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = COLOR_MAROON
                 val lordName = dasha.mahadashaLord.getName(lang)
-                canvas1.drawText("• $lordName $dashaTitle", 42f, dY, textPaint)
+                canvas1.drawText(lordName, 42f, dY, textPaint)
 
                 textPaint.typeface = Typeface.DEFAULT
                 textPaint.color = COLOR_DARK_TEXT
                 val startStr = dasha.startDate.format(dateFmt)
                 val endStr = dasha.endDate.format(dateFmt)
                 val dDesc = dasha.getDescription(lang)
-                val periodLine = if (isTa) "$startStr முதல் $endStr வரை ($dDesc)" else if (isHi) "$startStr से $endStr तक ($dDesc)" else "$startStr to $endStr ($dDesc)"
-                canvas1.drawText(periodLine, 160f, dY, textPaint)
-                dY += 13f
+
+                canvas1.drawText(startStr, 185f, dY, textPaint)
+                canvas1.drawText(endStr, 305f, dY, textPaint)
+                canvas1.drawText(dDesc, 425f, dY, textPaint)
+
+                if (idx < 3) {
+                    borderPaint.color = Color.rgb(240, 240, 240)
+                    canvas1.drawLine(38f, dY + 3.5f, boxRight - 6f, dY + 3.5f, borderPaint)
+                }
+                dY += 13.5f
             }
 
-            y += 75f
+            y += dashaTableHeight + 10f
 
             // Sani Transit & Saturn Status Card
             headerPaint.textSize = 11.5f
@@ -814,12 +832,13 @@ object HoroscopePdfExporter {
 
         val planetRows = StringBuilder()
         result.planetPositions.forEach { p ->
-            val gName = if (isTa) p.graha.nameTa else p.graha.nameEn
-            val rName = if (isTa) p.rasi.nameTa else p.rasi.nameEn
-            val nName = p.nakshatram
+            val gName = p.graha.getName(lang)
+            val rName = p.rasi.getName(lang)
+            val nName = p.getNakshatram(lang)
+            val padaLabel = if (isTa) "பாதம் ${p.pada}" else if (lang == AppLanguage.HINDI) "चरण ${p.pada}" else "Pada ${p.pada}"
             val degFormatted = String.format(Locale.US, "%02d° %02d'", p.degrees.toInt(), ((p.degrees - p.degrees.toInt()) * 60).toInt())
-            val lordName = if (isTa) p.rasi.lordTa else p.rasi.lordEn
-            val retroStatus = if (p.isRetrograde) (if (isTa) "வக்ரம் (Retrograde)" else "Retrograde") else (if (isTa) "நேர்கதி (Direct)" else "Direct")
+            val lordName = p.rasi.getLord(lang)
+            val retroStatus = if (p.isRetrograde) (if (isTa) "வக்ரம் (Retrograde)" else if (lang == AppLanguage.HINDI) "वक्री (Retrograde)" else "Retrograde") else (if (isTa) "நேர்கதி (Direct)" else if (lang == AppLanguage.HINDI) "मार्गी (Direct)" else "Direct")
             val statusColor = if (p.isRetrograde) "#b91c1c" else "#15803d"
 
             planetRows.append(
@@ -828,7 +847,7 @@ object HoroscopePdfExporter {
       <td><strong>$gName</strong></td>
       <td>$rName</td>
       <td>$degFormatted</td>
-      <td>$nName (பாதம் ${p.pada})</td>
+      <td>$nName ($padaLabel)</td>
       <td>$lordName</td>
       <td style="color: $statusColor; font-weight: bold;">$retroStatus</td>
     </tr>
@@ -948,10 +967,42 @@ object HoroscopePdfExporter {
     </tbody>
   </table>
 
-  <!-- Vimshottari Dasha Balance -->
+  <!-- Vimshottari Dasha Balance & Sequence Table -->
   <div class="dasha-box">
     <strong>${if (isTa) "விம்சோத்தரி தசா இருப்பு (Vimshottari Dasha Balance):" else "Vimshottari Dasha Balance at Birth:"}</strong>
     <span style="color: #800000; font-weight: bold; margin-left: 6px;">$dashaBalanceStr</span>
+  </div>
+
+  <div style="margin-top: 10px;">
+    <div style="font-size: 12px; font-weight: bold; color: #800000; margin-bottom: 4px;">
+      ${if (isTa) "விம்சோத்தரி மகாதிசை வரிசை அட்டவணை (Vimshottari Mahadasha Sequence)" else "Vimshottari Mahadasha Sequence Timeline"}
+    </div>
+    <table class="data-table" style="margin-top: 2px;">
+      <thead>
+        <tr>
+          <th>${if (isTa) "மகாதிசை அதிபதி (Lord)" else "Mahadasha Lord"}</th>
+          <th>${if (isTa) "தொடக்க நாள் (Start Date)" else "Start Date"}</th>
+          <th>${if (isTa) "முடிவு நாள் (End Date)" else "End Date"}</th>
+          <th>${if (isTa) "கால அளவு (Duration)" else "Duration"}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${result.dashaPeriods.joinToString("") { d ->
+          val lName = if (isTa) d.mahadashaLord.nameTa else d.mahadashaLord.nameEn
+          val sStr = d.startDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+          val eStr = d.endDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+          val descStr = d.getDescription(if (isTa) AppLanguage.TAMIL else AppLanguage.ENGLISH)
+          """
+          <tr>
+            <td><strong>$lName</strong></td>
+            <td>$sStr</td>
+            <td>$eStr</td>
+            <td>$descStr</td>
+          </tr>
+          """.trimIndent()
+        }}
+      </tbody>
+    </table>
   </div>
 
   <div class="footer-note">

@@ -9,12 +9,18 @@ data class PanchangamDetail(
     val tamilYear: TamilSamvatsara,
     // 1. Samvatsara (Tamil Year)
     val samvatsaraName: String = "",
+    val samvatsaraNameTa: String = samvatsaraName,
+    val samvatsaraNameEn: String = samvatsaraName,
+    val samvatsaraNameHi: String = samvatsaraName,
     // 2. Ayanam (Dakshinayanam / Uttarayanam)
     val ayanam: String,
     // 3. Rithu (Season)
     val ritu: String,
     // 4. Sanskrit Solar Month (e.g. Mesha Masa / சிம்ம மாதம்)
     val sanskritMonth: String = "",
+    val sanskritMonthTa: String = sanskritMonth,
+    val sanskritMonthEn: String = sanskritMonth,
+    val sanskritMonthHi: String = sanskritMonth,
     // 5. Paksham (Shukla / Krishna)
     val paksha: String,
     // 6. Tithi
@@ -206,6 +212,18 @@ data class PanchangamDetail(
         AppLanguage.TAMIL -> dinaYogamTa
         AppLanguage.HINDI -> dinaYogamHi
         AppLanguage.ENGLISH -> dinaYogamEn
+    }
+
+    fun getSamvatsara(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> samvatsaraNameTa.ifBlank { tamilYear.tamilName }
+        AppLanguage.HINDI -> samvatsaraNameHi.ifBlank { tamilYear.hindiName }
+        AppLanguage.ENGLISH -> samvatsaraNameEn.ifBlank { tamilYear.englishName }
+    }
+
+    fun getSanskritMonth(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> sanskritMonthTa.ifBlank { tamilMonth.sanskritMasa }
+        AppLanguage.HINDI -> sanskritMonthHi.ifBlank { tamilMonth.sanskritMasaHi }
+        AppLanguage.ENGLISH -> sanskritMonthEn.ifBlank { tamilMonth.sanskritMasaEn }
     }
 
     fun getTillText(lang: AppLanguage, endTime: String): String = when (lang) {

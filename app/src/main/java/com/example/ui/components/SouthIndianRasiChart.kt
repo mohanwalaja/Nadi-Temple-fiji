@@ -27,7 +27,11 @@ fun SouthIndianRasiChart(
     lagnaRasi: Rasi,
     planetPositions: List<PlanetPosition>,
     lang: AppLanguage,
-    chartTitle: String = if (lang == AppLanguage.TAMIL) "ராசி சக்கரம் (Rasi Chart)" else "Natal Rasi Chart",
+    chartTitle: String = when (lang) {
+        AppLanguage.TAMIL -> "ராசி சக்கரம்"
+        AppLanguage.HINDI -> "राशि चक्र"
+        AppLanguage.ENGLISH -> "Natal Rasi Chart"
+    },
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -108,7 +112,11 @@ private fun ChartCell(
     ) {
         // Rasi Name
         Text(
-            text = if (lang == AppLanguage.TAMIL) rasi.nameTa else rasi.nameEn.take(4),
+            text = when (lang) {
+                AppLanguage.TAMIL -> rasi.nameTa
+                AppLanguage.HINDI -> rasi.nameHi
+                AppLanguage.ENGLISH -> rasi.nameEn.take(4)
+            },
             fontSize = 9.sp,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -122,7 +130,11 @@ private fun ChartCell(
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Text(
-                    text = if (lang == AppLanguage.TAMIL) "லக்" else "LAG",
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "லக்"
+                        AppLanguage.HINDI -> "लग्न"
+                        AppLanguage.ENGLISH -> "LAG"
+                    },
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -139,7 +151,11 @@ private fun ChartCell(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             planetsInRasi.forEach { p ->
-                val planetText = if (lang == AppLanguage.TAMIL) p.graha.shortTa else p.graha.shortEn
+                val planetText = when (lang) {
+                    AppLanguage.TAMIL -> p.graha.shortTa
+                    AppLanguage.HINDI -> p.graha.shortHi
+                    AppLanguage.ENGLISH -> p.graha.shortEn
+                }
                 val suffix = if (p.isRetrograde) "(R)" else ""
                 Text(
                     text = "$planetText$suffix",
@@ -165,7 +181,11 @@ private fun CenterCell(lagna: Rasi, lang: AppLanguage, modifier: Modifier = Modi
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "ஸ்ரீ சிவ சுப்பிரமணியர்",
+                text = when (lang) {
+                    AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணியர்"
+                    AppLanguage.HINDI -> "श्री शिव सुब्रमण्य"
+                    AppLanguage.ENGLISH -> "Sri Siva Subramaniya"
+                },
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -173,7 +193,11 @@ private fun CenterCell(lagna: Rasi, lang: AppLanguage, modifier: Modifier = Modi
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "லக்னம்: ${if (lang == AppLanguage.TAMIL) lagna.nameTa else lagna.nameEn}",
+                text = when (lang) {
+                    AppLanguage.TAMIL -> "லக்னம்: ${lagna.nameTa}"
+                    AppLanguage.HINDI -> "लग्न: ${lagna.nameHi}"
+                    AppLanguage.ENGLISH -> "Lagna: ${lagna.nameEn}"
+                },
                 fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -193,7 +217,11 @@ private fun CenterCellBottom(lang: AppLanguage, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = if (lang == AppLanguage.TAMIL) "திருவருள் துணை ॐ" else "Divine Blessings ॐ",
+            text = when (lang) {
+                AppLanguage.TAMIL -> "திருவருள் துணை ॐ"
+                AppLanguage.HINDI -> "शुभ आशीर्वाद ॐ"
+                AppLanguage.ENGLISH -> "Divine Blessings ॐ"
+            },
             fontSize = 10.sp,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold

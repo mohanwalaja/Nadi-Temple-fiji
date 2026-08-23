@@ -52,7 +52,6 @@ object WeddingMatchPdfExporter {
 
         document.finishPage(page)
 
-        // Save to cache directory
         val cacheDir = File(context.cacheDir, "pdf")
         if (!cacheDir.exists()) cacheDir.mkdirs()
 
@@ -82,25 +81,31 @@ object WeddingMatchPdfExporter {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        context.startActivity(Intent.createChooser(shareIntent, "Share Wedding Match PDF"))
+        val chooser = Intent.createChooser(shareIntent, "Share Wedding Match PDF")
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
     }
 
     private fun drawMatchmakingReport(canvas: Canvas, data: WeddingMatchPdfData) {
         val lang = data.language
 
-        // Traditional South Indian Color Palette
+        // Colors
         val deepMaroon = Color.rgb(122, 21, 38)
         val templeGold = Color.rgb(200, 155, 60)
         val borderGold = Color.rgb(180, 135, 45)
         val warmBg = Color.rgb(255, 253, 248)
         val cardBg = Color.rgb(252, 249, 242)
         val textDark = Color.rgb(25, 25, 25)
-        val textMuted = Color.rgb(80, 80, 80)
+        val textMuted = Color.rgb(85, 85, 85)
+
+        // Base background fill
+        val bgPaint = Paint().apply { color = warmBg; style = Paint.Style.FILL }
+        canvas.drawRect(0f, 0f, PAGE_WIDTH.toFloat(), PAGE_HEIGHT.toFloat(), bgPaint)
 
         // Paints
         val invocationPaint = Paint().apply {
             color = deepMaroon
-            textSize = 9.5f
+            textSize = 9f
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
@@ -108,7 +113,7 @@ object WeddingMatchPdfExporter {
 
         val templeTitlePaint = Paint().apply {
             color = deepMaroon
-            textSize = 14f
+            textSize = 13f
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
@@ -116,7 +121,7 @@ object WeddingMatchPdfExporter {
 
         val priestPaint = Paint().apply {
             color = deepMaroon
-            textSize = 10.5f
+            textSize = 9.5f
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
@@ -124,7 +129,7 @@ object WeddingMatchPdfExporter {
 
         val subHeaderPaint = Paint().apply {
             color = textMuted
-            textSize = 8.5f
+            textSize = 8f
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
@@ -133,21 +138,21 @@ object WeddingMatchPdfExporter {
         val goldLinePaint = Paint().apply {
             color = templeGold
             style = Paint.Style.STROKE
-            strokeWidth = 1.5f
+            strokeWidth = 1.2f
             isAntiAlias = true
         }
 
         val outerBorderPaint = Paint().apply {
             color = deepMaroon
             style = Paint.Style.STROKE
-            strokeWidth = 2.5f
+            strokeWidth = 2.2f
             isAntiAlias = true
         }
 
         val innerBorderPaint = Paint().apply {
             color = borderGold
             style = Paint.Style.STROKE
-            strokeWidth = 1f
+            strokeWidth = 0.8f
             isAntiAlias = true
         }
 
@@ -159,20 +164,27 @@ object WeddingMatchPdfExporter {
         val cardBorderPaint = Paint().apply {
             color = Color.rgb(220, 200, 160)
             style = Paint.Style.STROKE
-            strokeWidth = 1f
+            strokeWidth = 0.8f
             isAntiAlias = true
         }
 
         val textPaint = Paint().apply {
             color = textDark
-            textSize = 9f
+            textSize = 8f
+            isAntiAlias = true
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        }
+
+        val labelPaint = Paint().apply {
+            color = textMuted
+            textSize = 7.8f
             isAntiAlias = true
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         }
 
         val boldTextPaint = Paint().apply {
             color = textDark
-            textSize = 9.5f
+            textSize = 8.2f
             isAntiAlias = true
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
@@ -184,146 +196,157 @@ object WeddingMatchPdfExporter {
 
         val whiteTextPaint = Paint().apply {
             color = Color.WHITE
-            textSize = 9f
+            textSize = 8.2f
             isAntiAlias = true
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
 
-        // 1. South Indian Ornamental Double Border with Corner Accents
+        // 1. South Indian Ornamental Double Border
         val m = 18f
         canvas.drawRect(m, m, PAGE_WIDTH - m, PAGE_HEIGHT - m, outerBorderPaint)
         canvas.drawRect(m + 3.5f, m + 3.5f, PAGE_WIDTH - m - 3.5f, PAGE_HEIGHT - m - 3.5f, innerBorderPaint)
 
-        // Draw Corner Diamond Ornaments (South Indian Kolam motif)
+        // Corner Diamond Accents
         drawCornerDiamond(canvas, m + 3.5f, m + 3.5f, templeGold)
         drawCornerDiamond(canvas, PAGE_WIDTH - m - 3.5f, m + 3.5f, templeGold)
         drawCornerDiamond(canvas, m + 3.5f, PAGE_HEIGHT - m - 3.5f, templeGold)
         drawCornerDiamond(canvas, PAGE_WIDTH - m - 3.5f, PAGE_HEIGHT - m - 3.5f, templeGold)
 
-        var y = 36f
+        var y = 33f
 
-        // 2. Auspicious Invocation
+        // 2. Invocation
         val invocationText = when (lang) {
             AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||   || குருப்யோ நம: ||"
             AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥   ॥ श्री गुरुभ्यो नमः ॥"
             AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||   || Gurubhyo Namah ||"
         }
         canvas.drawText(invocationText, PAGE_WIDTH / 2f, y, invocationPaint)
-        y += 15f
+        y += 14f
 
-        // 3. Temple Name & Mohan Gurukkal Info
+        // 3. Temple Name
         val templeName = when (lang) {
             AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில்"
             AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर"
             AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil"
         }
         canvas.drawText(templeName, PAGE_WIDTH / 2f, y, templeTitlePaint)
-        y += 14f
-
-        val priestText = when (lang) {
-            AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
-            AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
-            AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
-        }
-        canvas.drawText(priestText, PAGE_WIDTH / 2f, y, priestPaint)
         y += 12f
 
         val subtitle = when (lang) {
-            AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • திருமணப் பொருத்த அறிக்கை"
-            AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप • विवाह मिलान प्रमाण पत्र"
-            AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji • Vedic Matchmaking Certificate"
+            AppLanguage.TAMIL -> "நாடி, பிஜி தீவுகள் • துல்லிய வேத திருமணப் பொருத்த அறிக்கை"
+            AppLanguage.HINDI -> "नादी, फिजी द्वीप • वैदिक विवाह मिलान प्रमाण पत्र"
+            AppLanguage.ENGLISH -> "Nadi, Fiji Islands • Vedic Marriage Compatibility Certificate"
         }
         canvas.drawText(subtitle, PAGE_WIDTH / 2f, y, subHeaderPaint)
-        y += 12f
-
-        // Ornamental Separator Line
-        canvas.drawLine(m + 25, y, PAGE_WIDTH - m - 25, y, goldLinePaint)
         y += 10f
 
-        // 4. Side-by-Side Bride & Groom Kundali Cards
-        val availableWidth = PAGE_WIDTH - (m * 2) - 16
-        val cardWidth = (availableWidth - 10) / 2
-        val brideLeft = m + 8
-        val groomLeft = brideLeft + cardWidth + 10
+        // Ornamental Separator Line
+        canvas.drawLine(m + 20f, y, PAGE_WIDTH - m - 20f, y, goldLinePaint)
+        y += 8f
+
+        // 4. Side-by-Side Bride & Groom Profiles
+        val contentLeft = m + 8f
+        val contentRight = PAGE_WIDTH - m - 8f
+        val totalAvailableWidth = contentRight - contentLeft
+        val cardGap = 8f
+        val cardWidth = (totalAvailableWidth - cardGap) / 2f
+        val brideLeft = contentLeft
+        val groomLeft = brideLeft + cardWidth + cardGap
         val cardHeight = 104f
 
-        // Bride Card Rect
+        // --- Bride Card ---
         val brideRect = RectF(brideLeft, y, brideLeft + cardWidth, y + cardHeight)
-        canvas.drawRoundRect(brideRect, 6f, 6f, cardBgPaint)
-        canvas.drawRoundRect(brideRect, 6f, 6f, cardBorderPaint)
+        canvas.drawRoundRect(brideRect, 5f, 5f, cardBgPaint)
+        canvas.drawRoundRect(brideRect, 5f, 5f, cardBorderPaint)
 
-        // Bride Card Header
-        val brideHeaderRect = RectF(brideLeft, y, brideLeft + cardWidth, y + 18f)
-        val brideHeaderPaint = Paint().apply { color = Color.rgb(194, 24, 91) }
-        canvas.drawRoundRect(brideHeaderRect, 6f, 6f, brideHeaderPaint)
+        val brideHeaderRect = RectF(brideLeft, y, brideLeft + cardWidth, y + 16f)
+        val brideHeaderPaint = Paint().apply { color = Color.rgb(180, 30, 80) }
+        canvas.drawRoundRect(brideHeaderRect, 5f, 5f, brideHeaderPaint)
+        canvas.drawRect(brideLeft, y + 8f, brideLeft + cardWidth, y + 16f, brideHeaderPaint)
         val brideHeaderTitle = when (lang) {
             AppLanguage.TAMIL -> "மணமகள் விபரம் (Bride Profile)"
             AppLanguage.HINDI -> "वधू (कन्या) विवरण"
             AppLanguage.ENGLISH -> "Bride Profile"
         }
-        canvas.drawText(brideHeaderTitle, brideLeft + 8, y + 13, whiteTextPaint)
+        canvas.drawText(brideHeaderTitle, brideLeft + 8f, y + 11.5f, whiteTextPaint)
 
-        // Bride Card Content
-        var by = y + 31f
-        val bx = brideLeft + 8
-        canvas.drawText("${getLabel("Name", lang)}: ${data.brideName.ifBlank { "-" }}", bx, by, boldTextPaint)
-        by += 12f
-        canvas.drawText("${getLabel("DOB", lang)}: ${data.brideDob.format(DateTimeFormatter.ISO_LOCAL_DATE)} | ${data.brideTob}", bx, by, textPaint)
-        by += 12f
-        canvas.drawText("${getLabel("Place", lang)}: ${data.bridePlace.ifBlank { "-" }}", bx, by, textPaint)
-        by += 12f
-        canvas.drawText("${getLabel("Rasi", lang)}: ${data.brideRasi.getName(lang)} (${data.brideRasi.getLord(lang)})", bx, by, textPaint)
-        by += 12f
-        canvas.drawText("${getLabel("Star", lang)}: ${data.brideNakshatraName} - ${getLabel("Pada", lang)} ${data.bridePada}", bx, by, textPaint)
-        by += 12f
+        var by = y + 27f
+        val bx = brideLeft + 8f
+        val maxValWidth = cardWidth - 16f
+
+        drawField(canvas, bx, by, getLabel("Name", lang), data.brideName.ifBlank { "-" }, labelPaint, boldTextPaint, maxValWidth)
+        by += 12.5f
+
+        val dobStr = "${data.brideDob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} (${String.format("%02d:%02d", data.brideTob.hour, data.brideTob.minute)})"
+        drawField(canvas, bx, by, getLabel("DOB", lang), dobStr, labelPaint, textPaint, maxValWidth)
+        by += 12.5f
+
+        drawField(canvas, bx, by, getLabel("Place", lang), data.bridePlace.ifBlank { "-" }.take(22), labelPaint, textPaint, maxValWidth)
+        by += 12.5f
+
+        val brideRasiStr = "${data.brideRasi.getName(lang)} (${data.brideRasi.getLord(lang)})"
+        drawField(canvas, bx, by, getLabel("Rasi", lang), brideRasiStr, labelPaint, textPaint, maxValWidth)
+        by += 12.5f
+
+        val brideStarStr = "${data.brideNakshatraName} (பாதம் ${data.bridePada})"
+        drawField(canvas, bx, by, getLabel("Star", lang), brideStarStr, labelPaint, textPaint, maxValWidth)
+        by += 12.5f
+
         val brideLagnaStr = data.brideLagna?.getName(lang) ?: "-"
         val brideMarsDoshaStr = if (data.brideMarsHouse in listOf(2, 4, 7, 8, 12)) getLabel("DoshamPresent", lang) else getLabel("NoDosham", lang)
-        val brideMarsHouseLabel = getLabel("House", lang)
-        val marsLabel = getLabel("Mars", lang)
-        canvas.drawText("${getLabel("Lagna", lang)}: $brideLagnaStr | $marsLabel: ${data.brideMarsHouse}$brideMarsHouseLabel ($brideMarsDoshaStr)", bx, by, textPaint)
+        val brideLagnaMarsStr = "$brideLagnaStr • செவ்: ${data.brideMarsHouse} ($brideMarsDoshaStr)"
+        drawField(canvas, bx, by, getLabel("Lagna", lang), brideLagnaMarsStr, labelPaint, textPaint, maxValWidth)
 
-        // Groom Card Rect
+        // --- Groom Card ---
         val groomRect = RectF(groomLeft, y, groomLeft + cardWidth, y + cardHeight)
-        canvas.drawRoundRect(groomRect, 6f, 6f, cardBgPaint)
-        canvas.drawRoundRect(groomRect, 6f, 6f, cardBorderPaint)
+        canvas.drawRoundRect(groomRect, 5f, 5f, cardBgPaint)
+        canvas.drawRoundRect(groomRect, 5f, 5f, cardBorderPaint)
 
-        // Groom Card Header
-        val groomHeaderRect = RectF(groomLeft, y, groomLeft + cardWidth, y + 18f)
+        val groomHeaderRect = RectF(groomLeft, y, groomLeft + cardWidth, y + 16f)
         val groomHeaderPaint = Paint().apply { color = deepMaroon }
-        canvas.drawRoundRect(groomHeaderRect, 6f, 6f, groomHeaderPaint)
+        canvas.drawRoundRect(groomHeaderRect, 5f, 5f, groomHeaderPaint)
+        canvas.drawRect(groomLeft, y + 8f, groomLeft + cardWidth, y + 16f, groomHeaderPaint)
         val groomHeaderTitle = when (lang) {
             AppLanguage.TAMIL -> "மணமகன் விபரம் (Groom Profile)"
             AppLanguage.HINDI -> "वर (दूल्हा) विवरण"
             AppLanguage.ENGLISH -> "Groom Profile"
         }
-        canvas.drawText(groomHeaderTitle, groomLeft + 8, y + 13, whiteTextPaint)
+        canvas.drawText(groomHeaderTitle, groomLeft + 8f, y + 11.5f, whiteTextPaint)
 
-        // Groom Card Content
-        var gy = y + 31f
-        val gx = groomLeft + 8
-        canvas.drawText("${getLabel("Name", lang)}: ${data.groomName.ifBlank { "-" }}", gx, gy, boldTextPaint)
-        gy += 12f
-        canvas.drawText("${getLabel("DOB", lang)}: ${data.groomDob.format(DateTimeFormatter.ISO_LOCAL_DATE)} | ${data.groomTob}", gx, gy, textPaint)
-        gy += 12f
-        canvas.drawText("${getLabel("Place", lang)}: ${data.groomPlace.ifBlank { "-" }}", gx, gy, textPaint)
-        gy += 12f
-        canvas.drawText("${getLabel("Rasi", lang)}: ${data.groomRasi.getName(lang)} (${data.groomRasi.getLord(lang)})", gx, gy, textPaint)
-        gy += 12f
-        canvas.drawText("${getLabel("Star", lang)}: ${data.groomNakshatraName} - ${getLabel("Pada", lang)} ${data.groomPada}", gx, gy, textPaint)
-        gy += 12f
+        var gy = y + 27f
+        val gx = groomLeft + 8f
+
+        drawField(canvas, gx, gy, getLabel("Name", lang), data.groomName.ifBlank { "-" }, labelPaint, boldTextPaint, maxValWidth)
+        gy += 12.5f
+
+        val groomDobStr = "${data.groomDob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} (${String.format("%02d:%02d", data.groomTob.hour, data.groomTob.minute)})"
+        drawField(canvas, gx, gy, getLabel("DOB", lang), groomDobStr, labelPaint, textPaint, maxValWidth)
+        gy += 12.5f
+
+        drawField(canvas, gx, gy, getLabel("Place", lang), data.groomPlace.ifBlank { "-" }.take(22), labelPaint, textPaint, maxValWidth)
+        gy += 12.5f
+
+        val groomRasiStr = "${data.groomRasi.getName(lang)} (${data.groomRasi.getLord(lang)})"
+        drawField(canvas, gx, gy, getLabel("Rasi", lang), groomRasiStr, labelPaint, textPaint, maxValWidth)
+        gy += 12.5f
+
+        val groomStarStr = "${data.groomNakshatraName} (பாதம் ${data.groomPada})"
+        drawField(canvas, gx, gy, getLabel("Star", lang), groomStarStr, labelPaint, textPaint, maxValWidth)
+        gy += 12.5f
+
         val groomLagnaStr = data.groomLagna?.getName(lang) ?: "-"
         val groomMarsDoshaStr = if (data.groomMarsHouse in listOf(2, 4, 7, 8, 12)) getLabel("DoshamPresent", lang) else getLabel("NoDosham", lang)
-        val groomMarsHouseLabel = getLabel("House", lang)
-        canvas.drawText("${getLabel("Lagna", lang)}: $groomLagnaStr | $marsLabel: ${data.groomMarsHouse}$groomMarsHouseLabel ($groomMarsDoshaStr)", gx, gy, textPaint)
+        val groomLagnaMarsStr = "$groomLagnaStr • செவ்: ${data.groomMarsHouse} ($groomMarsDoshaStr)"
+        drawField(canvas, gx, gy, getLabel("Lagna", lang), groomLagnaMarsStr, labelPaint, textPaint, maxValWidth)
 
-        y += cardHeight + 8f
+        y += cardHeight + 7f
 
         // 5. Verdict & Score Banner
         val result = data.result
         val verdictBgColor = when (result.verdictStatus) {
-            PoruthamStatus.UTTHAMAM -> Color.rgb(235, 248, 237)
+            PoruthamStatus.UTTHAMAM -> Color.rgb(238, 250, 240)
             PoruthamStatus.MADHYAMAM -> Color.rgb(255, 248, 230)
-            PoruthamStatus.PORUNDHADHU -> Color.rgb(255, 238, 238)
+            PoruthamStatus.PORUNDHADHU -> Color.rgb(255, 240, 240)
         }
         val verdictBorderColor = when (result.verdictStatus) {
             PoruthamStatus.UTTHAMAM -> Color.rgb(76, 175, 80)
@@ -331,176 +354,261 @@ object WeddingMatchPdfExporter {
             PoruthamStatus.PORUNDHADHU -> Color.rgb(239, 83, 80)
         }
         val verdictTextColor = when (result.verdictStatus) {
-            PoruthamStatus.UTTHAMAM -> Color.rgb(30, 110, 40)
-            PoruthamStatus.MADHYAMAM -> Color.rgb(200, 90, 0)
-            PoruthamStatus.PORUNDHADHU -> Color.rgb(180, 30, 30)
+            PoruthamStatus.UTTHAMAM -> Color.rgb(30, 115, 45)
+            PoruthamStatus.MADHYAMAM -> Color.rgb(190, 85, 0)
+            PoruthamStatus.PORUNDHADHU -> Color.rgb(180, 25, 25)
         }
 
-        val bannerRect = RectF(brideLeft, y, groomLeft + cardWidth, y + 36f)
+        val bannerHeight = 34f
+        val bannerRect = RectF(contentLeft, y, contentRight, y + bannerHeight)
         val bannerBgPaint = Paint().apply { color = verdictBgColor; style = Paint.Style.FILL }
         val bannerBorderPaint = Paint().apply { color = verdictBorderColor; style = Paint.Style.STROKE; strokeWidth = 1f; isAntiAlias = true }
-        canvas.drawRoundRect(bannerRect, 6f, 6f, bannerBgPaint)
-        canvas.drawRoundRect(bannerRect, 6f, 6f, bannerBorderPaint)
+        canvas.drawRoundRect(bannerRect, 5f, 5f, bannerBgPaint)
+        canvas.drawRoundRect(bannerRect, 5f, 5f, bannerBorderPaint)
 
         val vPaint = Paint().apply {
             color = verdictTextColor
-            textSize = 10.5f
+            textSize = 9.5f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
 
         val scoreStr = "${getLabel("TotalScore", lang)}: ${result.totalPoruthamsMatched} / 10 (${result.totalScore} / 10.0) — ${result.verdictStatus.getName(lang)}"
-        canvas.drawText(scoreStr, brideLeft + 10, y + 15, vPaint)
+        canvas.drawText(scoreStr, contentLeft + 8f, y + 13.5f, vPaint)
 
         val rajjuLocalized = if (result.rajjuMatch) getLabel("RajjuAuspicious", lang) else getLabel("RajjuDosham", lang)
         val samyamLocalized = if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) getLabel("MarsBalanced", lang) else getLabel("MarsRemedyNeeded", lang)
 
         val subVerdictPaint = Paint().apply {
             color = textDark
-            textSize = 8.5f
+            textSize = 7.8f
             isAntiAlias = true
         }
-        canvas.drawText("${getLabel("Rajju", lang)}: $rajjuLocalized   |   ${getLabel("KujaDoshaShort", lang)}: $samyamLocalized", brideLeft + 10, y + 29, subVerdictPaint)
+        val subLine = "${getLabel("Rajju", lang)}: $rajjuLocalized   •   ${getLabel("KujaDoshaShort", lang)}: $samyamLocalized"
+        canvas.drawText(subLine, contentLeft + 8f, y + 27f, subVerdictPaint)
 
-        y += 42f
+        y += bannerHeight + 7f
 
         // 6. 10 Poruthams Table
-        val tableLeft = brideLeft
-        val tableRight = groomLeft + cardWidth
+        val tableLeft = contentLeft
+        val tableRight = contentRight
         val tableWidth = tableRight - tableLeft
 
         // Column widths strictly calibrated:
-        // Col 0: No (24f)
-        // Col 1: Porutham Name (115f)
-        // Col 2: Explanation / Astrological Result (245f)
-        // Col 3: Verdict (90f)
-        // Col 4: Points (45f)
-        val col0 = tableLeft
-        val col1 = col0 + 24f
-        val col2 = col1 + 115f
-        val col3 = col2 + 245f
-        val col4 = col3 + 90f
+        // Col 0: No (22f)
+        // Col 1: Porutham Name (112f)
+        // Col 2: Explanation (260f)
+        // Col 3: Verdict (95f)
+        // Col 4: Score (54f)
+        val w0 = 22f
+        val w1 = 112f
+        val w2 = 260f
+        val w3 = 95f
+        val w4 = tableWidth - (w0 + w1 + w2 + w3) // 54f
 
-        val headerHeight = 18f
+        val col0 = tableLeft
+        val col1 = col0 + w0
+        val col2 = col1 + w1
+        val col3 = col2 + w2
+        val col4 = col3 + w3
+
+        val headerHeight = 16f
         canvas.drawRect(tableLeft, y, tableRight, y + headerHeight, tableHeaderPaint)
 
-        canvas.drawText(getLabel("ColNo", lang), col0 + 4, y + 13, whiteTextPaint)
-        canvas.drawText(getLabel("ColPorutham", lang), col1 + 4, y + 13, whiteTextPaint)
-        canvas.drawText(getLabel("ColSignificance", lang), col2 + 4, y + 13, whiteTextPaint)
-        canvas.drawText(getLabel("ColVerdict", lang), col3 + 4, y + 13, whiteTextPaint)
-        canvas.drawText(getLabel("ColPoints", lang), col4 + 4, y + 13, whiteTextPaint)
+        canvas.drawText(getLabel("ColNo", lang), col0 + 4f, y + 11.5f, whiteTextPaint)
+        canvas.drawText(getLabel("ColPorutham", lang), col1 + 4f, y + 11.5f, whiteTextPaint)
+        canvas.drawText(getLabel("ColSignificance", lang), col2 + 4f, y + 11.5f, whiteTextPaint)
+        canvas.drawText(getLabel("ColVerdict", lang), col3 + 4f, y + 11.5f, whiteTextPaint)
+        canvas.drawText(getLabel("ColPoints", lang), col4 + 4f, y + 11.5f, whiteTextPaint)
         y += headerHeight
 
         val rowPaintEven = Paint().apply { color = Color.rgb(255, 255, 255); style = Paint.Style.FILL }
-        val rowPaintOdd = Paint().apply { color = Color.rgb(249, 246, 240); style = Paint.Style.FILL }
-        val linePaint = Paint().apply { color = Color.rgb(225, 215, 195); strokeWidth = 0.75f }
+        val rowPaintOdd = Paint().apply { color = Color.rgb(250, 247, 240); style = Paint.Style.FILL }
+        val gridLinePaint = Paint().apply { color = Color.rgb(228, 220, 205); strokeWidth = 0.6f }
 
-        val rowHeight = 21f
+        val rowHeight = 20f
         result.poruthams.forEachIndexed { index, p ->
             val rowY = y
             canvas.drawRect(tableLeft, rowY, tableRight, rowY + rowHeight, if (index % 2 == 0) rowPaintEven else rowPaintOdd)
 
             val statusColor = when (p.status) {
-                PoruthamStatus.UTTHAMAM -> Color.rgb(40, 130, 45)
-                PoruthamStatus.MADHYAMAM -> Color.rgb(210, 100, 0)
-                PoruthamStatus.PORUNDHADHU -> Color.rgb(195, 30, 30)
+                PoruthamStatus.UTTHAMAM -> Color.rgb(35, 125, 40)
+                PoruthamStatus.MADHYAMAM -> Color.rgb(195, 90, 0)
+                PoruthamStatus.PORUNDHADHU -> Color.rgb(190, 25, 25)
             }
             val statusPaint = Paint().apply {
                 color = statusColor
-                textSize = 8.5f
+                textSize = 7.8f
                 typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 isAntiAlias = true
             }
 
-            // No
-            canvas.drawText("${index + 1}", col0 + 6, rowY + 14, textPaint.apply { textSize = 8.5f })
+            // Col 0: No
+            canvas.drawText("${index + 1}", col0 + 5f, rowY + 13f, textPaint.apply { textSize = 7.8f })
 
-            // Porutham Name (cleanly truncated if too long)
-            val pName = p.getName(lang)
-            val pNameClean = if (pName.length > 22) pName.take(21) + "…" else pName
-            canvas.drawText(pNameClean, col1 + 4, rowY + 14, boldTextPaint.apply { textSize = 8.5f })
+            // Col 1: Porutham Name (Clean & Formatted)
+            val pName = getStandardPoruthamName(index, lang, p.getName(lang))
+            canvas.drawText(pName, col1 + 4f, rowY + 13f, boldTextPaint.apply { textSize = 7.8f })
 
-            // Explanation (cleanly fitted in 245f width)
+            // Col 2: Explanation (Cleanly trimmed to fit 260f width)
             val rawExp = p.getExplanation(lang)
-            val maxChars = when (lang) {
-                AppLanguage.ENGLISH -> 48
-                AppLanguage.HINDI -> 44
-                AppLanguage.TAMIL -> 44
-            }
+            val maxChars = 52
             val expClean = if (rawExp.length > maxChars) rawExp.take(maxChars - 1) + "…" else rawExp
-            canvas.drawText(expClean, col2 + 4, rowY + 14, textPaint.apply { textSize = 7.8f })
+            canvas.drawText(expClean, col2 + 4f, rowY + 13f, textPaint.apply { textSize = 7.2f; color = textDark })
 
-            // Status Verdict
-            canvas.drawText(p.status.getName(lang), col3 + 4, rowY + 14, statusPaint)
+            // Col 3: Status Verdict
+            canvas.drawText(p.status.getName(lang), col3 + 4f, rowY + 13f, statusPaint)
 
-            // Points
-            val ptsStr = if (p.pointsEarned == p.pointsEarned.toInt().toDouble()) "${p.pointsEarned.toInt()}/${p.maxPoints.toInt()}" else "${p.pointsEarned}/${p.maxPoints.toInt()}"
-            canvas.drawText(ptsStr, col4 + 8, rowY + 14, boldTextPaint.apply { textSize = 8.5f })
+            // Col 4: Points
+            val ptsStr = if (p.pointsEarned == p.pointsEarned.toInt().toDouble()) "${p.pointsEarned.toInt()} / ${p.maxPoints.toInt()}" else "${p.pointsEarned} / ${p.maxPoints.toInt()}"
+            canvas.drawText(ptsStr, col4 + 6f, rowY + 13f, boldTextPaint.apply { textSize = 7.8f; color = textDark })
 
-            canvas.drawLine(tableLeft, rowY + rowHeight, tableRight, rowY + rowHeight, linePaint)
+            // Horizontal row line
+            canvas.drawLine(tableLeft, rowY + rowHeight, tableRight, rowY + rowHeight, gridLinePaint)
+
+            // Vertical column dividers
+            canvas.drawLine(col1, rowY, col1, rowY + rowHeight, gridLinePaint)
+            canvas.drawLine(col2, rowY, col2, rowY + rowHeight, gridLinePaint)
+            canvas.drawLine(col3, rowY, col3, rowY + rowHeight, gridLinePaint)
+            canvas.drawLine(col4, rowY, col4, rowY + rowHeight, gridLinePaint)
+
             y += rowHeight
         }
 
-        // Draw Table Outer Border
-        canvas.drawRect(tableLeft, y - (10 * rowHeight) - headerHeight, tableRight, y, bannerBorderPaint)
-        y += 8f
+        // Table Outer Border
+        val tableTotalHeight = (10 * rowHeight) + headerHeight
+        canvas.drawRect(tableLeft, y - tableTotalHeight, tableRight, y, bannerBorderPaint)
+        y += 7f
 
         // 7. Sevvay Dosham Analysis Box
-        val sevvayBoxHeight = 62f
+        val sevvayBoxHeight = 72f
         val sevvayRect = RectF(tableLeft, y, tableRight, y + sevvayBoxHeight)
-        canvas.drawRoundRect(sevvayRect, 6f, 6f, cardBgPaint)
-        canvas.drawRoundRect(sevvayRect, 6f, 6f, cardBorderPaint)
+        canvas.drawRoundRect(sevvayRect, 5f, 5f, cardBgPaint)
+        canvas.drawRoundRect(sevvayRect, 5f, 5f, cardBorderPaint)
 
-        var sy = y + 14f
-        val sx = tableLeft + 10
-        canvas.drawText(getLabel("KujaDoshaTitle", lang), sx, sy, boldTextPaint.apply { color = deepMaroon; textSize = 9.5f })
+        var sy = y + 13f
+        val sx = tableLeft + 8f
+
+        // Header
+        canvas.drawText(getLabel("KujaDoshaTitle", lang), sx, sy, boldTextPaint.apply { color = deepMaroon; textSize = 8.8f })
         sy += 13f
 
-        val brideSevTxt = "${getLabel("Bride", lang)}: ${result.sevvayDosham.getBrideDoshamSeverity(lang)} ${result.sevvayDosham.getBrideCancellationReason(lang) ?: ""}"
-        val groomSevTxt = "${getLabel("Groom", lang)}: ${result.sevvayDosham.getGroomDoshamSeverity(lang)} ${result.sevvayDosham.getGroomCancellationReason(lang) ?: ""}"
-        canvas.drawText("${brideSevTxt.take(45)}  |  ${groomSevTxt.take(45)}", sx, sy, textPaint.apply { textSize = 8.2f })
+        // Two columns for Bride & Groom Mars status
+        val colMid = tableLeft + (tableWidth / 2f)
+        val brideSevTxt = "${getLabel("Bride", lang)}: ${result.sevvayDosham.getBrideDoshamSeverity(lang)} ${result.sevvayDosham.getBrideCancellationReason(lang)?.let { "($it)" } ?: ""}"
+        val groomSevTxt = "${getLabel("Groom", lang)}: ${result.sevvayDosham.getGroomDoshamSeverity(lang)} ${result.sevvayDosham.getGroomCancellationReason(lang)?.let { "($it)" } ?: ""}"
+
+        canvas.drawText(brideSevTxt.take(48), sx, sy, textPaint.apply { textSize = 7.8f; color = textDark })
+        canvas.drawText(groomSevTxt.take(48), colMid + 4f, sy, textPaint.apply { textSize = 7.8f; color = textDark })
         sy += 13f
 
+        // Samyam Balance
         val samyamStatusTxt = when (lang) {
             AppLanguage.TAMIL -> result.sevvayDosham.doshaSamyamStatusTa
             AppLanguage.HINDI -> result.sevvayDosham.doshaSamyamStatusHi
             AppLanguage.ENGLISH -> result.sevvayDosham.doshaSamyamStatusEn
         }
+        val samyamLine = "${getLabel("DoshaBalance", lang)}: $samyamStatusTxt"
+        canvas.drawText(samyamLine.take(85), sx, sy, boldTextPaint.apply { color = textDark; textSize = 7.8f })
+        sy += 12.5f
+
+        // Recommendation
         val samyamRecTxt = when (lang) {
             AppLanguage.TAMIL -> result.sevvayDosham.recommendationTa
             AppLanguage.HINDI -> result.sevvayDosham.recommendationHi
             AppLanguage.ENGLISH -> result.sevvayDosham.recommendationEn
         }
-        val fullSamyamTxt = "${getLabel("DoshaBalance", lang)}: $samyamStatusTxt • $samyamRecTxt"
-        canvas.drawText(fullSamyamTxt.take(90), sx, sy, boldTextPaint.apply { color = textDark; textSize = 8.2f })
+        val recLine = "வழிகாட்டல் / பலன்: $samyamRecTxt"
+        canvas.drawText(recLine.take(90), sx, sy, labelPaint.apply { textSize = 7.5f })
 
-        y += sevvayBoxHeight + 8f
+        y += sevvayBoxHeight + 7f
 
-        // 8. Priest Seal & Auspicious Blessing Box (South Indian Style Signature Box)
-        val priestCardHeight = 44f
+        // 8. Head Priest Endorsement & Blessings Box
+        val priestCardHeight = 58f
         val priestCardRect = RectF(tableLeft, y, tableRight, y + priestCardHeight)
         val priestCardBg = Paint().apply { color = Color.rgb(250, 245, 235); style = Paint.Style.FILL }
-        canvas.drawRoundRect(priestCardRect, 6f, 6f, priestCardBg)
-        canvas.drawRoundRect(priestCardRect, 6f, 6f, cardBorderPaint)
+        canvas.drawRoundRect(priestCardRect, 5f, 5f, priestCardBg)
+        canvas.drawRoundRect(priestCardRect, 5f, 5f, cardBorderPaint)
 
-        var py = y + 14f
-        val px = tableLeft + 10
+        var py = y + 13f
+        val px = tableLeft + 8f
         val endorseTitle = when (lang) {
-            AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கை & ஆசிகள் வழங்கியவர்:"
+            AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கை & சுப ஆசிகள் வழங்கியவர்:"
             AppLanguage.HINDI -> "विवाह मिलान प्रमाण पत्र एवं शुभाशीर्वाद प्रदाता:"
             AppLanguage.ENGLISH -> "Matchmaking Certificate & Blessings Issued By:"
         }
-        canvas.drawText(endorseTitle, px, py, textPaint.apply { textSize = 8f; color = textMuted })
+        canvas.drawText(endorseTitle, px, py, labelPaint.apply { textSize = 7.5f; color = textMuted })
         py += 13f
 
-        val priestSigText = "மோகன் குருக்கள் (Mohan Gurukkal) • Head Priest, Sri Siva Subramaniya Swami Kovil, Nadi, Fiji • Ph: +6797607465"
-        canvas.drawText(priestSigText, px, py, boldTextPaint.apply { textSize = 8.8f; color = deepMaroon })
-        py += 12f
+        val priestName = when (lang) {
+            AppLanguage.TAMIL -> "பிரம்மஸ்ரீ மோகன் குருக்கள் (Head Priest: Mohan Gurukkal)"
+            AppLanguage.HINDI -> "ब्रह्मश्री मोहन गुरुक्कल (Head Priest: Mohan Gurukkal)"
+            AppLanguage.ENGLISH -> "Brahmasri Mohan Gurukkal (Head Priest)"
+        }
+        canvas.drawText(priestName, px, py, boldTextPaint.apply { textSize = 9.2f; color = deepMaroon })
+        py += 12.5f
 
-        // 9. Auspicious Footer
+        val priestTemple = "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • Ph: +6797607465"
+        canvas.drawText(priestTemple, px, py, textPaint.apply { textSize = 7.8f; color = textDark })
+
+        // Right-side Auspicious Seal Badge
+        val sealRight = tableRight - 10f
+        val sealWidth = 95f
+        val sealTop = y + 8f
+        val sealBottom = y + priestCardHeight - 8f
+        val sealRect = RectF(sealRight - sealWidth, sealTop, sealRight, sealBottom)
+        val sealBorderPaint = Paint().apply {
+            color = templeGold
+            style = Paint.Style.STROKE
+            strokeWidth = 1f
+            isAntiAlias = true
+        }
+        canvas.drawRoundRect(sealRect, 4f, 4f, sealBorderPaint)
+
+        val sealPaint = Paint().apply {
+            color = deepMaroon
+            textSize = 7.2f
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+            isAntiAlias = true
+        }
+        val sealMidX = sealRight - (sealWidth / 2f)
+        canvas.drawText("|| சுபமஸ்து ||", sealMidX, sealTop + 13f, sealPaint)
+        canvas.drawText("ஸ்ரீ சுப்பிரமணிய", sealMidX, sealTop + 24f, sealPaint)
+        canvas.drawText("சுவாமி துணை", sealMidX, sealTop + 34f, sealPaint)
+
+        y += priestCardHeight + 7f
+
+        // 9. Vedic Marriage Blessings & Crucial Notes Box
+        val guidanceHeight = PAGE_HEIGHT - m - 24f - y
+        if (guidanceHeight > 25f) {
+            val guideRect = RectF(tableLeft, y, tableRight, y + guidanceHeight)
+            canvas.drawRoundRect(guideRect, 5f, 5f, cardBgPaint)
+            canvas.drawRoundRect(guideRect, 5f, 5f, cardBorderPaint)
+
+            var gy2 = y + 12f
+            val gx2 = tableLeft + 8f
+
+            val guideTitle = when (lang) {
+                AppLanguage.TAMIL -> "முக்கிய பொருத்த விளக்கம் (Key Astrological Factors):"
+                AppLanguage.HINDI -> "मुख्य मिलान सूत्र (Key Astrological Factors):"
+                AppLanguage.ENGLISH -> "Key Astrological Marriage Harmony Factors:"
+            }
+            canvas.drawText(guideTitle, gx2, gy2, boldTextPaint.apply { color = deepMaroon; textSize = 8f })
+            gy2 += 11f
+
+            val rajjuNote = "• ரஜ்ஜுப் பொருத்தம்: தம்பதியரின் மாங்கல்ய பலம் மற்றும் தீர்க்காயுளுக்கு அதிமுக்கிய பொருத்தமாகும்."
+            canvas.drawText(rajjuNote.take(90), gx2, gy2, labelPaint.apply { textSize = 7.2f })
+            gy2 += 10.5f
+
+            val ganaDinaNote = "• தினப் பொருத்தம் & கணப் பொருத்தம்: தேக சௌக்கியம், ஆயுள் விருத்தி மற்றும் தம்பதியர் மன ஒற்றுமைக்கு உகந்தது."
+            canvas.drawText(ganaDinaNote.take(90), gx2, gy2, labelPaint.apply { textSize = 7.2f })
+        }
+
+        // 10. Auspicious Footer
         val footerPaint = Paint().apply {
             color = deepMaroon
-            textSize = 8.5f
+            textSize = 8f
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
             isAntiAlias = true
@@ -510,7 +618,48 @@ object WeddingMatchPdfExporter {
             AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ लोकाः समस्ताः सुखिनो भवन्तु ॥ शुभम् ॥"
             AppLanguage.ENGLISH -> "Om Saravanabhava • Sri Siva Subramaniya Swami Thunai • Subhamastu"
         }
-        canvas.drawText(footerText, PAGE_WIDTH / 2f, PAGE_HEIGHT - 25f, footerPaint)
+        canvas.drawText(footerText, PAGE_WIDTH / 2f, PAGE_HEIGHT - 22f, footerPaint)
+    }
+
+    private fun drawField(
+        canvas: Canvas,
+        x: Float,
+        y: Float,
+        label: String,
+        value: String,
+        labelPaint: Paint,
+        valPaint: Paint,
+        maxWidth: Float
+    ) {
+        val labelStr = "$label: "
+        canvas.drawText(labelStr, x, y, labelPaint)
+        val labelWidth = labelPaint.measureText(labelStr)
+        val remainingWidth = maxWidth - labelWidth
+
+        var cleanVal = value
+        if (valPaint.measureText(cleanVal) > remainingWidth) {
+            while (cleanVal.isNotEmpty() && valPaint.measureText("$cleanVal…") > remainingWidth) {
+                cleanVal = cleanVal.dropLast(1)
+            }
+            cleanVal = "$cleanVal…"
+        }
+        canvas.drawText(cleanVal, x + labelWidth, y, valPaint)
+    }
+
+    private fun getStandardPoruthamName(index: Int, lang: AppLanguage, originalName: String): String {
+        return when (index) {
+            0 -> if (lang == AppLanguage.TAMIL) "1. தினப் பொருத்தம் (Dina)" else "1. Dina Porutham"
+            1 -> if (lang == AppLanguage.TAMIL) "2. கணப் பொருத்தம் (Gana)" else "2. Gana Porutham"
+            2 -> if (lang == AppLanguage.TAMIL) "3. மகேந்திரம் (Mahendra)" else "3. Mahendra Porutham"
+            3 -> if (lang == AppLanguage.TAMIL) "4. ஸ்திரீ தீர்க்கம் (Stree)" else "4. Stree Deergha"
+            4 -> if (lang == AppLanguage.TAMIL) "5. யோனிப் பொருத்தம் (Yoni)" else "5. Yoni Porutham"
+            5 -> if (lang == AppLanguage.TAMIL) "6. ராசிப் பொருத்தம் (Rasi)" else "6. Rasi Porutham"
+            6 -> if (lang == AppLanguage.TAMIL) "7. ராசி அதிபதி (Lord)" else "7. Rasiyadhipathi"
+            7 -> if (lang == AppLanguage.TAMIL) "8. வசியப் பொருத்தம் (Vasiya)" else "8. Vasiya Porutham"
+            8 -> if (lang == AppLanguage.TAMIL) "9. ரஜ்ஜுப் பொருத்தம் (Rajju)" else "9. Rajju Porutham"
+            9 -> if (lang == AppLanguage.TAMIL) "10. வேதைப் பொருத்தம் (Vedha)" else "10. Vedhai Porutham"
+            else -> originalName
+        }
     }
 
     private fun drawCornerDiamond(canvas: Canvas, cx: Float, cy: Float, colorInt: Int) {
@@ -520,10 +669,10 @@ object WeddingMatchPdfExporter {
             isAntiAlias = true
         }
         val path = Path().apply {
-            moveTo(cx, cy - 3.5f)
-            lineTo(cx + 3.5f, cy)
-            lineTo(cx, cy + 3.5f)
-            lineTo(cx - 3.5f, cy)
+            moveTo(cx, cy - 3f)
+            lineTo(cx + 3f, cy)
+            lineTo(cx, cy + 3f)
+            lineTo(cx - 3f, cy)
             close()
         }
         canvas.drawPath(path, paint)
@@ -536,8 +685,8 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Name"
         }
         "DOB" -> when (lang) {
-            AppLanguage.TAMIL -> "பிறந்த தேதி/நேரம்"
-            AppLanguage.HINDI -> "जन्म तिथि/समय"
+            AppLanguage.TAMIL -> "தேதி / நேரம்"
+            AppLanguage.HINDI -> "तिथि / समय"
             AppLanguage.ENGLISH -> "DOB / Time"
         }
         "Place" -> when (lang) {
@@ -546,9 +695,9 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Birth Place"
         }
         "Rasi" -> when (lang) {
-            AppLanguage.TAMIL -> "ராசி (அதிபதி)"
-            AppLanguage.HINDI -> "राशि (स्वामी)"
-            AppLanguage.ENGLISH -> "Rasi (Lord)"
+            AppLanguage.TAMIL -> "ராசி"
+            AppLanguage.HINDI -> "राशि"
+            AppLanguage.ENGLISH -> "Rasi"
         }
         "Star" -> when (lang) {
             AppLanguage.TAMIL -> "நட்சத்திரம்"
@@ -596,9 +745,9 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Rajju"
         }
         "RajjuAuspicious" -> when (lang) {
-            AppLanguage.TAMIL -> "✓ ரஜ்ஜு சுபம் (பொருத்தம் உண்டு)"
+            AppLanguage.TAMIL -> "✓ ரஜ்ஜு சுபம் (பொருந்தும்)"
             AppLanguage.HINDI -> "✓ रज्जु शुभ (अनुकूल)"
-            AppLanguage.ENGLISH -> "✓ Rajju Auspicious (Matched)"
+            AppLanguage.ENGLISH -> "✓ Rajju Matched"
         }
         "RajjuDosham" -> when (lang) {
             AppLanguage.TAMIL -> "✗ ஏக ரஜ்ஜு (தோஷம்)"
@@ -611,14 +760,14 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Kuja Dosha"
         }
         "MarsBalanced" -> when (lang) {
-            AppLanguage.TAMIL -> "✓ செவ்வாய் சமநிலை உண்டு"
-            AppLanguage.HINDI -> "✓ मंगल दोष साम्य"
-            AppLanguage.ENGLISH -> "✓ Mars Balanced"
+            AppLanguage.TAMIL -> "✓ சமநிலை உண்டு"
+            AppLanguage.HINDI -> "✓ दोष साम्य"
+            AppLanguage.ENGLISH -> "✓ Balanced"
         }
         "MarsRemedyNeeded" -> when (lang) {
-            AppLanguage.TAMIL -> "⚠ தோஷ நிவர்த்தி தேவை"
-            AppLanguage.HINDI -> "⚠ दोष निवारण आवश्यक"
-            AppLanguage.ENGLISH -> "⚠ Remedy / Review Advised"
+            AppLanguage.TAMIL -> "⚠ நிவர்த்தி தேவை"
+            AppLanguage.HINDI -> "⚠ दोष निवारण"
+            AppLanguage.ENGLISH -> "⚠ Review Advised"
         }
         "KujaDoshaTitle" -> when (lang) {
             AppLanguage.TAMIL -> "செவ்வாய் தோஷ விளக்கம் & தோஷ சாம்யம் (Kuja Dosha Analysis)"
@@ -647,8 +796,8 @@ object WeddingMatchPdfExporter {
         }
         "ColPorutham" -> when (lang) {
             AppLanguage.TAMIL -> "பொருத்தம்"
-            AppLanguage.HINDI -> "पोरुथम (गुण)"
-            AppLanguage.ENGLISH -> "Porutham Name"
+            AppLanguage.HINDI -> "पोरुथम"
+            AppLanguage.ENGLISH -> "Porutham"
         }
         "ColSignificance" -> when (lang) {
             AppLanguage.TAMIL -> "பொருத்த பலன் விளக்கம்"
@@ -661,7 +810,7 @@ object WeddingMatchPdfExporter {
             AppLanguage.ENGLISH -> "Verdict"
         }
         "ColPoints" -> when (lang) {
-            AppLanguage.TAMIL -> "புள்ளி"
+            AppLanguage.TAMIL -> "மதிப்பெண்"
             AppLanguage.HINDI -> "अंक"
             AppLanguage.ENGLISH -> "Score"
         }

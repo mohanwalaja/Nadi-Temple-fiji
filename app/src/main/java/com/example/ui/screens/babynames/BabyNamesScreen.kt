@@ -298,11 +298,13 @@ fun NakshatraSpotlightCard(
                         fontWeight = FontWeight.Bold,
                         color = TempleMaroon
                     )
-                    Text(
-                        text = "(${star.nakshatraNameEn})",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    if (currentLanguage == AppLanguage.TAMIL) {
+                        Text(
+                            text = "(${star.nakshatraNameEn})",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
                 Surface(
@@ -358,24 +360,34 @@ fun NakshatraSpotlightCard(
                                 }
                             }
                             Text(
-                                text = pada.letterTa,
+                                text = when (currentLanguage) {
+                                    AppLanguage.TAMIL -> pada.letterTa
+                                    AppLanguage.HINDI -> pada.letterHi
+                                    AppLanguage.ENGLISH -> pada.letterEn
+                                },
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
-                            Text(
-                                text = pada.letterEn,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
-                            )
+                            if (currentLanguage != AppLanguage.ENGLISH) {
+                                Text(
+                                    text = pada.letterEn,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                             Surface(
                                 shape = RoundedCornerShape(4.dp),
                                 color = TempleGold.copy(alpha = 0.2f)
                             ) {
                                 Text(
-                                    text = pada.rasiTa,
+                                    text = when (currentLanguage) {
+                                        AppLanguage.TAMIL -> pada.rasiTa
+                                        AppLanguage.HINDI -> pada.rasiHi
+                                        AppLanguage.ENGLISH -> pada.rasiEn
+                                    },
                                     style = MaterialTheme.typography.labelSmall,
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -471,7 +483,11 @@ fun NakshatraSummaryCard(
                         }
                     }
                     Text(
-                        text = "${star.getName(currentLanguage)} (${star.nakshatraNameEn})",
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "${star.nakshatraIndex}. ${star.nakshatraNameTa} (${star.nakshatraNameEn})"
+                            AppLanguage.HINDI -> "${star.nakshatraIndex}. ${star.nakshatraNameHi}"
+                            AppLanguage.ENGLISH -> "${star.nakshatraIndex}. ${star.nakshatraNameEn}"
+                        },
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface

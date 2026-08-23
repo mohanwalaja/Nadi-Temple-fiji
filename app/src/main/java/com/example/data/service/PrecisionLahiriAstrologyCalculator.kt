@@ -18,14 +18,36 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
 
     companion object {
         val NAK_TA = listOf(
-            "அஸ்வினி (Ashwini)", "பரணி (Bharani)", "கிருத்திகை (Krittika)", "ரோகிணி (Rohini)",
-            "மிருகசீரிஷம் (Mrigashirsha)", "திருவாதிரை (Thiruvathirai)", "புனர்பூசம் (Punarvasu)",
-            "பூசம் (Pushya)", "ஆயில்யம் (Ashlesha)", "மகம் (Magha)", "பூரம் (Purva Phalguni)",
-            "உத்திரம் (Uttara Phalguni)", "அஸ்தம் (Hasta)", "சித்திரை (Chitra)", "சுவாதி (Swati)",
-            "விசாகம் (Vishakha)", "அனுஷம் (Anuradha)", "கேட்டை (Jyeshtha)", "மூலம் (Mula)",
-            "பூராடம் (Purva Ashadha)", "உத்திராடம் (Uttara Ashadha)", "திருவோணம் (Shravana)",
-            "அவிட்டம் (Dhanishta)", "சதயம் (Shatabhisha)", "பூரட்டாதி (Purva Bhadrapada)",
-            "உத்திரட்டாதி (Uttara Bhadrapada)", "ரேவதி (Revati)"
+            "அஸ்வினி", "பரணி", "கிருத்திகை", "ரோகிணி",
+            "மிருகசீரிஷம்", "திருவாதிரை", "புனர்பூசம்",
+            "பூசம்", "ஆயில்யம்", "மகம்", "பூரம்",
+            "உத்திரம்", "அஸ்தம்", "சித்திரை", "சுவாதி",
+            "விசாகம்", "அனுஷம்", "கேட்டை", "மூலம்",
+            "பூராடம்", "உத்திராடம்", "திருவோணம்",
+            "அவிட்டம்", "சதயம்", "பூரட்டாதி",
+            "உத்திரட்டாதி", "ரேவதி"
+        )
+
+        val NAK_EN = listOf(
+            "Ashwini", "Bharani", "Krittika", "Rohini",
+            "Mrigashirsha", "Ardra", "Punarvasu",
+            "Pushya", "Ashlesha", "Magha", "Purva Phalguni",
+            "Uttara Phalguni", "Hasta", "Chitra", "Swati",
+            "Vishakha", "Anuradha", "Jyeshtha", "Mula",
+            "Purva Ashadha", "Uttara Ashadha", "Shravana",
+            "Dhanishta", "Shatabhisha", "Purva Bhadrapada",
+            "Uttara Bhadrapada", "Revati"
+        )
+
+        val NAK_HI = listOf(
+            "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी",
+            "मृगशिरा", "आर्द्रा", "पुनर्वसु",
+            "पुष्य", "आश्लेषा", "मघा", "पूर्वाफाल्गुनी",
+            "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाती",
+            "विशाखा", "अनुराधा", "ज्येष्ठा", "मूल",
+            "पूर्वाषाढ़ा", "उत्तराषाढ़ा", "श्रवण",
+            "धनिष्ठा", "शतभिषा", "पूर्वभाद्रपदा",
+            "उत्तरभाद्रपदा", "रेवती"
         )
 
         val NAK_LORD = listOf(
@@ -122,6 +144,9 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val nakSpan = 360.0 / 27.0 // 13° 20' (13.33333333°)
         val nakshatraIdx = (moonSid / nakSpan).toInt() % 27
         val janmaNakshatram = NAK_TA[nakshatraIdx]
+        val janmaNakshatramTa = NAK_TA[nakshatraIdx]
+        val janmaNakshatramEn = NAK_EN[nakshatraIdx]
+        val janmaNakshatramHi = NAK_HI[nakshatraIdx]
         val posInNak = moonSid - (nakshatraIdx * nakSpan)
         val pada = (posInNak / (nakSpan / 4.0)).toInt().coerceIn(0, 3) + 1
 
@@ -145,6 +170,9 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
                 rasi = rasi,
                 degrees = degInRasi,
                 nakshatram = NAK_TA[nIdx],
+                nakshatramTa = NAK_TA[nIdx],
+                nakshatramEn = NAK_EN[nIdx],
+                nakshatramHi = NAK_HI[nIdx],
                 pada = p,
                 isRetrograde = retrogradeMap[graha] ?: false,
                 isCombust = isCombust,
@@ -269,6 +297,9 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
             lagnaDegrees = lagnaDegrees,
             chandraRasi = chandraRasi,
             janmaNakshatram = janmaNakshatram,
+            janmaNakshatramTa = janmaNakshatramTa,
+            janmaNakshatramEn = janmaNakshatramEn,
+            janmaNakshatramHi = janmaNakshatramHi,
             janmaPada = pada,
             planetPositions = planetPositions,
             bhavas = bhavas,

@@ -21,15 +21,37 @@ interface AstrologyCalculator {
 
 class StandardAstrologyCalculator : AstrologyCalculator {
 
-    private val nakshatrams = listOf(
-        "அஸ்வினி (Ashwini)", "பரணி (Bharani)", "கிருத்திகை (Krittika)", "ரோகிணி (Rohini)",
-        "மிருகசீரிஷம் (Mrigashirsha)", "திருவாதிரை (Thiruvathirai)", "புனர்பூசம் (Punarvasu)",
-        "பூசம் (Pushya)", "ஆயில்யம் (Ashlesha)", "மகம் (Magha)", "பூரம் (Purva Phalguni)",
-        "உத்திரம் (Uttara Phalguni)", "அஸ்தம் (Hasta)", "சித்திரை (Chitra)", "சுவாதி (Swati)",
-        "விசாகம் (Vishakha)", "அனுஷம் (Anuradha)", "கேட்டை (Jyeshtha)", "மூலம் (Mula)",
-        "பூராடம் (Purva Ashadha)", "உத்திராடம் (Uttara Ashadha)", "திருவோணம் (Shravana)",
-        "அவிட்டம் (Dhanishta)", "சதயம் (Shatabhisha)", "பூரட்டாதி (Purva Bhadrapada)",
-        "உத்திரட்டாதி (Uttara Bhadrapada)", "ரேவதி (Revati)"
+    private val nakshatramsTa = listOf(
+        "அஸ்வினி", "பரணி", "கிருத்திகை", "ரோகிணி",
+        "மிருகசீரிஷம்", "திருவாதிரை", "புனர்பூசம்",
+        "பூசம்", "ஆயில்யம்", "மகம்", "பூரம்",
+        "உத்திரம்", "அஸ்தம்", "சித்திரை", "சுவாதி",
+        "விசாகம்", "அனுஷம்", "கேட்டை", "மூலம்",
+        "பூராடம்", "உத்திராடம்", "திருவோணம்",
+        "அவிட்டம்", "சதயம்", "பூரட்டாதி",
+        "உத்திரட்டாதி", "ரேவதி"
+    )
+
+    private val nakshatramsEn = listOf(
+        "Ashwini", "Bharani", "Krittika", "Rohini",
+        "Mrigashirsha", "Ardra", "Punarvasu",
+        "Pushya", "Ashlesha", "Magha", "Purva Phalguni",
+        "Uttara Phalguni", "Hasta", "Chitra", "Swati",
+        "Vishakha", "Anuradha", "Jyeshtha", "Mula",
+        "Purva Ashadha", "Uttara Ashadha", "Shravana",
+        "Dhanishta", "Shatabhisha", "Purva Bhadrapada",
+        "Uttara Bhadrapada", "Revati"
+    )
+
+    private val nakshatramsHi = listOf(
+        "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी",
+        "मृगशिरा", "आर्द्रा", "पुनर्वसु",
+        "पुष्य", "आश्लेषा", "मघा", "पूर्वाफाल्गुनी",
+        "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाती",
+        "विशाखा", "अनुराधा", "ज्येष्ठा", "मूल",
+        "पूर्वाषाढ़ा", "उत्तराषाढ़ा", "श्रवण",
+        "धनिष्ठा", "शतभिषा", "पूर्वभाद्रपदा",
+        "उत्तरभाद्रपदा", "रेवती"
     )
 
     override fun calculateHoroscope(
@@ -52,7 +74,9 @@ class StandardAstrologyCalculator : AstrologyCalculator {
         val chandraRasiIndex = (moonDegree / 30).toInt() + 1
         val chandraRasi = Rasi.values().first { it.index == chandraRasiIndex }
         val nakshatraIndex = (moonDegree / (360.0 / 27.0)).toInt() % 27
-        val janmaNakshatra = nakshatrams[nakshatraIndex]
+        val janmaNakshatraTa = nakshatramsTa[nakshatraIndex]
+        val janmaNakshatraEn = nakshatramsEn[nakshatraIndex]
+        val janmaNakshatraHi = nakshatramsHi[nakshatraIndex]
         val pada = ((moonDegree % (360.0 / 27.0)) / (360.0 / 108.0)).toInt() + 1
 
         // 9 Grahas positions
@@ -191,7 +215,10 @@ class StandardAstrologyCalculator : AstrologyCalculator {
             lagnaRasi = lagnaRasi,
             lagnaDegrees = lagnaDegrees,
             chandraRasi = chandraRasi,
-            janmaNakshatram = janmaNakshatra,
+            janmaNakshatram = janmaNakshatraTa,
+            janmaNakshatramTa = janmaNakshatraTa,
+            janmaNakshatramEn = janmaNakshatraEn,
+            janmaNakshatramHi = janmaNakshatraHi,
             janmaPada = pada,
             planetPositions = planets,
             bhavas = bhavas,
@@ -219,7 +246,10 @@ class StandardAstrologyCalculator : AstrologyCalculator {
             graha = graha,
             rasi = rasi,
             degrees = degreesInRasi,
-            nakshatram = nakshatrams[nakshatraIdx],
+            nakshatram = nakshatramsTa[nakshatraIdx],
+            nakshatramTa = nakshatramsTa[nakshatraIdx],
+            nakshatramEn = nakshatramsEn[nakshatraIdx],
+            nakshatramHi = nakshatramsHi[nakshatraIdx],
             pada = pada,
             isRetrograde = isRetrograde,
             isCombust = isCombust,

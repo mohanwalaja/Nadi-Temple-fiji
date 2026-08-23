@@ -130,12 +130,27 @@ fun JathagamScreen(
                         showDatePicker = false
                     }
                 ) {
-                    Text(if (lang == AppLanguage.TAMIL) "சரி (OK)" else "OK", fontWeight = FontWeight.Bold, color = TempleMaroon)
+                    Text(
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "சரி"
+                            AppLanguage.HINDI -> "ठीक है"
+                            AppLanguage.ENGLISH -> "OK"
+                        },
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text(if (lang == AppLanguage.TAMIL) "ரத்து (Cancel)" else "Cancel", color = Color.Gray)
+                    Text(
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "ரத்து"
+                            AppLanguage.HINDI -> "रद्द करें"
+                            AppLanguage.ENGLISH -> "Cancel"
+                        },
+                        color = Color.Gray
+                    )
                 }
             }
         ) {
@@ -159,7 +174,11 @@ fun JathagamScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = if (lang == AppLanguage.TAMIL) "பிறந்த நேரம் தேர்வு" else "Select Birth Time",
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "பிறந்த நேரம் தேர்வு"
+                        AppLanguage.HINDI -> "जन्म समय चुनें"
+                        AppLanguage.ENGLISH -> "Select Birth Time"
+                    },
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -188,12 +207,26 @@ fun JathagamScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(if (lang == AppLanguage.TAMIL) "சரி (OK)" else "OK", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "சரி"
+                            AppLanguage.HINDI -> "ठीक है"
+                            AppLanguage.ENGLISH -> "OK"
+                        },
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) {
-                    Text(if (lang == AppLanguage.TAMIL) "ரத்து" else "Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "ரத்து"
+                            AppLanguage.HINDI -> "रद्द करें"
+                            AppLanguage.ENGLISH -> "Cancel"
+                        },
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         )
@@ -216,7 +249,11 @@ fun JathagamScreen(
                 onClick = { selectedTab = 0 },
                 text = {
                     Text(
-                        text = if (lang == AppLanguage.TAMIL) "ஜாதக கணிப்பு" else "Horoscope Calculator",
+                        text = when (lang) {
+                            AppLanguage.TAMIL -> "ஜாதக கணிப்பு"
+                            AppLanguage.HINDI -> "कुंडली कैलकुलेटर"
+                            AppLanguage.ENGLISH -> "Horoscope Calculator"
+                        },
                         fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal,
                         color = if (selectedTab == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -227,8 +264,13 @@ fun JathagamScreen(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
                 text = {
+                    val savedTitle = when (lang) {
+                        AppLanguage.TAMIL -> "சேமித்தவை"
+                        AppLanguage.HINDI -> "सहेजे गए"
+                        AppLanguage.ENGLISH -> "Saved"
+                    }
                     Text(
-                        text = "${if (lang == AppLanguage.TAMIL) "சேமித்தவை" else "Saved"} (${state.savedProfiles.size})",
+                        text = "$savedTitle (${state.savedProfiles.size})",
                         fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal,
                         color = if (selectedTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -260,12 +302,20 @@ fun JathagamScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "பிறப்பு விவரங்கள் (Birth Details)" else "Birth Details Input",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "பிறப்பு விவரங்கள்"
+                                            AppLanguage.HINDI -> "जन्म विवरण"
+                                            AppLanguage.ENGLISH -> "Birth Details"
+                                        },
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "தேதி, நேரம் மற்றும் பிறந்த ஊரை உள்ளிடவும்" else "Enter date, time & location to calculate birth chart",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "தேதி, நேரம் மற்றும் பிறந்த ஊரை உள்ளிடவும்"
+                                            AppLanguage.HINDI -> "जन्म तिथि, समय एवं स्थान दर्ज करें"
+                                            AppLanguage.ENGLISH -> "Enter date, time & location"
+                                        },
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -274,16 +324,20 @@ fun JathagamScreen(
                                 TextButton(
                                     onClick = { viewModel.resetToNew() },
                                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = if (lang == AppLanguage.TAMIL) "+ புதியது" else "+ New",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                                 ) {
+                                     Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                                     Spacer(modifier = Modifier.width(4.dp))
+                                     Text(
+                                         text = when (lang) {
+                                             AppLanguage.TAMIL -> "+ புதியது"
+                                             AppLanguage.HINDI -> "+ नया"
+                                             AppLanguage.ENGLISH -> "+ New"
+                                         },
+                                         fontSize = 12.sp,
+                                         fontWeight = FontWeight.Bold,
+                                         color = MaterialTheme.colorScheme.primary
+                                     )
+                                 }
                             }
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -292,8 +346,24 @@ fun JathagamScreen(
                             OutlinedTextField(
                                 value = state.nameInput,
                                 onValueChange = { viewModel.onNameChange(it) },
-                                label = { Text(text = if (lang == AppLanguage.TAMIL) "ஜாதகர் பெயர் (Devotee Name)" else "Devotee Name") },
-                                placeholder = { Text(text = if (lang == AppLanguage.TAMIL) "பெயர் உள்ளிடவும்" else "Enter devotee name") },
+                                label = {
+                                    Text(
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "ஜாதகர் பெயர்"
+                                            AppLanguage.HINDI -> "जातक का नाम"
+                                            AppLanguage.ENGLISH -> "Devotee Name"
+                                        }
+                                    )
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "பெயர் உள்ளிடவும்"
+                                            AppLanguage.HINDI -> "नाम दर्ज करें"
+                                            AppLanguage.ENGLISH -> "Enter devotee name"
+                                        }
+                                    )
+                                },
                                 leadingIcon = {
                                     Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 },
@@ -331,7 +401,15 @@ fun JathagamScreen(
                                     value = state.birthDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                                     onValueChange = {},
                                     readOnly = true,
-                                    label = { Text(text = if (lang == AppLanguage.TAMIL) "பிறந்த தேதி (DOB)" else "Birth Date (DOB)") },
+                                    label = {
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "பிறந்த தேதி"
+                                                AppLanguage.HINDI -> "जन्म तिथि"
+                                                AppLanguage.ENGLISH -> "Date of Birth"
+                                            }
+                                        )
+                                    },
                                     leadingIcon = {
                                         Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     },
@@ -362,7 +440,15 @@ fun JathagamScreen(
                                     value = state.birthTime.format(timeFormatter),
                                     onValueChange = {},
                                     readOnly = true,
-                                    label = { Text(text = if (lang == AppLanguage.TAMIL) "பிறந்த நேரம் (Time)" else "Birth Time") },
+                                    label = {
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "பிறந்த நேரம்"
+                                                AppLanguage.HINDI -> "जन्म समय"
+                                                AppLanguage.ENGLISH -> "Birth Time"
+                                            }
+                                        )
+                                    },
                                     leadingIcon = {
                                         Icon(imageVector = Icons.Default.Schedule, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     },
@@ -394,7 +480,15 @@ fun JathagamScreen(
                             OutlinedTextField(
                                 value = state.birthPlace,
                                 onValueChange = { viewModel.onBirthPlaceChange(it) },
-                                label = { Text(text = if (lang == AppLanguage.TAMIL) "பிறந்த ஊர் / நகரம் (Birth Place)" else "Birth Location / City") },
+                                label = {
+                                    Text(
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "பிறந்த ஊர் / நகரம்"
+                                            AppLanguage.HINDI -> "जन्म स्थान / शहर"
+                                            AppLanguage.ENGLISH -> "Birth Place / City"
+                                        }
+                                    )
+                                },
                                 leadingIcon = {
                                     Icon(imageVector = Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 },
@@ -452,7 +546,11 @@ fun JathagamScreen(
                                         Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(13.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = if (lang == AppLanguage.TAMIL) "📍 எனது இடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान (GPS)" else "📍 My Location (GPS)",
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "📍 எனது இடம் (GPS)"
+                                                AppLanguage.HINDI -> "📍 मेरा स्थान (GPS)"
+                                                AppLanguage.ENGLISH -> "📍 My Location (GPS)"
+                                            },
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.primary
@@ -460,14 +558,13 @@ fun JathagamScreen(
                                     }
                                 }
 
-                                val popularPlaces = listOf(
-                                    "சென்னை (Chennai)" to "சென்னை (Chennai)",
-                                    "மதுரை (Madurai)" to "மதுரை (Madurai)",
-                                    "நாடி (Nadi, Fiji)" to "நாடி (Nadi, Fiji)",
-                                    "சுவா (Suva, Fiji)" to "சுவா (Suva)"
-                                )
-                                popularPlaces.forEach { (display, value) ->
-                                    val isSelected = state.birthPlace.contains(value.substringBefore(" "))
+                                val popularPlaces = when (lang) {
+                                    AppLanguage.TAMIL -> listOf("சென்னை", "மதுரை", "நாடி, பிஜி", "சுவா, பிஜி")
+                                    AppLanguage.HINDI -> listOf("चेन्नई", "मदुरै", "नादी, फिजी", "सुवा, फिजी")
+                                    AppLanguage.ENGLISH -> listOf("Chennai", "Madurai", "Nadi, Fiji", "Suva, Fiji")
+                                }
+                                popularPlaces.forEach { placeName ->
+                                    val isSelected = state.birthPlace.contains(placeName.substringBefore(","))
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
                                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
@@ -475,10 +572,10 @@ fun JathagamScreen(
                                             1.dp,
                                             if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
                                         ),
-                                        modifier = Modifier.clickable { viewModel.onBirthPlaceChange(value) }
+                                        modifier = Modifier.clickable { viewModel.onBirthPlaceChange(placeName) }
                                     ) {
                                         Text(
-                                            text = display,
+                                            text = placeName,
                                             fontSize = 11.sp,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                             color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -493,12 +590,23 @@ fun JathagamScreen(
                             // Timezone Info Badge
                             val tzDesc = if (state.birthPlace.contains("Chennai", ignoreCase = true) ||
                                 state.birthPlace.contains("சென்னை", ignoreCase = true) ||
+                                state.birthPlace.contains("चेन्नई", ignoreCase = true) ||
                                 state.birthPlace.contains("Madurai", ignoreCase = true) ||
                                 state.birthPlace.contains("மதுரை", ignoreCase = true) ||
-                                state.birthPlace.contains("India", ignoreCase = true)) {
-                                "🇮🇳 இந்திய திட்ட நேரம் (IST / UTC+05:30)"
+                                state.birthPlace.contains("मदुरै", ignoreCase = true) ||
+                                state.birthPlace.contains("India", ignoreCase = true) ||
+                                state.birthPlace.contains("भारत", ignoreCase = true)) {
+                                when (lang) {
+                                    AppLanguage.TAMIL -> "🇮🇳 இந்திய திட்ட நேரம் (IST / UTC+05:30)"
+                                    AppLanguage.HINDI -> "🇮🇳 भारतीय मानक समय (IST / UTC+05:30)"
+                                    AppLanguage.ENGLISH -> "🇮🇳 Indian Standard Time (IST / UTC+05:30)"
+                                }
                             } else {
-                                "🇫🇯 பிஜி திட்ட நேரம் (FJT / UTC+12:00)"
+                                when (lang) {
+                                    AppLanguage.TAMIL -> "🇫🇯 பிஜி திட்ட நேரம் (FJT / UTC+12:00)"
+                                    AppLanguage.HINDI -> "🇫🇯 फिजी मानक समय (FJT / UTC+12:00)"
+                                    AppLanguage.ENGLISH -> "🇫🇯 Fiji Standard Time (FJT / UTC+12:00)"
+                                }
                             }
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
@@ -517,7 +625,11 @@ fun JathagamScreen(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "கால மண்டலம் (Timezone): $tzDesc" else "Timezone: $tzDesc",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "கால மண்டலம்: $tzDesc"
+                                            AppLanguage.HINDI -> "समय क्षेत्र: $tzDesc"
+                                            AppLanguage.ENGLISH -> "Timezone: $tzDesc"
+                                        },
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -545,7 +657,11 @@ fun JathagamScreen(
                                     Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "🔮 ஜாதகம் கணிக்க" else "🔮 Calculate Chart",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "🔮 ஜாதகம் கணிக்க"
+                                            AppLanguage.HINDI -> "🔮 कुंडली गणना करें"
+                                            AppLanguage.ENGLISH -> "🔮 Calculate Horoscope"
+                                        },
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -571,7 +687,15 @@ fun JathagamScreen(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (state.isSavedSuccessfully) (if (lang == AppLanguage.TAMIL) "சேமிக்கப்பட்டது!" else "Saved!") else AppStrings.saveProfile(lang),
+                                        text = if (state.isSavedSuccessfully) {
+                                            when (lang) {
+                                                AppLanguage.TAMIL -> "சேமிக்கப்பட்டது!"
+                                                AppLanguage.HINDI -> "सहेजा गया!"
+                                                AppLanguage.ENGLISH -> "Saved!"
+                                            }
+                                        } else {
+                                            AppStrings.saveProfile(lang)
+                                        },
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -583,56 +707,6 @@ fun JathagamScreen(
 
                 // 2. Horoscope Results View (Clean High-Contrast Cards)
                 state.horoscopeResult?.let { result ->
-                    // Temple & Head Priest Certificate Header Badge
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().testTag("card_temple_head_priest_header"),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||"
-                                        AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥"
-                                        AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||"
-                                    },
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TempleMaroon
-                                )
-                                Spacer(modifier = Modifier.height(3.dp))
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
-                                        AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
-                                        AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
-                                    },
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
-                                        AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
-                                        AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
-                                    },
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = TempleMaroon
-                                )
-                            }
-                        }
-                    }
-
                     // Summary Banner Card
                     item {
                         Card(
@@ -644,7 +718,11 @@ fun JathagamScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "${result.devoteeName} - ${if (lang == AppLanguage.TAMIL) "ஜாதகக் குறிப்பு" else "Horoscope Summary"}",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "${result.devoteeName} - ஜாதகக் குறிப்பு"
+                                        AppLanguage.HINDI -> "${result.devoteeName} - कुंडली सारांश"
+                                        AppLanguage.ENGLISH -> "${result.devoteeName} - Horoscope Summary"
+                                    },
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
@@ -657,16 +735,45 @@ fun JathagamScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Column {
-                                        Text(text = if (lang == AppLanguage.TAMIL) "லக்னம்" else "Lagna", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "லக்னம்"
+                                                AppLanguage.HINDI -> "लग्न"
+                                                AppLanguage.ENGLISH -> "Lagna"
+                                            },
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                         Text(text = "${result.lagnaRasi.getName(lang)} (${String.format("%.1f", result.lagnaDegrees)}°)", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     }
                                     Column {
-                                        Text(text = if (lang == AppLanguage.TAMIL) "சந்திர ராசி" else "Chandra Rasi", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "சந்திர ராசி"
+                                                AppLanguage.HINDI -> "चंद्र राशि"
+                                                AppLanguage.ENGLISH -> "Chandra Rasi"
+                                            },
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                         Text(text = result.chandraRasi.getName(lang), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     }
                                     Column {
-                                        Text(text = if (lang == AppLanguage.TAMIL) "நட்சத்திரம் / பாதம்" else "Nakshatram / Pada", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text(text = "${result.janmaNakshatram} (${result.janmaPada})", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "நட்சத்திரம் / பாதம்"
+                                                AppLanguage.HINDI -> "नक्षत्र / चरण"
+                                                AppLanguage.ENGLISH -> "Star / Pada"
+                                            },
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = "${result.getJanmaNakshatram(lang)} (${if (lang == AppLanguage.TAMIL) "${result.janmaPada}-ம் பாதம்" else if (lang == AppLanguage.HINDI) "चरण ${result.janmaPada}" else "Pada ${result.janmaPada}"})",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
                                     }
                                 }
                             }
@@ -699,8 +806,8 @@ fun JathagamScreen(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = when (lang) {
-                                                AppLanguage.TAMIL -> "ஜாதக PDF அறிக்கை (Horoscope PDF)"
-                                                AppLanguage.HINDI -> "कुंडली PDF रिपोर्ट (Horoscope PDF)"
+                                                AppLanguage.TAMIL -> "ஜாதக PDF அறிக்கை"
+                                                AppLanguage.HINDI -> "कुंडली PDF रिपोर्ट"
                                                 AppLanguage.ENGLISH -> "Vedic Horoscope PDF Report"
                                             },
                                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -739,9 +846,9 @@ fun JathagamScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     val languages = listOf(
-                                        Triple("தமிழ் (Tamil)", AppLanguage.TAMIL, "ta"),
-                                        Triple("English", AppLanguage.ENGLISH, "en"),
-                                        Triple("हिन्दी (Hindi)", AppLanguage.HINDI, "hi")
+                                        Triple(when (lang) { AppLanguage.TAMIL -> "தமிழ்"; AppLanguage.HINDI -> "तमिल"; AppLanguage.ENGLISH -> "Tamil" }, AppLanguage.TAMIL, "ta"),
+                                        Triple(when (lang) { AppLanguage.TAMIL -> "ஆங்கிலம்"; AppLanguage.HINDI -> "अंग्रेजी"; AppLanguage.ENGLISH -> "English" }, AppLanguage.ENGLISH, "en"),
+                                        Triple(when (lang) { AppLanguage.TAMIL -> "இந்தி"; AppLanguage.HINDI -> "हिन्दी"; AppLanguage.ENGLISH -> "Hindi" }, AppLanguage.HINDI, "hi")
                                     )
 
                                     languages.forEach { (label, exportLang, tag) ->
@@ -794,7 +901,7 @@ fun JathagamScreen(
                                     onClick = {
                                         val htmlFile = HoroscopePdfExporter.exportHoroscopeToHtml(context, result, lang)
                                         if (htmlFile != null) {
-                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "A4 HTML அறிக்கை உருவாக்கப்பட்டது!" else "A4 HTML Report Generated!", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, if (lang == AppLanguage.TAMIL) "A4 HTML அறிக்கை உருவாக்கப்பட்டது!" else if (lang == AppLanguage.HINDI) "A4 HTML रिपोर्ट तैयार है!" else "A4 HTML Report Generated!", Toast.LENGTH_SHORT).show()
                                             try {
                                                 val uri = androidx.core.content.FileProvider.getUriForFile(
                                                     context,
@@ -823,7 +930,11 @@ fun JathagamScreen(
                                     border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                                 ) {
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "🌐 ஒற்றைப் பக்க A4 HTML அறிக்கை (Single-Page A4 Web Report)" else "🌐 Single-Page A4 HTML Report (Web/Print)",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "🌐 ஒற்றைப் பக்க A4 HTML அறிக்கை"
+                                            AppLanguage.HINDI -> "🌐 एक-पृष्ठीय A4 HTML रिपोर्ट"
+                                            AppLanguage.ENGLISH -> "🌐 Single-Page A4 HTML Report (Web/Print)"
+                                        },
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -852,7 +963,7 @@ fun JathagamScreen(
                                     Icon(
                                         imageVector = Icons.Default.AutoAwesome,
                                         contentDescription = null,
-                                        tint = TempleMaroon,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -863,7 +974,7 @@ fun JathagamScreen(
                                             AppLanguage.ENGLISH -> "Janma Rasi Predictions (${result.chandraRasi.nameEn})"
                                         },
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                        color = TempleMaroon
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
 
@@ -885,7 +996,7 @@ fun JathagamScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .testTag("btn_palan_yearly"),
-                                    colors = ButtonDefaults.buttonColors(containerColor = TempleMaroon),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                     shape = RoundedCornerShape(12.dp),
                                     contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
                                 ) {
@@ -896,7 +1007,7 @@ fun JathagamScreen(
                                         Icon(
                                             imageVector = Icons.Default.Stars,
                                             contentDescription = null,
-                                            tint = TempleGoldLight,
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             modifier = Modifier.size(18.dp)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -908,7 +1019,7 @@ fun JathagamScreen(
                                             },
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color.White
+                                            color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
                                 }
@@ -935,9 +1046,13 @@ fun JathagamScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "நவக்கிரக நிலைகள் (9 Planetary Positions)" else "9 Planetary Positions (Navagrahas)",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "நவக்கிரக நிலைகள்"
+                                        AppLanguage.HINDI -> "नवग्रह स्थितियाँ"
+                                        AppLanguage.ENGLISH -> "9 Planetary Positions (Navagrahas)"
+                                    },
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = TempleMaroon
+                                    color = MaterialTheme.colorScheme.primary
                                 )
 
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -954,7 +1069,7 @@ fun JathagamScreen(
                                             text = p.graha.getName(lang),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 13.sp,
-                                            color = if (p.graha == Graha.SURYA || p.graha == Graha.CHANDRA) TempleMaroon else MaterialTheme.colorScheme.onSurface,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.weight(1.2f)
                                         )
                                         Text(
@@ -963,7 +1078,7 @@ fun JathagamScreen(
                                             modifier = Modifier.weight(1f)
                                         )
                                         Text(
-                                            text = "${String.format("%.1f", p.degrees)}° (${p.nakshatram} - ${p.pada})",
+                                            text = "${String.format("%.1f", p.degrees)}° (${p.getNakshatram(lang)} - ${p.pada})",
                                             fontSize = 11.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.weight(1.5f)
@@ -974,7 +1089,11 @@ fun JathagamScreen(
                                                 shape = RoundedCornerShape(4.dp)
                                             ) {
                                                 Text(
-                                                    text = "வக்ரம்",
+                                                    text = when (lang) {
+                                                        AppLanguage.TAMIL -> "வக்ரம்"
+                                                        AppLanguage.HINDI -> "वक्री"
+                                                        AppLanguage.ENGLISH -> "Retrograde"
+                                                    },
                                                     fontSize = 9.sp,
                                                     color = TempleKumkum,
                                                     fontWeight = FontWeight.Bold,
@@ -1000,12 +1119,16 @@ fun JathagamScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(imageVector = Icons.Default.Shield, contentDescription = null, tint = TempleMaroon, modifier = Modifier.size(20.dp))
+                                    Icon(imageVector = Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = if (lang == AppLanguage.TAMIL) "சனிப் பெயர்ச்சி நிலை (Sani Transit Status)" else "Saturn Transit Analysis",
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "சனிப் பெயர்ச்சி நிலை"
+                                            AppLanguage.HINDI -> "शनि गोचर स्थिति"
+                                            AppLanguage.ENGLISH -> "Saturn Transit Analysis"
+                                        },
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                        color = TempleMaroon
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
 
@@ -1019,13 +1142,29 @@ fun JathagamScreen(
                                     Column(modifier = Modifier.padding(12.dp)) {
                                         Text(
                                             text = if (sani.isEzharaiSani) {
-                                                "ஏழரை சனி நடப்பு: ${if (lang == AppLanguage.TAMIL) sani.ezharaiTypeTa else sani.ezharaiTypeEn}"
+                                                when (lang) {
+                                                    AppLanguage.TAMIL -> "ஏழரை சனி நடப்பு: ${sani.getEzharaiType(lang)}"
+                                                    AppLanguage.HINDI -> "साढ़े साती चल रही है: ${sani.getEzharaiType(lang)}"
+                                                    AppLanguage.ENGLISH -> "Sade Sati Active: ${sani.getEzharaiType(lang)}"
+                                                }
                                             } else if (sani.isAshtamaSani) {
-                                                "அஷ்டம சனி நடப்பு"
+                                                when (lang) {
+                                                    AppLanguage.TAMIL -> "அஷ்டம சனி நடப்பு"
+                                                    AppLanguage.HINDI -> "अष्टम शनि चल रहा है"
+                                                    AppLanguage.ENGLISH -> "Ashtama Sani Active"
+                                                }
                                             } else if (sani.isKandakaSani) {
-                                                "கண்டக சனி நடப்பு"
+                                                when (lang) {
+                                                    AppLanguage.TAMIL -> "கண்டக சனி நடப்பு"
+                                                    AppLanguage.HINDI -> "कंटक शनि चल रहा है"
+                                                    AppLanguage.ENGLISH -> "Kandaka Sani Active"
+                                                }
                                             } else {
-                                                if (lang == AppLanguage.TAMIL) "ஏழரை / அஷ்டம சனி தாக்கம் இல்லை (அனுகூல காலம்)" else "No Sade Sati / Ashtama Sani active"
+                                                when (lang) {
+                                                    AppLanguage.TAMIL -> "ஏழரை / அஷ்டம சனி தாக்கம் இல்லை (அனுகூல காலம்)"
+                                                    AppLanguage.HINDI -> "साढ़े साती / अष्टम शनि का प्रभाव नहीं है (अनुकूल समय)"
+                                                    AppLanguage.ENGLISH -> "No Sade Sati / Ashtama Sani active (Favorable Period)"
+                                                }
                                             },
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
@@ -1035,7 +1174,11 @@ fun JathagamScreen(
                                         Spacer(modifier = Modifier.height(6.dp))
 
                                         Text(
-                                            text = "பரிகாரம்: ${if (lang == AppLanguage.TAMIL) sani.remedyTa else sani.remedyEn}",
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "பரிகாரம்: ${sani.getRemedy(lang)}"
+                                                AppLanguage.HINDI -> "उपाय: ${sani.getRemedy(lang)}"
+                                                AppLanguage.ENGLISH -> "Remedy: ${sani.getRemedy(lang)}"
+                                            },
                                             fontSize = 12.sp,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
@@ -1055,9 +1198,13 @@ fun JathagamScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "தோஷ பரிசீலனை (Dosha Assessment)" else "Dosha Assessment & Remedies",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "தோஷ பரிசீலனை"
+                                        AppLanguage.HINDI -> "दोष विचार एवं परिहार"
+                                        AppLanguage.ENGLISH -> "Dosha Assessment & Remedies"
+                                    },
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = TempleMaroon
+                                    color = MaterialTheme.colorScheme.primary
                                 )
 
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -1107,135 +1254,67 @@ fun JathagamScreen(
 
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "ஆரோக்கியம் (Health)"
-                                        AppLanguage.HINDI -> "स्वास्थ्य (Health)"
+                                        AppLanguage.TAMIL -> "ஆரோக்கியம்"
+                                        AppLanguage.HINDI -> "स्वास्थ्य"
                                         AppLanguage.ENGLISH -> "Health & Vitality"
                                     },
                                     text = summ.getHealth(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "தனம் & நிதி (Wealth)"
-                                        AppLanguage.HINDI -> "धन एवं संपत्ति (Wealth)"
+                                        AppLanguage.TAMIL -> "தனம் & நிதி"
+                                        AppLanguage.HINDI -> "धन एवं संपत्ति"
                                         AppLanguage.ENGLISH -> "Wealth & Finances"
                                     },
                                     text = summ.getWealth(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "கல்வி (Education)"
-                                        AppLanguage.HINDI -> "शिक्षा एवं विद्या (Education)"
+                                        AppLanguage.TAMIL -> "கல்வி"
+                                        AppLanguage.HINDI -> "शिक्षा एवं विद्या"
                                         AppLanguage.ENGLISH -> "Education & Intellect"
                                     },
                                     text = summ.getEducation(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "தொழில் & வேலை (Career)"
-                                        AppLanguage.HINDI -> "व्यवसाय एवं आजीविका (Career)"
+                                        AppLanguage.TAMIL -> "தொழில் & வேலை"
+                                        AppLanguage.HINDI -> "व्यवसाय एवं आजीविका"
                                         AppLanguage.ENGLISH -> "Career & Status"
                                     },
                                     text = summ.getCareer(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "திருமணம் (Marriage)"
-                                        AppLanguage.HINDI -> "विवाह एवं संबंध (Marriage)"
+                                        AppLanguage.TAMIL -> "திருமணம்"
+                                        AppLanguage.HINDI -> "विवाह एवं संबंध"
                                         AppLanguage.ENGLISH -> "Marriage & Union"
                                     },
                                     text = summ.getMarriage(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "குடும்பம் (Family)"
-                                        AppLanguage.HINDI -> "परिवार एवं सुख (Family)"
+                                        AppLanguage.TAMIL -> "குடும்பம்"
+                                        AppLanguage.HINDI -> "परिवार एवं सुख"
                                         AppLanguage.ENGLISH -> "Family & Harmony"
                                     },
                                     text = summ.getFamily(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "வெளிநாட்டு வாய்ப்புகள் (Foreign)"
-                                        AppLanguage.HINDI -> "विदेश योग एवं यात्रा (Foreign Travels)"
+                                        AppLanguage.TAMIL -> "வெளிநாட்டு வாய்ப்புகள்"
+                                        AppLanguage.HINDI -> "विदेश योग एवं यात्रा"
                                         AppLanguage.ENGLISH -> "Foreign Travels"
                                     },
                                     text = summ.getForeignTravel(lang)
                                 )
                                 SummaryAspectRow(
                                     title = when (lang) {
-                                        AppLanguage.TAMIL -> "தற்போதைய வழிகாட்டுதல் (Guidance)"
+                                        AppLanguage.TAMIL -> "தற்போதைய வழிகாட்டுதல்"
                                         AppLanguage.HINDI -> "समयानुसार मार्गदर्शन एवं मंदिर परिहार"
                                         AppLanguage.ENGLISH -> "Current Planetary Guidance"
                                     },
                                     text = summ.getCurrentPeriodGuidance(lang)
-                                )
-                            }
-                        }
-                    }
-
-                    // 8. Temple Endorsement & Head Priest Blessings Card
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().testTag("card_jathagam_priest_endorsement"),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = androidx.compose.foundation.BorderStroke(1.5.dp, TempleGold),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "ஜாதகக் கணிப்பு அறிக்கை & ஆசிகள் வழங்கியவர்:"
-                                        AppLanguage.HINDI -> "जन्मकुंडली फलकथन एवं शुभाशीर्वाद प्रदाता:"
-                                        AppLanguage.ENGLISH -> "Horoscope Assessment & Divine Blessings Issued By:"
-                                    },
-                                    fontSize = 11.5.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "மோகன் குருக்கள் (Mohan Gurukkal)"
-                                        AppLanguage.HINDI -> "मोहन गुरुक्कल (Mohan Gurukkal)"
-                                        AppLanguage.ENGLISH -> "Mohan Gurukkal"
-                                    },
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TempleMaroon
-                                )
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
-                                        AppLanguage.HINDI -> "मुख्य पुजारी • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
-                                        AppLanguage.ENGLISH -> "Head Priest • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
-                                    },
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = "Mobile: +6797607465",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TempleMaroon
-                                )
-                                Spacer(modifier = Modifier.height(10.dp))
-                                HorizontalDivider(color = TempleGold.copy(alpha = 0.3f))
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = when (lang) {
-                                        AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருவருள் துணை!"
-                                        AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ शुभम् ॥"
-                                        AppLanguage.ENGLISH -> "May Lord Murugan & Sri Siva Subramaniya Swami Bestow Divine Blessings & Prosperity!"
-                                    },
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TempleMaroon,
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
                         }
@@ -1261,7 +1340,11 @@ fun JathagamScreen(
                                 Icon(imageVector = Icons.Default.BookmarkBorder, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "சேமிக்கப்பட்ட ஜாதகங்கள் எதுவும் இல்லை" else "No saved horoscope profiles yet.",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "சேமிக்கப்பட்ட ஜாதகங்கள் எதுவும் இல்லை"
+                                        AppLanguage.HINDI -> "कोई सहेजी गई कुंडली नहीं है"
+                                        AppLanguage.ENGLISH -> "No saved horoscope profiles yet."
+                                    },
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 14.sp
                                 )
@@ -1320,7 +1403,11 @@ private fun DoshaItemRow(dosha: DoshaCheckResult, lang: AppLanguage) {
             if (dosha.isPresent) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "பரிகாரம்: ${dosha.getRemedy(lang)}",
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "பரிகாரம்: ${dosha.getRemedy(lang)}"
+                        AppLanguage.HINDI -> "उपाय: ${dosha.getRemedy(lang)}"
+                        AppLanguage.ENGLISH -> "Remedy: ${dosha.getRemedy(lang)}"
+                    },
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary
@@ -1385,7 +1472,11 @@ private fun SavedProfileCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${profile.nakshatram} (${profile.pada}-ஆம் பாதம்)",
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "${profile.nakshatram} (${profile.pada}-ஆம் பாதம்)"
+                        AppLanguage.HINDI -> "${profile.nakshatram} (चरण ${profile.pada})"
+                        AppLanguage.ENGLISH -> "${profile.nakshatram} (Pada ${profile.pada})"
+                    },
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Bold

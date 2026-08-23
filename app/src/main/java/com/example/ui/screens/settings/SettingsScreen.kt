@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.AppLanguage
+import com.example.data.repository.AppStrings
 import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,11 @@ fun SettingsScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "அமைப்புகள் (Settings)" else "Settings",
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "அமைப்புகள்"
+                                AppLanguage.HINDI -> "सेटिंग्स"
+                                AppLanguage.ENGLISH -> "Settings"
+                            },
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
@@ -82,8 +87,8 @@ fun SettingsScreen(
                             Text(
                                 text = when (lang) {
                                     AppLanguage.TAMIL -> "மொழி தேர்வு (Language)"
-                                    AppLanguage.HINDI -> "भाषा का चयन (Language)"
-                                    AppLanguage.ENGLISH -> "App Language"
+                                    AppLanguage.HINDI -> "भाषा का चयन"
+                                    AppLanguage.ENGLISH -> "Language Selection"
                                 },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
@@ -154,7 +159,7 @@ fun SettingsScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "English\n(ஆங்கிலம்)",
+                                    text = "English\n(Default)",
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isEng) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -182,7 +187,7 @@ fun SettingsScreen(
                             Text(
                                 text = when (lang) {
                                     AppLanguage.TAMIL -> "தோற்ற அமைப்பு (Display & Theme)"
-                                    AppLanguage.HINDI -> "थीम और दृश्य (Display & Theme)"
+                                    AppLanguage.HINDI -> "थीम और दृश्य"
                                     AppLanguage.ENGLISH -> "Display & Appearance"
                                 },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -194,8 +199,16 @@ fun SettingsScreen(
 
                         // Dark Mode Toggle
                         SettingToggleRow(
-                            title = if (lang == AppLanguage.TAMIL) "இரவு முறை (Dark Mode)" else if (lang == AppLanguage.HINDI) "डार्क मोड (Dark Mode)" else "Dark Mode",
-                            subtitle = if (lang == AppLanguage.TAMIL) "கண்களுக்கு இதமான இருண்ட தோற்றம்" else if (lang == AppLanguage.HINDI) "आँखों के लिए आरामदायक डार्क थीम" else "Comfortable dark theme for low light",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "இரவு முறை (Dark Mode)"
+                                AppLanguage.HINDI -> "डार्क मोड (Dark Theme)"
+                                AppLanguage.ENGLISH -> "Dark Mode"
+                            },
+                            subtitle = when (lang) {
+                                AppLanguage.TAMIL -> "கண்களுக்கு இதமான இருண்ட தோற்றம்"
+                                AppLanguage.HINDI -> "आँखों के लिए आरामदायक डार्क थीम"
+                                AppLanguage.ENGLISH -> "Comfortable dark theme for low light"
+                            },
                             isChecked = prefs.isDarkMode && !prefs.useSystemTheme,
                             onCheckedChange = { isDark ->
                                 viewModel.setDarkMode(enabled = isDark, useSystem = false)
@@ -209,8 +222,16 @@ fun SettingsScreen(
 
                         // System Theme Toggle
                         SettingToggleRow(
-                            title = if (lang == AppLanguage.TAMIL) "கைபேசி முறைப்படி (System Default)" else if (lang == AppLanguage.HINDI) "सिस्टम के अनुसार (System Default)" else "Follow System Theme",
-                            subtitle = if (lang == AppLanguage.TAMIL) "போனின் அமைப்பைப் பின்பற்றும்" else if (lang == AppLanguage.HINDI) "डिवाइस की थीम का पालन करें" else "Automatically match device system theme",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "கைபேசி முறைப்படி (System Default)"
+                                AppLanguage.HINDI -> "सिस्टम के अनुसार (System Default)"
+                                AppLanguage.ENGLISH -> "Follow System Theme"
+                            },
+                            subtitle = when (lang) {
+                                AppLanguage.TAMIL -> "போனின் அமைப்பைப் பின்பற்றும்"
+                                AppLanguage.HINDI -> "डिवाइस की थीम का पालन करें"
+                                AppLanguage.ENGLISH -> "Automatically match device system theme"
+                            },
                             isChecked = prefs.useSystemTheme,
                             onCheckedChange = { useSys ->
                                 viewModel.setDarkMode(enabled = prefs.isDarkMode, useSystem = useSys)
@@ -236,7 +257,7 @@ fun SettingsScreen(
                             Text(
                                 text = when (lang) {
                                     AppLanguage.TAMIL -> "இருப்பிடம் மற்றும் நேரம் (Location & Time)"
-                                    AppLanguage.HINDI -> "स्थान और समय क्षेत्र (Location & Time)"
+                                    AppLanguage.HINDI -> "स्थान और समय क्षेत्र"
                                     AppLanguage.ENGLISH -> "Location & Time Zone"
                                 },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -259,13 +280,29 @@ fun SettingsScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        val locations = listOf(
-                            "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
-                            "சுவா, பிஜி (Suva, Fiji Islands)",
-                            "சென்னை (Chennai, India)",
-                            "சிங்கப்பூர் (Singapore)",
-                            "சிட்னி (Sydney, Australia)"
-                        )
+                        val locations = when (lang) {
+                            AppLanguage.TAMIL -> listOf(
+                                "நாடி, பிஜி தீவுகள் (Nadi, Fiji Islands)",
+                                "சுவா, பிஜி (Suva, Fiji Islands)",
+                                "சென்னை (Chennai, India)",
+                                "சிங்கப்பூர் (Singapore)",
+                                "சிட்னி (Sydney, Australia)"
+                            )
+                            AppLanguage.HINDI -> listOf(
+                                "नादी, फ़िजी द्वीप समूह (Nadi, Fiji Islands)",
+                                "सुवा, फ़िजी (Suva, Fiji Islands)",
+                                "चेन्नई, भारत (Chennai, India)",
+                                "सिंगापुर (Singapore)",
+                                "सिडनी, ऑस्ट्रेलिया (Sydney, Australia)"
+                            )
+                            AppLanguage.ENGLISH -> listOf(
+                                "Nadi, Fiji Islands",
+                                "Suva, Fiji Islands",
+                                "Chennai, India",
+                                "Singapore",
+                                "Sydney, Australia"
+                            )
+                        }
 
                         locations.forEach { loc ->
                             val isSelected = prefs.selectedLocation == loc
@@ -314,7 +351,11 @@ fun SettingsScreen(
                             Icon(imageVector = Icons.Default.Notifications, contentDescription = null, tint = TempleMaroon, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "நினைவூட்டல் அமைப்புகள் (Notifications)" else "Notifications",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "நினைவூட்டல் அமைப்புகள் (Notifications)"
+                                    AppLanguage.HINDI -> "अधिसूचना सेटिंग्स (Notifications)"
+                                    AppLanguage.ENGLISH -> "Notifications"
+                                },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = TempleMaroon
                             )
@@ -323,8 +364,16 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         SettingToggleRow(
-                            title = if (lang == AppLanguage.TAMIL) "இந்துப் பண்டிகைகள் அறிவிப்பு" else "Hindu Festival Alerts",
-                            subtitle = if (lang == AppLanguage.TAMIL) "விசேஷ தினங்களுக்கு முந்தைய நாள் நினைவூட்டல்" else "Reminders before major festivals",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "இந்துப் பண்டிகைகள் அறிவிப்பு"
+                                AppLanguage.HINDI -> "हिन्दू पर्व एवं त्योहार सूचना"
+                                AppLanguage.ENGLISH -> "Hindu Festival Alerts"
+                            },
+                            subtitle = when (lang) {
+                                AppLanguage.TAMIL -> "விசேஷ தினங்களுக்கு முந்தைய நாள் நினைவூட்டல்"
+                                AppLanguage.HINDI -> "प्रमुख त्योहारों से पहले स्मरण सूचना"
+                                AppLanguage.ENGLISH -> "Reminders before major festivals"
+                            },
                             isChecked = prefs.festivalNotificationEnabled,
                             onCheckedChange = { viewModel.setFestivalNotification(it) },
                             testTag = "toggle_notif_festival"
@@ -332,8 +381,16 @@ fun SettingsScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
 
                         SettingToggleRow(
-                            title = if (lang == AppLanguage.TAMIL) "திருக்கோயில் விசேஷங்கள்" else "Temple Events & Poojas",
-                            subtitle = if (lang == AppLanguage.TAMIL) "மகா அபிஷேகங்கள், பிரதோஷம், சஷ்டி" else "Special abhishekams and utsavam alerts",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "திருக்கோயில் விசேஷங்கள்"
+                                AppLanguage.HINDI -> "मंदिर विशेष पूजा एवं उत्सव"
+                                AppLanguage.ENGLISH -> "Temple Events & Poojas"
+                            },
+                            subtitle = when (lang) {
+                                AppLanguage.TAMIL -> "மகா அபிஷேகங்கள், பிரதோஷம், சஷ்டி"
+                                AppLanguage.HINDI -> "महाअभिषेक, प्रदोष, षष्ठी उत्सव सूचना"
+                                AppLanguage.ENGLISH -> "Special abhishekams and utsavam alerts"
+                            },
                             isChecked = prefs.templeEventNotificationEnabled,
                             onCheckedChange = { viewModel.setTempleEventNotification(it) },
                             testTag = "toggle_notif_temple"
@@ -341,8 +398,16 @@ fun SettingsScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
 
                         SettingToggleRow(
-                            title = if (lang == AppLanguage.TAMIL) "தினசரி பஞ்சாங்கம்" else "Daily Panchangam Morning Alert",
-                            subtitle = if (lang == AppLanguage.TAMIL) "காலை 6:00 மணிக்கு திதி, நட்சத்திர குறிப்பு" else "Daily morning tithi and nakshatra",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "தினசரி பஞ்சாங்கம்"
+                                AppLanguage.HINDI -> "दैनिक पंचांग प्रातः सूचना"
+                                AppLanguage.ENGLISH -> "Daily Panchangam Morning Alert"
+                            },
+                            subtitle = when (lang) {
+                                AppLanguage.TAMIL -> "காலை 6:00 மணிக்கு திதி, நட்சத்திர குறிப்பு"
+                                AppLanguage.HINDI -> "प्रातः 6:00 बजे दैनिक तिथि एवं नक्षत्र सूचना"
+                                AppLanguage.ENGLISH -> "Daily morning tithi and nakshatra"
+                            },
                             isChecked = prefs.panchangamNotificationEnabled,
                             onCheckedChange = { viewModel.setPanchangamNotification(it) },
                             testTag = "toggle_notif_panchangam"
@@ -361,17 +426,18 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில்" else "Sri Siva Subramaniya Swami Kovil",
+                            text = AppStrings.appTitle(lang),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (lang == AppLanguage.TAMIL)
-                                "பக்தி மணம் கமழும் தமிழ் நாட்காட்டி, பஞ்சாங்கம், ஜோதிடம் மற்றும் திருக்கோயில் சேவைகளுக்கான அதிகாரப்பூர்வ செயலி.\n\nபதிப்பு: 1.0.0 (Native Android with Jetpack Compose & Room)"
-                            else
-                                "Official devotional Tamil Calendar, Ephemeris Panchangam, Jyotisha and Temple companion application.\n\nVersion: 1.0.0 (Native Android with Jetpack Compose & Room)",
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "பக்தி மணம் கமழும் தமிழ் நாட்காட்டி, பஞ்சாங்கம், ஜோதிடம் மற்றும் திருக்கோயில் சேவைகளுக்கான அதிகாரப்பூர்வ செயலி.\n\nபதிப்பு: 1.0.0 (Native Android with Jetpack Compose & Room)"
+                                AppLanguage.HINDI -> "प्रामाणिक वैदिक पंचांग, दैनिक राशिफल, विवाह मिलान, कुंडली एवं मंदिर सेवा हेतु आधिकारिक ऐप।\n\nसंस्करण: 1.0.0 (Native Android with Jetpack Compose & Room)"
+                                AppLanguage.ENGLISH -> "Official devotional Hindu Calendar, Ephemeris Panchangam, Horoscope, Wedding Match and Temple companion application.\n\nVersion: 1.0.0 (Native Android with Jetpack Compose & Room)"
+                            },
                             fontSize = 12.sp,
                             lineHeight = 18.sp,
                             color = TempleMaroonDark

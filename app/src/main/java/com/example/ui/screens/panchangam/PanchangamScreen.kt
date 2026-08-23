@@ -218,11 +218,23 @@ fun PanchangamScreen(
                                 }
                             }
 
-                            val quickPresets = listOf(
-                                "🇫🇯 நாடி" to "நாடி, பிஜி தீவுகள்",
-                                "🇮🇳 சென்னை" to "சென்னை, தமிழ்நாடு",
-                                "🌍 உலகம்" to ""
-                            )
+                            val quickPresets = when (lang) {
+                                AppLanguage.TAMIL -> listOf(
+                                    "🇫🇯 நாடி" to "நாடி, பிஜி தீவுகள்",
+                                    "🇮🇳 சென்னை" to "சென்னை, தமிழ்நாடு",
+                                    "🌍 உலகம்" to ""
+                                )
+                                AppLanguage.HINDI -> listOf(
+                                    "🇫🇯 नादी" to "நாடி, பிஜி தீவுகள்",
+                                    "🇮🇳 चेन्नई" to "சென்னை, தமிழ்நாடு",
+                                    "🌍 विश्व" to ""
+                                )
+                                AppLanguage.ENGLISH -> listOf(
+                                    "🇫🇯 Nadi" to "நாடி, பிஜி தீவுகள்",
+                                    "🇮🇳 Chennai" to "சென்னை, தமிழ்நாடு",
+                                    "🌍 Global" to ""
+                                )
+                            }
                             quickPresets.forEach { (label, loc) ->
                                 val isSelected = loc.isNotEmpty() && state.selectedLocation.contains(loc.substringBefore(","))
                                 Surface(
@@ -275,7 +287,11 @@ fun PanchangamScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             val engFormatted = state.selectedDate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.ENGLISH))
                             val tamilDateStr = if (panchangam != null) {
-                                "${panchangam.tamilMonth.name(lang)} ${panchangam.tamilDate} | ${panchangam.tamilYear.tamilName} வருடம்"
+                                when (lang) {
+                                    AppLanguage.TAMIL -> "${panchangam.tamilMonth.name(lang)} ${panchangam.tamilDate} | ${panchangam.tamilYear.tamilName} வருடம்"
+                                    AppLanguage.HINDI -> "${panchangam.tamilMonth.name(lang)} ${panchangam.tamilDate} | ${panchangam.tamilYear.hindiName} संवत्सर"
+                                    AppLanguage.ENGLISH -> "${panchangam.tamilMonth.name(lang)} ${panchangam.tamilDate} | ${panchangam.tamilYear.englishName} Year"
+                                }
                             } else ""
 
                             Text(
@@ -312,7 +328,11 @@ fun PanchangamScreen(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "இன்றைய தேதிக்குச் செல்லவும்" else "Go to Today",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "இன்றைய தேதிக்குச் செல்லவும்"
+                                    AppLanguage.HINDI -> "आज की तिथि पर जाएं"
+                                    AppLanguage.ENGLISH -> "Go to Today"
+                                },
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
@@ -346,7 +366,11 @@ fun PanchangamScreen(
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "இன்றைய விசேஷ விரத நாள்" else "Today's Special Observance",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "இன்றைய விசேஷ விரத நாள்"
+                                        AppLanguage.HINDI -> "आज का विशेष व्रत/पर्व"
+                                        AppLanguage.ENGLISH -> "Today's Special Observance"
+                                    },
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -380,7 +404,11 @@ fun PanchangamScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "பஞ்சாங்கம் (10 அங்கங்கள்)" else if (lang == AppLanguage.HINDI) "पंचांग (10 अंग)" else "Drik Panchangam (10 Limbs)",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "பஞ்சாங்கம் (10 அங்கங்கள்)"
+                                    AppLanguage.HINDI -> "पंचांग (10 अंग)"
+                                    AppLanguage.ENGLISH -> "Drik Panchangam (10 Limbs)"
+                                },
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -400,17 +428,28 @@ fun PanchangamScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
+                        val uptoStr = when (lang) {
+                            AppLanguage.TAMIL -> "வரை"
+                            AppLanguage.HINDI -> "तक"
+                            AppLanguage.ENGLISH -> "upto"
+                        }
+                        val padaStr = when (lang) {
+                            AppLanguage.TAMIL -> "பாதம்"
+                            AppLanguage.HINDI -> "पाद"
+                            AppLanguage.ENGLISH -> "Pada"
+                        }
+
                         val angamsList = listOf(
-                            Triple("1", if (lang == AppLanguage.TAMIL) "சம்வத்சரம் (Samvatsaram)" else if (lang == AppLanguage.HINDI) "संवत्सर (Samvatsaram)" else "Samvatsaram (Tamil Year)", panchangam.samvatsaraName),
-                            Triple("2", if (lang == AppLanguage.TAMIL) "அயனம் (Ayanam)" else if (lang == AppLanguage.HINDI) "अयन (Ayanam)" else "Ayanam (Solar Movement)", panchangam.ayanam),
-                            Triple("3", if (lang == AppLanguage.TAMIL) "ருது (Rithu)" else if (lang == AppLanguage.HINDI) "ऋतु (Rithu)" else "Rithu (Season)", panchangam.ritu),
-                            Triple("4", if (lang == AppLanguage.TAMIL) "மாசம் (Masam)" else if (lang == AppLanguage.HINDI) "मास (Masam)" else "Masam (Solar Month)", panchangam.sanskritMonth),
-                            Triple("5", if (lang == AppLanguage.TAMIL) "பக்ஷம் (Paksham)" else if (lang == AppLanguage.HINDI) "पक्ष (Paksham)" else "Paksham (Fortnight)", panchangam.paksha),
-                            Triple("6", if (lang == AppLanguage.TAMIL) "திதி (Tithi)" else if (lang == AppLanguage.HINDI) "तिथि (Tithi)" else "Tithi (Lunar Day)", "${panchangam.tithi} (${panchangam.tithiEndTime} வரை)"),
-                            Triple("7", if (lang == AppLanguage.TAMIL) "வாசரம் (Vasaram)" else if (lang == AppLanguage.HINDI) "वासर (Vasaram)" else "Vasaram (Weekday)", "${panchangam.vasaram} (${panchangam.dayOfWeek})"),
-                            Triple("8", if (lang == AppLanguage.TAMIL) "நட்சத்திரம் (Nakshatram)" else if (lang == AppLanguage.HINDI) "नक्षत्र (Nakshatram)" else "Nakshatram (Asterism)", "${panchangam.nakshatram} பாதம் ${panchangam.pada} (${panchangam.nakshatramEndTime} வரை)"),
-                            Triple("9", if (lang == AppLanguage.TAMIL) "யோகம் (Yogam)" else if (lang == AppLanguage.HINDI) "योग (Yogam)" else "Yogam (Nithya / Dina Yoga)", "${panchangam.yogam} / ${panchangam.dinaYogam} (${panchangam.yogamEndTime} வரை)"),
-                            Triple("10", if (lang == AppLanguage.TAMIL) "கரணம் (Karanam)" else if (lang == AppLanguage.HINDI) "करण (Karanam)" else "Karanam (Half-Tithi)", "${panchangam.karanam} (${panchangam.karanamEndTime} வரை)")
+                            Triple("1", if (lang == AppLanguage.TAMIL) "சம்வத்சரம் (Samvatsaram)" else if (lang == AppLanguage.HINDI) "संवत्सर" else "Samvatsaram (Year)", panchangam.getSamvatsara(lang)),
+                            Triple("2", if (lang == AppLanguage.TAMIL) "அயனம் (Ayanam)" else if (lang == AppLanguage.HINDI) "अयन" else "Ayanam (Solar Movement)", panchangam.getAyanam(lang)),
+                            Triple("3", if (lang == AppLanguage.TAMIL) "ருது (Rithu)" else if (lang == AppLanguage.HINDI) "ऋतु" else "Rithu (Season)", panchangam.getRitu(lang)),
+                            Triple("4", if (lang == AppLanguage.TAMIL) "மாசம் (Masam)" else if (lang == AppLanguage.HINDI) "मास" else "Masam (Solar Month)", panchangam.getSanskritMonth(lang)),
+                            Triple("5", if (lang == AppLanguage.TAMIL) "பக்ஷம் (Paksham)" else if (lang == AppLanguage.HINDI) "पक्ष" else "Paksham (Fortnight)", panchangam.getPaksha(lang)),
+                            Triple("6", if (lang == AppLanguage.TAMIL) "திதி (Tithi)" else if (lang == AppLanguage.HINDI) "तिथि" else "Tithi (Lunar Day)", "${panchangam.getTithi(lang)} (${panchangam.tithiEndTime} $uptoStr)"),
+                            Triple("7", if (lang == AppLanguage.TAMIL) "வாசரம் (Vasaram)" else if (lang == AppLanguage.HINDI) "वासर" else "Vasaram (Weekday)", "${panchangam.getVasaram(lang)} (${panchangam.getDayOfWeek(lang)})"),
+                            Triple("8", if (lang == AppLanguage.TAMIL) "நட்சத்திரம் (Nakshatram)" else if (lang == AppLanguage.HINDI) "नक्षत्र" else "Nakshatram (Star)", "${panchangam.getNakshatram(lang)} $padaStr ${panchangam.pada} (${panchangam.nakshatramEndTime} $uptoStr)"),
+                            Triple("9", if (lang == AppLanguage.TAMIL) "யோகம் (Yogam)" else if (lang == AppLanguage.HINDI) "योग" else "Yogam", "${panchangam.getYogam(lang)} / ${panchangam.getDinaYogam(lang)} (${panchangam.yogamEndTime} $uptoStr)"),
+                            Triple("10", if (lang == AppLanguage.TAMIL) "கரணம் (Karanam)" else if (lang == AppLanguage.HINDI) "करण" else "Karanam (Half-Tithi)", "${panchangam.getKaranam(lang)} (${panchangam.karanamEndTime} $uptoStr)")
                         )
 
                         angamsList.forEachIndexed { index, (num, label, value) ->
@@ -471,13 +510,17 @@ fun PanchangamScreen(
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
-                                    text = if (lang == AppLanguage.TAMIL) "சந்திராஷ்டமம்" else "Chandrashtamam",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "சந்திராஷ்டமம்"
+                                        AppLanguage.HINDI -> "चंद्राष्टम"
+                                        AppLanguage.ENGLISH -> "Chandrashtamam"
+                                    },
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp,
                                     color = TempleKumkum
                                 )
                                 Text(
-                                    text = panchangam.chandrashtamam,
+                                    text = panchangam.getChandrashtamam(lang),
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -498,17 +541,36 @@ fun PanchangamScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "சுப நேரங்கள் (Auspicious Timings)" else "Auspicious Timings",
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "சுப நேரங்கள் (Auspicious Timings)"
+                                AppLanguage.HINDI -> "शुभ मुहूर्त एवं समय"
+                                AppLanguage.ENGLISH -> "Auspicious Timings"
+                            },
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = SacredGreen
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
+                        val morningPrefix = when (lang) {
+                            AppLanguage.TAMIL -> "காலை: "
+                            AppLanguage.HINDI -> "प्रातः: "
+                            AppLanguage.ENGLISH -> "Morning: "
+                        }
+                        val eveningPrefix = when (lang) {
+                            AppLanguage.TAMIL -> "மாலை: "
+                            AppLanguage.HINDI -> "सायं: "
+                            AppLanguage.ENGLISH -> "Evening: "
+                        }
+
                         // Nalla Neram
                         TimingInfoBlock(
-                            title = if (lang == AppLanguage.TAMIL) "நல்ல நேரம்" else "Nalla Neram",
-                            line1 = "காலை: ${panchangam.nallaNeramMorning}",
-                            line2 = "மாலை: ${panchangam.nallaNeramEvening}",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "நல்ல நேரம்"
+                                AppLanguage.HINDI -> "शुभ चौघड़िया / शुभ समय"
+                                AppLanguage.ENGLISH -> "Auspicious Time (Nalla Neram)"
+                            },
+                            line1 = "$morningPrefix${panchangam.nallaNeramMorning}",
+                            line2 = "$eveningPrefix${panchangam.nallaNeramEvening}",
                             accentColor = SacredGreen
                         )
 
@@ -516,9 +578,13 @@ fun PanchangamScreen(
 
                         // Gowri Nalla Neram
                         TimingInfoBlock(
-                            title = if (lang == AppLanguage.TAMIL) "கௌரி நல்ல நேரம்" else "Gowri Nalla Neram",
-                            line1 = "காலை: ${panchangam.gowriNallaNeramMorning}",
-                            line2 = "மாலை: ${panchangam.gowriNallaNeramEvening}",
+                            title = when (lang) {
+                                AppLanguage.TAMIL -> "கௌரி நல்ல நேரம்"
+                                AppLanguage.HINDI -> "गौरी शुभ समय"
+                                AppLanguage.ENGLISH -> "Gowri Good Time"
+                            },
+                            line1 = "$morningPrefix${panchangam.gowriNallaNeramMorning}",
+                            line2 = "$eveningPrefix${panchangam.gowriNallaNeramEvening}",
                             accentColor = TempleMaroon
                         )
 
@@ -534,7 +600,11 @@ fun PanchangamScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "அபிஜித் முகூர்த்தம்" else "Abhijit Muhurtham",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "அபிஜித் முகூர்த்தம்"
+                                    AppLanguage.HINDI -> "अभिजीत मुहूर्त"
+                                    AppLanguage.ENGLISH -> "Abhijit Muhurtham"
+                                },
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -560,7 +630,11 @@ fun PanchangamScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "அசுப நேரங்கள் & திசா சூலம்" else "Inauspicious Timings & Soola",
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "அசுப நேரங்கள் & திசா சூலம்"
+                                AppLanguage.HINDI -> "अशुभ समय एवं दिशा शूल"
+                                AppLanguage.ENGLISH -> "Inauspicious Timings & Soola"
+                            },
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = TempleKumkum
                         )
@@ -589,12 +663,26 @@ fun PanchangamScreen(
                                 }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(text = "துர்முஹூர்த்தம்", fontSize = 12.sp)
+                                    Text(
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "துர்முஹூர்த்தம்"
+                                            AppLanguage.HINDI -> "दुर्मुहूर्त"
+                                            AppLanguage.ENGLISH -> "Dur Muhurtham"
+                                        },
+                                        fontSize = 12.sp
+                                    )
                                     Text(text = panchangam.durMuhurtham, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(text = "வர்ஜ்யம்", fontSize = 12.sp)
+                                    Text(
+                                        text = when (lang) {
+                                            AppLanguage.TAMIL -> "வர்ஜ்யம்"
+                                            AppLanguage.HINDI -> "वर्ज्यम्"
+                                            AppLanguage.ENGLISH -> "Varjyam"
+                                        },
+                                        fontSize = 12.sp
+                                    )
                                     Text(text = panchangam.varjyam, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
                             }
@@ -615,12 +703,20 @@ fun PanchangamScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "சூலம்: ${panchangam.dishaSoola}",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "சூலம்: ${panchangam.getDishaSoola(lang)}"
+                                        AppLanguage.HINDI -> "दिशा शूल: ${panchangam.getDishaSoola(lang)}"
+                                        AppLanguage.ENGLISH -> "Disha Soola: ${panchangam.getDishaSoola(lang)}"
+                                    },
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = "பரிகாரம்: ${panchangam.soolaPariharam}",
+                                    text = when (lang) {
+                                        AppLanguage.TAMIL -> "பரிகாரம்: ${panchangam.getSoolaPariharam(lang)}"
+                                        AppLanguage.HINDI -> "निवारण: ${panchangam.getSoolaPariharam(lang)}"
+                                        AppLanguage.ENGLISH -> "Remedy: ${panchangam.getSoolaPariharam(lang)}"
+                                    },
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = TempleMaroon
@@ -642,7 +738,11 @@ fun PanchangamScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = if (lang == AppLanguage.TAMIL) "சூரிய - சந்திர காலங்கள் & ராசி நிலைகள்" else "Solar, Lunar & Signs",
+                            text = when (lang) {
+                                AppLanguage.TAMIL -> "சூரிய - சந்திர காலங்கள் & ராசி நிலைகள்"
+                                AppLanguage.HINDI -> "सूर्य-चन्द्र समय एवं राशि स्थिति"
+                                AppLanguage.ENGLISH -> "Solar, Lunar & Signs"
+                            },
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = TempleMaroon
                         )
@@ -676,12 +776,20 @@ fun PanchangamScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "சூரிய ராசி: ${panchangam.suryaRasi}",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "சூரிய ராசி: ${panchangam.getSuryaRasi(lang)}"
+                                    AppLanguage.HINDI -> "सूर्य राशि: ${panchangam.getSuryaRasi(lang)}"
+                                    AppLanguage.ENGLISH -> "Sun Sign: ${panchangam.getSuryaRasi(lang)}"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "சந்திர ராசி: ${panchangam.chandraRasi}",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "சந்திர ராசி: ${panchangam.getChandraRasi(lang)}"
+                                    AppLanguage.HINDI -> "चन्द्र राशि: ${panchangam.getChandraRasi(lang)}"
+                                    AppLanguage.ENGLISH -> "Moon Sign: ${panchangam.getChandraRasi(lang)}"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -694,12 +802,20 @@ fun PanchangamScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "அயனம்: ${panchangam.ayanam}",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "அயனம்: ${panchangam.getAyanam(lang)}"
+                                    AppLanguage.HINDI -> "अयन: ${panchangam.getAyanam(lang)}"
+                                    AppLanguage.ENGLISH -> "Ayanam: ${panchangam.getAyanam(lang)}"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "ருது: ${panchangam.ritu}",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "ருது: ${panchangam.getRitu(lang)}"
+                                    AppLanguage.HINDI -> "ऋतु: ${panchangam.getRitu(lang)}"
+                                    AppLanguage.ENGLISH -> "Season (Rithu): ${panchangam.getRitu(lang)}"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -777,7 +893,11 @@ private fun LocationSelectionDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = if (lang == AppLanguage.TAMIL) "இருப்பிடம் தேர்வு (Location)" else if (lang == AppLanguage.HINDI) "स्थान का चयन (Location)" else "Select Location",
+                text = when (lang) {
+                    AppLanguage.TAMIL -> "இருப்பிடம் தேர்வு"
+                    AppLanguage.HINDI -> "स्थान का चयन"
+                    AppLanguage.ENGLISH -> "Select Location"
+                },
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp
             )
@@ -805,13 +925,21 @@ private fun LocationSelectionDialog(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "📍 எனது இருப்பிடம் (GPS)" else if (lang == AppLanguage.HINDI) "📍 मेरा स्थान (GPS)" else "📍 Use My GPS Location",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "📍 எனது இருப்பிடம் (GPS)"
+                                    AppLanguage.HINDI -> "📍 मेरा स्थान (GPS)"
+                                    AppLanguage.ENGLISH -> "📍 Use My GPS Location"
+                                },
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "துல்லியமான அட்சரேகை & தீர்க்கரேகை கணக்கீடு" else "Calculates exact Lat, Lon & Local Solar Ephemeris",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "துல்லியமான அட்சரேகை & தீர்க்கரேகை கணக்கீடு"
+                                    AppLanguage.HINDI -> "सटीक अक्षांश व देशांतर गणना"
+                                    AppLanguage.ENGLISH -> "Calculates exact Lat, Lon & Local Solar Ephemeris"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -832,7 +960,11 @@ private fun LocationSelectionDialog(
                         onClick = { selectedTab = 0 },
                         text = {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "🌍 உலக நகரங்கள்" else "🌍 World Cities",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "🌍 உலக நகரங்கள்"
+                                    AppLanguage.HINDI -> "🌍 विश्व के शहर"
+                                    AppLanguage.ENGLISH -> "🌍 World Cities"
+                                },
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal
                             )
@@ -843,7 +975,11 @@ private fun LocationSelectionDialog(
                         onClick = { selectedTab = 1 },
                         text = {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "🧭 தனிப்பயன் (Lat/Lon)" else "🧭 Custom Coordinates",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "🧭 தனிப்பயன் (Lat/Lon)"
+                                    AppLanguage.HINDI -> "🧭 कस्टम निर्देशांक"
+                                    AppLanguage.ENGLISH -> "🧭 Custom Coordinates"
+                                },
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal
                             )
@@ -859,7 +995,16 @@ private fun LocationSelectionDialog(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text(text = if (lang == AppLanguage.TAMIL) "நகரம் / நாடு தேடவும்..." else "Search city or country...", fontSize = 12.sp) },
+                        placeholder = {
+                            Text(
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "நகரம் / நாடு தேடவும்..."
+                                    AppLanguage.HINDI -> "शहर या देश खोजें..."
+                                    AppLanguage.ENGLISH -> "Search city or country..."
+                                },
+                                fontSize = 12.sp
+                            )
+                        },
                         leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(16.dp)) },
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp)
@@ -957,7 +1102,11 @@ private fun LocationSelectionDialog(
                     ) {
                         item {
                             Text(
-                                text = if (lang == AppLanguage.TAMIL) "எந்தவொரு ஊர்/கோயிலின் அட்சரேகை & தீர்க்கரேகையை உள்ளிடவும்:" else "Enter exact coordinates for any town, village or temple:",
+                                text = when (lang) {
+                                    AppLanguage.TAMIL -> "எந்தவொரு ஊர்/கோயிலின் அட்சரேகை & தீர்க்கரேகையை உள்ளிடவும்:"
+                                    AppLanguage.HINDI -> "किसी भी नगर या मंदिर के निर्देशांक प्रविष्ट करें:"
+                                    AppLanguage.ENGLISH -> "Enter exact coordinates for any town, village or temple:"
+                                },
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -967,7 +1116,16 @@ private fun LocationSelectionDialog(
                             OutlinedTextField(
                                 value = customName,
                                 onValueChange = { customName = it },
-                                label = { Text(if (lang == AppLanguage.TAMIL) "இடத்தின் பெயர் (Place Name)" else "Location / Temple Name", fontSize = 11.sp) },
+                                label = {
+                                    Text(
+                                        when (lang) {
+                                            AppLanguage.TAMIL -> "இடத்தின் பெயர்"
+                                            AppLanguage.HINDI -> "स्थान का नाम"
+                                            AppLanguage.ENGLISH -> "Location / Temple Name"
+                                        },
+                                        fontSize = 11.sp
+                                    )
+                                },
                                 placeholder = { Text("e.g. Sri Shiva Temple, Houston", fontSize = 11.sp) },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
@@ -1051,7 +1209,13 @@ private fun LocationSelectionDialog(
                             ) {
                                 Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(if (lang == AppLanguage.TAMIL) "பயன்படுத்து & கணக்கிடு" else "Apply Coordinates")
+                                Text(
+                                    when (lang) {
+                                        AppLanguage.TAMIL -> "பயன்படுத்து & கணக்கிடு"
+                                        AppLanguage.HINDI -> "लागू करें और गणना करें"
+                                        AppLanguage.ENGLISH -> "Apply Coordinates"
+                                    }
+                                )
                             }
                         }
                     }
@@ -1060,7 +1224,13 @@ private fun LocationSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = if (lang == AppLanguage.TAMIL) "மூடு" else "Close")
+                Text(
+                    text = when (lang) {
+                        AppLanguage.TAMIL -> "மூடு"
+                        AppLanguage.HINDI -> "बंद करें"
+                        AppLanguage.ENGLISH -> "Close"
+                    }
+                )
             }
         }
     )

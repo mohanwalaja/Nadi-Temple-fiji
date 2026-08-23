@@ -54,14 +54,14 @@ fun MatchMakingScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Header / Temple Auspicious Banner with Quick PDF Export
+        // Header / Auspicious Banner with Quick PDF Export
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = TempleGold.copy(alpha = 0.12f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 border = CardDefaults.outlinedCardBorder().copy(
-                    brush = androidx.compose.ui.graphics.SolidColor(TempleGold)
+                    brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.outline)
                 )
             ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -72,7 +72,7 @@ fun MatchMakingScreen(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = TempleMaroon.copy(alpha = 0.15f),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                             modifier = Modifier.size(44.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
@@ -88,10 +88,14 @@ fun MatchMakingScreen(
                                 },
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = TempleMaroon
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "10 பொருத்தங்கள் • செவ்வாய் தோஷம் • தோஷ சாம்யம்",
+                                text = when (currentLanguage) {
+                                    AppLanguage.TAMIL -> "10 பொருத்தங்கள் • செவ்வாய் தோஷம் • தோஷ சாம்யம்"
+                                    AppLanguage.HINDI -> "10 पोरुथम • मंगल दोष • दोष साम्य"
+                                    AppLanguage.ENGLISH -> "10 Poruthams • Sevvay Dosham • Dosha Samyam"
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -101,8 +105,8 @@ fun MatchMakingScreen(
                         FilledTonalButton(
                             onClick = { showPdfLanguageDialog = true },
                             colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = TempleMaroon,
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             shape = RoundedCornerShape(10.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
@@ -125,7 +129,7 @@ fun MatchMakingScreen(
             item {
                 Text(
                     text = when (currentLanguage) {
-                        AppLanguage.TAMIL -> "மணமக்கள் பிறந்த விபரம் (Birth Details):"
+                        AppLanguage.TAMIL -> "மணமக்கள் பிறந்த விபரம்:"
                         AppLanguage.HINDI -> "वर-वधू जन्म विवरण:"
                         AppLanguage.ENGLISH -> "Bride & Groom Birth Details:"
                     },
@@ -141,7 +145,7 @@ fun MatchMakingScreen(
                     // Bride Input Card
                     PersonBirthInputCard(
                         title = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "மணமகள் (Bride)"
+                            AppLanguage.TAMIL -> "மணமகள்"
                             AppLanguage.HINDI -> "कन्या (वधू)"
                             AppLanguage.ENGLISH -> "Bride"
                         },
@@ -166,7 +170,7 @@ fun MatchMakingScreen(
                     // Groom Input Card
                     PersonBirthInputCard(
                         title = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "மணமகன் (Groom)"
+                            AppLanguage.TAMIL -> "மணமகன்"
                             AppLanguage.HINDI -> "वर (दूल्हा)"
                             AppLanguage.ENGLISH -> "Groom"
                         },
@@ -184,7 +188,7 @@ fun MatchMakingScreen(
                         calculatedPada = uiState.groomPada,
                         calculatedLagna = uiState.groomLagna,
                         calculatedMarsHouse = uiState.groomMarsHouse,
-                        accentColor = TempleMaroon,
+                        accentColor = MaterialTheme.colorScheme.primary,
                         currentLanguage = currentLanguage
                     )
                 }
@@ -200,7 +204,7 @@ fun MatchMakingScreen(
                     Button(
                         onClick = { viewModel.fetchAndCalculateCharts() },
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TempleMaroon),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp)
@@ -224,8 +228,8 @@ fun MatchMakingScreen(
                         onClick = { showPdfLanguageDialog = true },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = TempleGold.copy(alpha = 0.2f),
-                            contentColor = TempleMaroon
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -260,8 +264,8 @@ fun MatchMakingScreen(
                 ) {
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "கைமுறை திருத்தம் (Manual Rasi/Star Override)"
-                            AppLanguage.HINDI -> "हस्तचालित सुधार (Manual Override)"
+                            AppLanguage.TAMIL -> "கைமுறை திருத்தம்"
+                            AppLanguage.HINDI -> "हस्तचालित सुधार"
                             AppLanguage.ENGLISH -> "Manual Rasi/Star Override"
                         },
                         style = MaterialTheme.typography.labelMedium,
@@ -317,58 +321,8 @@ fun MatchMakingScreen(
                             onPadaSelected = { viewModel.updateGroomPada(it) },
                             onMarsHouseSelected = { viewModel.updateGroomMarsHouse(it) },
                             currentLanguage = currentLanguage,
-                            accentColor = TempleMaroon,
+                            accentColor = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-
-            // Temple & Head Priest Certificate Header Badge
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth().testTag("card_matchmaking_temple_header"),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, TempleGold.copy(alpha = 0.5f))
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "|| ஸ்ரீ கணேசாய நம: ||   || சுபமஸ்து ||"
-                                AppLanguage.HINDI -> "॥ श्री गणेशाय नमः ॥   ॥ शुभमस्तु ॥"
-                                AppLanguage.ENGLISH -> "|| Sri Ganeshaya Namah ||   || Subhamastu ||"
-                            },
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon
-                        )
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
-                                AppLanguage.HINDI -> "श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
-                                AppLanguage.ENGLISH -> "Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
-                            },
-                            fontSize = 13.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "தலைமை குருக்கள்: மோகன் குருக்கள் (Head Priest: Mohan Gurukkal) • Mobile: +6797607465"
-                                AppLanguage.HINDI -> "मुख्य पुजारी (Head Priest): मोहन गुरुक्कल • Mobile: +6797607465"
-                                AppLanguage.ENGLISH -> "Head Priest: Mohan Gurukkal • Mobile: +6797607465"
-                            },
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = TempleMaroon
                         )
                     }
                 }
@@ -387,7 +341,7 @@ fun MatchMakingScreen(
                 TabRow(
                     selectedTabIndex = uiState.selectedDetailTab,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = TempleMaroon,
+                    contentColor = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clip(RoundedCornerShape(12.dp))
                 ) {
                     Tab(
@@ -454,74 +408,6 @@ fun MatchMakingScreen(
                     )
                 }
             }
-
-            // Head Priest Endorsement & Blessing Card
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth().testTag("card_matchmaking_priest_endorsement"),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = androidx.compose.foundation.BorderStroke(1.5.dp, TempleGold),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கை & ஆசிகள் வழங்கியவர்:"
-                                AppLanguage.HINDI -> "विवाह मिलान प्रमाण पत्र एवं शुभाशीर्वाद प्रदाता:"
-                                AppLanguage.ENGLISH -> "Matchmaking Certificate & Blessings Issued By:"
-                            },
-                            fontSize = 11.5.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "மோகன் குருக்கள் (Mohan Gurukkal)"
-                                AppLanguage.HINDI -> "मोहन गुरुक्कल (Mohan Gurukkal)"
-                                AppLanguage.ENGLISH -> "Mohan Gurukkal"
-                            },
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon
-                        )
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள்"
-                                AppLanguage.HINDI -> "मुख्य पुजारी • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप"
-                                AppLanguage.ENGLISH -> "Head Priest • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji"
-                            },
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Mobile: +6797607465",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        HorizontalDivider(color = TempleGold.copy(alpha = 0.3f))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "வெற்றிவேல் முருகனுக்கு அரோகரா! ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருவருள் துணை! • சுபமஸ்து"
-                                AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ शुभमस्तु ॥"
-                                AppLanguage.ENGLISH -> "May Lord Murugan & Sri Siva Subramaniya Swami Bless the Divine Union!"
-                            },
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
-                }
-            }
         }
 
     // PDF Export Language Selection Dialog
@@ -533,14 +419,26 @@ fun MatchMakingScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = TempleMaroon)
-                    Text("PDF மொழி தேர்வு / Export Language", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "PDF மொழி தேர்வு"
+                            AppLanguage.HINDI -> "PDF भाषा चयन"
+                            AppLanguage.ENGLISH -> "PDF Export Language"
+                        },
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        text = "திருமணப் பொருத்த அறிக்கையை எந்த மொழியில் PDF ஆக உருவாக்க வேண்டும்?",
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "திருமணப் பொருத்த அறிக்கையை எந்த மொழியில் PDF ஆக உருவாக்க வேண்டும்?"
+                            AppLanguage.HINDI -> "विवाह मिलान रिपोर्ट किस भाषा में PDF बनानी है?"
+                            AppLanguage.ENGLISH -> "Select the language for the Matchmaking PDF Report:"
+                        },
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -552,7 +450,7 @@ fun MatchMakingScreen(
                                 showPdfLanguageDialog = false
                                 viewModel.exportAndSharePdf(context, AppLanguage.TAMIL)
                             },
-                        colors = CardDefaults.cardColors(containerColor = TempleGold.copy(alpha = 0.15f))
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Row(
                             modifier = Modifier.padding(14.dp),
@@ -561,7 +459,7 @@ fun MatchMakingScreen(
                         ) {
                             Text("🇮🇳", fontSize = 20.sp)
                             Column {
-                                Text("தமிழ் (Tamil)", fontWeight = FontWeight.Bold, color = TempleMaroon)
+                                Text("தமிழ் (Tamil)", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                 Text("முழுமையான தமிழ்ப் பஞ்சாங்க பொருத்த அறிக்கை", style = MaterialTheme.typography.labelSmall)
                             }
                         }
@@ -616,7 +514,13 @@ fun MatchMakingScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showPdfLanguageDialog = false }) {
-                    Text("ரத்து / Cancel")
+                    Text(
+                        when (currentLanguage) {
+                            AppLanguage.TAMIL -> "ரத்து"
+                            AppLanguage.HINDI -> "रद्द करें"
+                            AppLanguage.ENGLISH -> "Cancel"
+                        }
+                    )
                 }
             }
         )
@@ -676,7 +580,12 @@ fun PersonBirthInputCard(
                 }
 
                 // Calculated Star & Rasi Pill
-                val starName = MatchMakingCalculator.NAKSHATRAM_NAMES_TA.getOrElse(calculatedNakshatraIdx) { "" }
+                val nakshatramNames = when (currentLanguage) {
+                    AppLanguage.TAMIL -> MatchMakingCalculator.NAKSHATRAM_NAMES_TA
+                    AppLanguage.HINDI -> MatchMakingCalculator.NAKSHATRAM_NAMES_HI
+                    AppLanguage.ENGLISH -> MatchMakingCalculator.NAKSHATRAM_NAMES_EN
+                }
+                val starName = nakshatramNames.getOrElse(calculatedNakshatraIdx) { "" }
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = accentColor.copy(alpha = 0.12f)
@@ -700,7 +609,7 @@ fun PersonBirthInputCard(
                 label = {
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "பெயர் (Name)"
+                            AppLanguage.TAMIL -> "பெயர்"
                             AppLanguage.HINDI -> "नाम"
                             AppLanguage.ENGLISH -> "Name"
                         }
@@ -813,7 +722,7 @@ fun PersonBirthInputCard(
                     label = {
                         Text(
                             text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "பிறந்த இடம் (City/Place)"
+                                AppLanguage.TAMIL -> "பிறந்த இடம்"
                                 AppLanguage.HINDI -> "जन्म स्थान"
                                 AppLanguage.ENGLISH -> "Birth Place"
                             }
@@ -1048,7 +957,11 @@ fun PersonManualSelectorCard(
                 onExpandedChange = { marsExpanded = !marsExpanded }
             ) {
                 OutlinedTextField(
-                    value = "$selectedMarsHouse-ஆம் இடம்",
+                    value = when (currentLanguage) {
+                        AppLanguage.TAMIL -> "$selectedMarsHouse-ஆம் இடம்"
+                        AppLanguage.HINDI -> "भाव $selectedMarsHouse"
+                        AppLanguage.ENGLISH -> "House $selectedMarsHouse"
+                    },
                     onValueChange = {},
                     readOnly = true,
                     label = {
@@ -1074,7 +987,11 @@ fun PersonManualSelectorCard(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "$house-ஆம் இடம் ${if (isDosha) "⚠️ தோஷம்" else "(சுபம்)"}",
+                                    text = when (currentLanguage) {
+                                        AppLanguage.TAMIL -> "$house-ஆம் இடம் ${if (isDosha) "⚠️ தோஷம்" else "(சுபம்)"}"
+                                        AppLanguage.HINDI -> "भाव $house ${if (isDosha) "⚠️ दोष" else "(शुभ)"}"
+                                        AppLanguage.ENGLISH -> "House $house ${if (isDosha) "⚠️ Dosha" else "(Auspicious)"}"
+                                    },
                                     fontSize = 12.sp,
                                     color = if (isDosha) Color(0xFFC62828) else MaterialTheme.colorScheme.onSurface
                                 )
@@ -1125,7 +1042,11 @@ fun VerdictCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${result.totalPoruthamsMatched} / 10 பொருத்தம் (${result.totalScore} / 10.0)",
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "${result.totalPoruthamsMatched} / 10 பொருத்தம் (${result.totalScore} / 10.0)"
+                            AppLanguage.HINDI -> "${result.totalPoruthamsMatched} / 10 पोरुथम (${result.totalScore} / 10.0)"
+                            AppLanguage.ENGLISH -> "${result.totalPoruthamsMatched} / 10 Matched (${result.totalScore} / 10.0)"
+                        },
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -1167,7 +1088,11 @@ fun VerdictCard(
                     ) {
                         Text(if (result.rajjuMatch) "✓" else "✗", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         Text(
-                            text = if (result.rajjuMatch) "ரஜ்ஜு சுபம்" else "ரஜ்ஜு தோஷம்",
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> if (result.rajjuMatch) "ரஜ்ஜு சுபம்" else "ரஜ்ஜு தோஷம்"
+                                AppLanguage.HINDI -> if (result.rajjuMatch) "रज्जु शुभ" else "रज्जु दोष"
+                                AppLanguage.ENGLISH -> if (result.rajjuMatch) "Rajju Match" else "Rajju Dosha"
+                            },
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -1189,7 +1114,11 @@ fun VerdictCard(
                     ) {
                         Text("🛡️", fontSize = 14.sp)
                         Text(
-                            text = if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) "செவ்வாய் சமநிலை" else "தோஷ நிவர்த்தி தேவை",
+                            text = when (currentLanguage) {
+                                AppLanguage.TAMIL -> if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) "செவ்வாய் சமநிலை" else "தோஷ நிவர்த்தி தேவை"
+                                AppLanguage.HINDI -> if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) "मंगल साम्य" else "दोष निवारण आवश्यक"
+                                AppLanguage.ENGLISH -> if (result.sevvayDosham.doshaSamyamStatusTa.contains("உண்டு")) "Mars Balanced" else "Remedy Needed"
+                            },
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -1263,7 +1192,11 @@ fun PoruthamDetailCard(
                             color = MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Text(
-                                text = "மகா பொருத்தம்",
+                                text = when (currentLanguage) {
+                                    AppLanguage.TAMIL -> "மகா பொருத்தம்"
+                                    AppLanguage.HINDI -> "महा पोरुथम"
+                                    AppLanguage.ENGLISH -> "Crucial Match"
+                                },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 10.sp,
@@ -1329,7 +1262,7 @@ fun SevvayDoshamDetailCard(
                 Column {
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "செவ்வாய் தோஷ விளக்கம் (Kuja Dosha)"
+                            AppLanguage.TAMIL -> "செவ்வாய் தோஷ விளக்கம்"
                             AppLanguage.HINDI -> "मंगल दोष विश्लेषण"
                             AppLanguage.ENGLISH -> "Sevvay Dosham Analysis"
                         },
@@ -1434,7 +1367,11 @@ fun SevvayDoshamDetailCard(
             ) {
                 Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "தோஷ சாம்யம் (Dosha Samyam Balance):",
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "தோஷ சாம்யம் சமநிலை:"
+                            AppLanguage.HINDI -> "दोष साम्य संतुलन:"
+                            AppLanguage.ENGLISH -> "Dosha Samyam Balance:"
+                        },
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary

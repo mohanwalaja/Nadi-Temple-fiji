@@ -71,11 +71,20 @@ data class PlanetPosition(
     val rasi: Rasi,
     val degrees: Double, // 0.0 - 30.0 inside rasi
     val nakshatram: String,
+    val nakshatramTa: String = nakshatram,
+    val nakshatramEn: String = nakshatram,
+    val nakshatramHi: String = nakshatram,
     val pada: Int,
     val isRetrograde: Boolean = false,
     val isCombust: Boolean = false,
     val bhavaNumber: Int = 1
-)
+) {
+    fun getNakshatram(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> nakshatramTa
+        AppLanguage.HINDI -> nakshatramHi
+        AppLanguage.ENGLISH -> nakshatramEn
+    }
+}
 
 data class BhavaDetail(
     val number: Int, // 1 to 12
@@ -225,6 +234,9 @@ data class HoroscopeResult(
     val lagnaDegrees: Double,
     val chandraRasi: Rasi,
     val janmaNakshatram: String,
+    val janmaNakshatramTa: String = janmaNakshatram,
+    val janmaNakshatramEn: String = janmaNakshatram,
+    val janmaNakshatramHi: String = janmaNakshatram,
     val janmaPada: Int,
     val planetPositions: List<PlanetPosition>,
     val bhavas: List<BhavaDetail>,
@@ -236,6 +248,12 @@ data class HoroscopeResult(
     val isDemoEngine: Boolean = true
 ) {
     val janmaRasi: Rasi get() = chandraRasi
+
+    fun getJanmaNakshatram(lang: AppLanguage): String = when (lang) {
+        AppLanguage.TAMIL -> janmaNakshatramTa
+        AppLanguage.HINDI -> janmaNakshatramHi
+        AppLanguage.ENGLISH -> janmaNakshatramEn
+    }
 }
 
 typealias JathagamResult = HoroscopeResult
