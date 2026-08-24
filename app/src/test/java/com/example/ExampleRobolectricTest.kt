@@ -2,9 +2,8 @@ package com.example
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.example.data.model.*
-import com.example.data.service.RasiPalanEngine
-import com.example.data.service.StandardAstrologyCalculator
+import com.example.data.repository.BabyNamesRepository
+import com.example.ui.screens.babynames.BabyNamesViewModel
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,23 +24,24 @@ class ExampleRobolectricTest {
   }
 
   @Test
-  fun `rasi palan engine generates predictions from calculated jathagam`() {
-    val calc = StandardAstrologyCalculator()
-    val jathagam = calc.calculateHoroscope(
-      name = "Devotee Test",
-      dob = LocalDate.of(1995, 6, 15),
+  fun `baby naming view model calculates nakshatra and pada letters`() {
+    val repo = BabyNamesRepository()
+    val viewModel = BabyNamesViewModel(repository = repo)
+    viewModel.calculateByBirthDetails(
+      babyName = "Murugan Child",
+      dob = LocalDate.of(2026, 8, 23),
       tob = LocalTime.of(10, 30),
-      birthPlace = "Nadi, Fiji"
+      place = "Nadi, Fiji",
+      gender = "M"
     )
 
-    assertNotNull(jathagam.janmaRasi)
-    val palanResult = RasiPalanEngine.generate(jathagam, PalanTimeframe.DAILY)
-
-    assertEquals(jathagam.janmaRasi, palanResult.rasi)
-    assertEquals(jathagam.janmaNakshatram, palanResult.janmaNakshatram)
-    assertTrue(palanResult.generalTa.isNotEmpty())
-    assertTrue(palanResult.generalEn.isNotEmpty())
-    assertTrue(palanResult.pariharamTa.contains("ஸ்ரீ சிவ சுப்பிரமணிய"))
+    val state = viewModel.uiState.value
+    assertNotNull(state.birthResult)
+    val result = state.birthResult!!
+    assertNotNull(result.nakshatraLetters)
+    assertTrue(result.janmaPada in 1..4)
+    assertNotNull(result.primaryPadaInfo)
+    assertTrue(result.primaryPadaInfo.letterTa.isNotBlank())
+    assertTrue(result.primaryPadaInfo.letterEn.isNotBlank())
   }
 }
-

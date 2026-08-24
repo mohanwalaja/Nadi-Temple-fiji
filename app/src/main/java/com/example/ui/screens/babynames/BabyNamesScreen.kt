@@ -271,8 +271,7 @@ fun BabyNamesScreen(
                 item {
                     NakshatraSpotlightCard(
                         star = star,
-                        currentLanguage = currentLanguage,
-                        suggestions = uiState.currentSuggestions
+                        currentLanguage = currentLanguage
                     )
                 }
             }
@@ -751,61 +750,6 @@ fun BabyNamingResultCard(
                 }
             }
 
-            // Auspicious Baby Name Suggestions List
-            if (result.suggestedNames.isNotEmpty()) {
-                HorizontalDivider()
-
-                Text(
-                    text = when (currentLanguage) {
-                        AppLanguage.TAMIL -> "📖 பாரம்பரிய சுப பெயர் பரிந்துரைகள் (${if (result.gender == "M") "ஆண் குழந்தை" else "பெண் குழந்தை"}):"
-                        AppLanguage.HINDI -> "📖 पारंपरिक शुभ नाम सुझाव:"
-                        AppLanguage.ENGLISH -> "📖 Traditional Auspicious Name Suggestions:"
-                    },
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = TempleMaroon
-                )
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    result.suggestedNames.forEach { item ->
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "${item.nameTa} (${item.nameEn})",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        color = TempleMaroon
-                                    )
-                                    Text(
-                                        text = when (currentLanguage) { AppLanguage.TAMIL -> item.meaningTa; else -> item.meaningEn },
-                                        fontSize = 11.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Surface(
-                                    shape = CircleShape,
-                                    color = TempleGold.copy(alpha = 0.25f),
-                                    modifier = Modifier.size(24.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text("✨", fontSize = 11.sp)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             HorizontalDivider()
 
             // EXPORT CERTIFICATE PDF BUTTON
@@ -840,8 +784,7 @@ fun BabyNamingResultCard(
 @Composable
 fun NakshatraSpotlightCard(
     star: NakshatraBabyLetters,
-    currentLanguage: AppLanguage,
-    suggestions: List<com.example.data.model.BabyNameSuggestion> = emptyList()
+    currentLanguage: AppLanguage
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1010,34 +953,6 @@ fun NakshatraSpotlightCard(
                             fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text("${star.getGana(currentLanguage)} • ${star.getYoni(currentLanguage)}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-
-            // Name suggestions if present
-            if (suggestions.isNotEmpty()) {
-                HorizontalDivider()
-                Text(
-                    text = when (currentLanguage) {
-                        AppLanguage.TAMIL -> "📖 பெயர் பரிந்துரைகள்:"
-                        AppLanguage.HINDI -> "📖 नाम सुझाव:"
-                        AppLanguage.ENGLISH -> "📖 Name Suggestions:"
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = TempleMaroon
-                )
-
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    suggestions.take(6).forEach { s ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("• ${s.nameTa} (${s.nameEn})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TempleMaroon)
-                            Text(s.meaningTa, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
                     }
                 }
             }

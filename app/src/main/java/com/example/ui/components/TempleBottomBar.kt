@@ -59,13 +59,6 @@ fun TempleBottomBar(
             testTag = "nav_bottom_jathagam"
         ),
         NavItem(
-            route = Screen.RasiPalan.route,
-            filledIcon = Icons.Filled.Star,
-            outlinedIcon = Icons.Outlined.Star,
-            labelProvider = { AppStrings.rasiPalan(it) },
-            testTag = "nav_bottom_rasi_palan"
-        ),
-        NavItem(
             route = Screen.WeddingMatch.route,
             filledIcon = Icons.Filled.Favorite,
             outlinedIcon = Icons.Outlined.FavoriteBorder,

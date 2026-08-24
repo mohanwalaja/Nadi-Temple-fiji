@@ -3,7 +3,6 @@ package com.example.ui.screens.babynames
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.data.model.AppLanguage
-import com.example.data.model.BabyNameSuggestion
 import com.example.data.model.BabyNamingBirthResult
 import com.example.data.model.HoroscopeResult
 import com.example.data.model.NakshatraBabyLetters
@@ -36,8 +35,7 @@ data class BabyNamesUiState(
     val selectedNakshatraIndex: Int = 1,
     val searchQuery: String = "",
     val currentNakshatraLetters: NakshatraBabyLetters? = null,
-    val searchResults: List<NakshatraBabyLetters> = emptyList(),
-    val currentSuggestions: List<BabyNameSuggestion> = emptyList()
+    val searchResults: List<NakshatraBabyLetters> = emptyList()
 )
 
 class BabyNamesViewModel(
@@ -48,8 +46,7 @@ class BabyNamesViewModel(
     private val _uiState = MutableStateFlow(
         BabyNamesUiState(
             currentNakshatraLetters = repository.getNakshatraLetters(1),
-            searchResults = repository.allNakshatraLetters,
-            currentSuggestions = repository.getSuggestedNames(1, 1, "ALL")
+            searchResults = repository.allNakshatraLetters
         )
     )
     val uiState: StateFlow<BabyNamesUiState> = _uiState.asStateFlow()
@@ -77,10 +74,8 @@ class BabyNamesViewModel(
 
     fun updateInputGender(gender: String) {
         _uiState.update { it.copy(inputGender = gender) }
-        // Re-filter suggestions if birthResult exists
         _uiState.value.birthResult?.let { res ->
-            val updatedSuggestions = repository.getSuggestedNames(res.nakshatraLetters.nakshatraIndex, res.janmaPada, gender)
-            _uiState.update { it.copy(birthResult = res.copy(suggestedNames = updatedSuggestions, gender = gender)) }
+            _uiState.update { it.copy(birthResult = res.copy(gender = gender)) }
         }
     }
 
@@ -117,8 +112,6 @@ class BabyNamesViewModel(
             val primaryPadaInfo = nakshatraBabyLetters.padas.firstOrNull { it.padaNumber == pada }
                 ?: nakshatraBabyLetters.padas[0]
 
-            val suggestions = repository.getSuggestedNames(nakshatraBabyLetters.nakshatraIndex, pada, gender)
-
             val birthRes = BabyNamingBirthResult(
                 babyName = babyName,
                 gender = gender,
@@ -129,8 +122,7 @@ class BabyNamesViewModel(
                 janmaPada = pada,
                 primaryPadaInfo = primaryPadaInfo,
                 chandraRasi = horoscope.chandraRasi,
-                lagnaRasi = horoscope.lagnaRasi,
-                suggestedNames = suggestions
+                lagnaRasi = horoscope.lagnaRasi
             )
 
             _uiState.update {
@@ -156,8 +148,6 @@ class BabyNamesViewModel(
         val primaryPadaInfo = nakshatraBabyLetters.padas.firstOrNull { it.padaNumber == pada }
             ?: nakshatraBabyLetters.padas[0]
 
-        val suggestions = repository.getSuggestedNames(nakshatraBabyLetters.nakshatraIndex, pada, gender)
-
         val birthRes = BabyNamingBirthResult(
             babyName = horoscope.devoteeName,
             gender = gender,
@@ -168,8 +158,7 @@ class BabyNamesViewModel(
             janmaPada = pada,
             primaryPadaInfo = primaryPadaInfo,
             chandraRasi = horoscope.chandraRasi,
-            lagnaRasi = horoscope.lagnaRasi,
-            suggestedNames = suggestions
+            lagnaRasi = horoscope.lagnaRasi
         )
 
         _uiState.update {
@@ -190,8 +179,7 @@ class BabyNamesViewModel(
         _uiState.update { current ->
             current.copy(
                 selectedNakshatraIndex = index,
-                currentNakshatraLetters = letters,
-                currentSuggestions = repository.getSuggestedNames(index, 1, "ALL")
+                currentNakshatraLetters = letters
             )
         }
     }
