@@ -92,7 +92,8 @@ data class BabyNamingBirthResult(
     val janmaPada: Int,
     val primaryPadaInfo: PadaLetterInfo,
     val chandraRasi: Rasi,
-    val lagnaRasi: Rasi
+    val lagnaRasi: Rasi,
+    val suggestedNames: List<BabyNameSuggestion> = emptyList()
 )
 
 data class BabyNameSuggestion(
