@@ -2,11 +2,15 @@ package com.example.util
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import androidx.core.content.FileProvider
 import com.example.data.model.AppLanguage
 import com.example.data.model.BabyNamingBirthResult
@@ -31,7 +35,7 @@ object BabyNamePdfExporter {
     fun exportBabyNamingCertificatePdf(
         context: Context,
         result: BabyNamingBirthResult,
-        lang: AppLanguage
+        @Suppress("UNUSED_PARAMETER") lang: AppLanguage = AppLanguage.ENGLISH
     ): File? {
         return try {
             val pdfDocument = PdfDocument()
@@ -44,221 +48,166 @@ object BabyNamePdfExporter {
             val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
             val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-            // 1. Background
+            // 1. Clean White Background
             fillPaint.color = Color.WHITE
             canvas.drawRect(0f, 0f, PAGE_WIDTH.toFloat(), PAGE_HEIGHT.toFloat(), fillPaint)
 
             // 2. Ornate Double Borders (Maroon & Gold)
             borderPaint.color = COLOR_MAROON
             borderPaint.strokeWidth = 2.5f
-            canvas.drawRoundRect(RectF(18f, 18f, (PAGE_WIDTH - 18).toFloat(), (PAGE_HEIGHT - 18).toFloat()), 10f, 10f, borderPaint)
+            canvas.drawRoundRect(RectF(16f, 16f, (PAGE_WIDTH - 16).toFloat(), (PAGE_HEIGHT - 16).toFloat()), 10f, 10f, borderPaint)
 
             borderPaint.color = COLOR_GOLD
             borderPaint.strokeWidth = 1f
-            canvas.drawRoundRect(RectF(23f, 23f, (PAGE_WIDTH - 23).toFloat(), (PAGE_HEIGHT - 23).toFloat()), 8f, 8f, borderPaint)
+            canvas.drawRoundRect(RectF(20f, 20f, (PAGE_WIDTH - 20).toFloat(), (PAGE_HEIGHT - 20).toFloat()), 8f, 8f, borderPaint)
 
-            // Ornate Corner accents
-            drawCornerAccent(canvas, borderPaint, fillPaint, 24f, 24f)
-            drawCornerAccent(canvas, borderPaint, fillPaint, (PAGE_WIDTH - 24).toFloat(), 24f)
-            drawCornerAccent(canvas, borderPaint, fillPaint, 24f, (PAGE_HEIGHT - 24).toFloat())
-            drawCornerAccent(canvas, borderPaint, fillPaint, (PAGE_WIDTH - 24).toFloat(), (PAGE_HEIGHT - 24).toFloat())
+            // Corner Accents
+            drawCornerAccent(canvas, fillPaint, 21f, 21f)
+            drawCornerAccent(canvas, fillPaint, (PAGE_WIDTH - 21).toFloat(), 21f)
+            drawCornerAccent(canvas, fillPaint, 21f, (PAGE_HEIGHT - 21).toFloat())
+            drawCornerAccent(canvas, fillPaint, (PAGE_WIDTH - 21).toFloat(), (PAGE_HEIGHT - 21).toFloat())
 
-            var y = 42f
+            val boxLeft = 28f
+            val boxRight = (PAGE_WIDTH - 28).toFloat()
+            val contentWidth = (boxRight - boxLeft).toInt()
+            var currentY = 26f
 
-            // 3. Temple Header Banner
+            // 3. Temple Header Banner (3 Languages: Tamil, English, Hindi)
+            val headerHeight = 72f
             fillPaint.color = COLOR_MAROON
-            canvas.drawRoundRect(RectF(32f, y, (PAGE_WIDTH - 32).toFloat(), y + 72f), 8f, 8f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + headerHeight), 8f, 8f, fillPaint)
 
             headerPaint.textAlign = Paint.Align.CENTER
-            headerPaint.color = Color.WHITE
             headerPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 
-            headerPaint.textSize = 13.5f
-            canvas.drawText("🕉️ ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில் 🕉️", (PAGE_WIDTH / 2).toFloat(), y + 22f, headerPaint)
-
-            headerPaint.textSize = 10.5f
-            headerPaint.color = COLOR_GOLD
-            canvas.drawText("SRI SIVA SUBRAMANIYA SWAMI KOVIL • NADI, FIJI ISLANDS", (PAGE_WIDTH / 2).toFloat(), y + 39f, headerPaint)
-
-            headerPaint.textSize = 12f
             headerPaint.color = Color.WHITE
-            val certTitle = when (lang) {
-                AppLanguage.TAMIL -> "குழந்தை நாமகரண சுப ஆரம்ப அட்சர சான்றிதழ்"
-                AppLanguage.HINDI -> "शिशु नामकरण शुभ नक्षत्र अक्षर प्रमाण पत्र"
-                AppLanguage.ENGLISH -> "VEDIC BABY NAMING & NAKSHATRA INITIAL LETTERS CERTIFICATE"
-            }
-            canvas.drawText(certTitle, (PAGE_WIDTH / 2).toFloat(), y + 58f, headerPaint)
+            headerPaint.textSize = 12f
+            canvas.drawText("🕉️ ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில் • நாடி, பிஜி 🕉️", (PAGE_WIDTH / 2).toFloat(), currentY + 18f, headerPaint)
 
-            y += 82f
+            headerPaint.color = COLOR_GOLD
+            headerPaint.textSize = 9.5f
+            canvas.drawText("SRI SIVA SUBRAMANIYA SWAMI TEMPLE • NADI, FIJI ISLANDS", (PAGE_WIDTH / 2).toFloat(), currentY + 34f, headerPaint)
 
-            // 4. Baby & Birth Information Card
-            val boxLeft = 32f
-            val boxRight = (PAGE_WIDTH - 32).toFloat()
-            val infoTop = y
+            headerPaint.color = Color.WHITE
+            headerPaint.textSize = 8.5f
+            canvas.drawText("श्री शिव सुब्रमण्यम स्वामी मंदिर • नाडी, फिजी द्वीप", (PAGE_WIDTH / 2).toFloat(), currentY + 48f, headerPaint)
+
+            headerPaint.color = COLOR_LIGHT_GOLD
+            headerPaint.textSize = 10f
+            canvas.drawText("VEDIC BABY NAMING & NAKSHATRA LETTERS CERTIFICATE • நாமகரண சுப அட்சர சான்றிதழ்", (PAGE_WIDTH / 2).toFloat(), currentY + 63f, headerPaint)
+
+            currentY += headerHeight + 8f
+
+            // 4. Baby & Birth Particulars Card (Trilingual)
+            val infoTop = currentY
             val infoHeight = 74f
-
             fillPaint.color = COLOR_CARD_BG
             canvas.drawRoundRect(RectF(boxLeft, infoTop, boxRight, infoTop + infoHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_BORDER
             borderPaint.strokeWidth = 1f
             canvas.drawRoundRect(RectF(boxLeft, infoTop, boxRight, infoTop + infoHeight), 6f, 6f, borderPaint)
 
-            val dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
+            val dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH)
             val timeFmt = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
 
-            val col1X = boxLeft + 16f
+            val col1X = boxLeft + 12f
             val col2X = boxLeft + 270f
-            val r1Y = infoTop + 20f
-            val r2Y = infoTop + 40f
-            val r3Y = infoTop + 60f
+            val r1Y = infoTop + 18f
+            val r2Y = infoTop + 38f
+            val r3Y = infoTop + 58f
 
-            textPaint.textAlign = Paint.Align.LEFT
-            textPaint.textSize = 9.5f
+            val babyDisplayName = result.babyName.ifBlank { "Newborn Baby / பிறந்த குழந்தை" }
+            val genderLabel = if (result.gender == "M") "Boy / ஆண் / बालक" else "Girl / பெண் / बालिका"
 
-            // Row 1
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "குழந்தை பெயர்:"; AppLanguage.HINDI -> "शिशु का नाम:"; AppLanguage.ENGLISH -> "Baby Name:" }, col1X, r1Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(result.babyName.ifBlank { "Baby" }, col1X + 105f, r1Y, textPaint)
+            // Row 1 - Col 1 & 2
+            drawLabelValue(canvas, "Name / பெயர் / नाम:", babyDisplayName, col1X, r1Y, 115f)
+            drawLabelValue(canvas, "Gender / பாலினம் / लिंग:", genderLabel, col2X, r1Y, 115f)
 
-            // Row 2
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "பிறந்த தேதி (DOB):"; AppLanguage.HINDI -> "जन्म तिथि:"; AppLanguage.ENGLISH -> "Date of Birth:" }, col1X, r2Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(result.dob.format(dateFmt), col1X + 105f, r2Y, textPaint)
+            // Row 2 - Col 1 & 2
+            drawLabelValue(canvas, "DOB / பிறந்த தேதி:", result.dob.format(dateFmt), col1X, r2Y, 115f)
+            val birthPlaceTrimmed = result.birthPlace.take(30)
+            drawLabelValue(canvas, "Place / இடம் / स्थान:", birthPlaceTrimmed, col2X, r2Y, 115f)
 
-            // Row 3
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "பிறந்த நேரம் (TOB):"; AppLanguage.HINDI -> "जन्म समय:"; AppLanguage.ENGLISH -> "Time of Birth:" }, col1X, r3Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(result.tob.format(timeFmt), col1X + 105f, r3Y, textPaint)
+            // Row 3 - Col 1 & 2
+            drawLabelValue(canvas, "TOB / பிறந்த நேரம்:", result.tob.format(timeFmt), col1X, r3Y, 115f)
+            val lagnaCombined = "${result.lagnaRasi.nameEn} (${result.lagnaRasi.nameTa} / ${result.lagnaRasi.nameHi})"
+            drawLabelValue(canvas, "Lagna / லக்னம் / लग्न:", lagnaCombined, col2X, r3Y, 115f)
 
-            // Col 2
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            val genderLabel = if (result.gender == "M") when (lang) { AppLanguage.TAMIL -> "ஆண் (Boy)"; AppLanguage.HINDI -> "बालक (Male)"; AppLanguage.ENGLISH -> "Boy" } else when (lang) { AppLanguage.TAMIL -> "பெண் (Girl)"; AppLanguage.HINDI -> "बालिका (Female)"; AppLanguage.ENGLISH -> "Girl" }
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "பாலினம் (Gender):"; AppLanguage.HINDI -> "लिंग:"; AppLanguage.ENGLISH -> "Gender:" }, col2X, r1Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(genderLabel, col2X + 100f, r1Y, textPaint)
+            currentY = infoTop + infoHeight + 8f
 
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "பிறந்த இடம் (Place):"; AppLanguage.HINDI -> "जन्म स्थान:"; AppLanguage.ENGLISH -> "Birth Place:" }, col2X, r2Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(result.birthPlace, col2X + 100f, r2Y, textPaint)
-
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = COLOR_MAROON
-            canvas.drawText(when (lang) { AppLanguage.TAMIL -> "லக்னம் (Lagna):"; AppLanguage.HINDI -> "लग्न (Lagna):"; AppLanguage.ENGLISH -> "Ascendant:" }, col2X, r3Y, textPaint)
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            canvas.drawText(result.lagnaRasi.getName(lang), col2X + 100f, r3Y, textPaint)
-
-            y = infoTop + infoHeight + 14f
-
-            // 5. Astrological Star & Pada Particulars Banner (Gold & Maroon)
+            // 5. Astrological Star & Moon Sign Banner (All 3 Languages)
+            val starBannerHeight = 44f
             fillPaint.color = COLOR_LIGHT_GOLD
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + 54f), 6f, 6f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + starBannerHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_GOLD
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + 54f), 6f, 6f, borderPaint)
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + starBannerHeight), 6f, 6f, borderPaint)
 
-            val starName = result.nakshatraLetters.getName(lang)
-            val rasiName = result.chandraRasi.getName(lang)
-            val padaText = when (lang) {
-                AppLanguage.TAMIL -> "${result.janmaPada}-ஆம் பாதம் (Pada ${result.janmaPada})"
-                AppLanguage.HINDI -> "चरण ${result.janmaPada} (Pada ${result.janmaPada})"
-                AppLanguage.ENGLISH -> "Pada ${result.janmaPada}"
-            }
+            val starTa = result.nakshatraLetters.nakshatraNameTa
+            val starEn = result.nakshatraLetters.nakshatraNameEn
+            val starHi = result.nakshatraLetters.nakshatraNameHi
+            val rasiTa = result.chandraRasi.nameTa
+            val rasiEn = result.chandraRasi.nameEn
+            val rasiHi = result.chandraRasi.nameHi
 
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
-            textPaint.textSize = 13f
-            canvas.drawText("⭐ $starName ($padaText)  •  🌙 $rasiName", (PAGE_WIDTH / 2).toFloat(), y + 22f, textPaint)
+            textPaint.textSize = 11.5f
+            canvas.drawText("⭐ $starEn ($starTa / $starHi) • Pada ${result.janmaPada} (${result.janmaPada}-ஆம் பாதம் / चरण ${result.janmaPada})", (PAGE_WIDTH / 2).toFloat(), currentY + 16f, textPaint)
 
-            textPaint.textSize = 9.5f
-            textPaint.color = COLOR_MUTED_TEXT
-            val attrText = when (lang) {
-                AppLanguage.TAMIL -> "நட்சத்திர அதிபதி: ${result.nakshatraLetters.getLord(lang)}  |  அதிதேவதை: ${result.nakshatraLetters.getDeity(lang)}  |  கணம்: ${result.nakshatraLetters.getGana(lang)}"
-                AppLanguage.HINDI -> "स्वामी: ${result.nakshatraLetters.getLord(lang)}  |  देवता: ${result.nakshatraLetters.getDeity(lang)}  |  गण: ${result.nakshatraLetters.getGana(lang)}"
-                AppLanguage.ENGLISH -> "Star Lord: ${result.nakshatraLetters.getLord(lang)}  |  Deity: ${result.nakshatraLetters.getDeity(lang)}  |  Gana: ${result.nakshatraLetters.getGana(lang)}"
-            }
-            canvas.drawText(attrText, (PAGE_WIDTH / 2).toFloat(), y + 42f, textPaint)
+            textPaint.textSize = 9f
+            textPaint.color = COLOR_DARK_TEXT
+            val attrText = "🌙 Rasi: $rasiEn ($rasiTa / $rasiHi)  •  Lord: ${result.nakshatraLetters.lordEn} (${result.nakshatraLetters.lordTa})  •  Deity: ${result.nakshatraLetters.deityEn} (${result.nakshatraLetters.deityTa})"
+            canvas.drawText(attrText, (PAGE_WIDTH / 2).toFloat(), currentY + 33f, textPaint)
 
-            y += 66f
+            currentY += starBannerHeight + 8f
 
             // 6. Highlight: Primary Auspicious Starting Letter for Exact Birth Pada
-            val medHeight = 96f
+            val medHeight = 84f
             fillPaint.color = Color.WHITE
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + medHeight), 8f, 8f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + medHeight), 8f, 8f, fillPaint)
             borderPaint.color = COLOR_MAROON
-            borderPaint.strokeWidth = 1.8f
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + medHeight), 8f, 8f, borderPaint)
+            borderPaint.strokeWidth = 1.6f
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + medHeight), 8f, 8f, borderPaint)
 
-            // Inner header
+            // Inner title strip
             fillPaint.color = COLOR_MAROON
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + 24f), 8f, 8f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, currentY, boxRight, currentY + 20f), 8f, 8f, fillPaint)
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = Color.WHITE
-            textPaint.textSize = 10.5f
-            val primaryHeader = when (lang) {
-                AppLanguage.TAMIL -> "✨ ஜென்ம பாதத்திற்குரிய முதன்மை சுப ஆரம்ப அட்சரம் (Primary Starting Letter)"
-                AppLanguage.HINDI -> "✨ जन्म पाद के अनुसार मुख्य शुभ नामकरण अक्षर (Primary Initial Letter)"
-                AppLanguage.ENGLISH -> "✨ PRIMARY AUSPICIOUS INITIAL LETTER FOR BIRTH PADA"
-            }
-            canvas.drawText(primaryHeader, (PAGE_WIDTH / 2).toFloat(), y + 16f, textPaint)
+            textPaint.textSize = 9.5f
+            canvas.drawText("✨ PRIMARY AUSPICIOUS STARTING LETTER • முதன்மை ஆரம்ப சுப அட்சரம் (Pada ${result.janmaPada}) ✨", (PAGE_WIDTH / 2).toFloat(), currentY + 14f, textPaint)
 
-            // Large letter display
-            val primaryLetterTa = result.primaryPadaInfo.letterTa
-            val primaryLetterEn = result.primaryPadaInfo.letterEn
-            val primaryLetterHi = result.primaryPadaInfo.letterHi
+            val pTa = result.primaryPadaInfo.letterTa
+            val pEn = result.primaryPadaInfo.letterEn
+            val pHi = result.primaryPadaInfo.letterHi
 
-            textPaint.textSize = 32f
+            // Large letters in 3 scripts
+            textPaint.textSize = 28f
             textPaint.color = COLOR_MAROON
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            val mainLetterDisplay = when (lang) {
-                AppLanguage.TAMIL -> "$primaryLetterTa  ($primaryLetterEn)"
-                AppLanguage.HINDI -> "$primaryLetterHi  ($primaryLetterEn)"
-                AppLanguage.ENGLISH -> "$primaryLetterEn  ($primaryLetterTa)"
-            }
-            canvas.drawText(mainLetterDisplay, (PAGE_WIDTH / 2).toFloat(), y + 60f, textPaint)
+            canvas.drawText("$pTa   •   $pEn   •   $pHi", (PAGE_WIDTH / 2).toFloat(), currentY + 50f, textPaint)
 
-            textPaint.textSize = 9.5f
+            // Explanatory note in 3 languages wrapped properly
+            textPaint.textSize = 8f
             textPaint.color = COLOR_MUTED_TEXT
             textPaint.typeface = Typeface.DEFAULT
-            val padaNote = when (lang) {
-                AppLanguage.TAMIL -> "தமிழ் பஞ்சாங்க விதிப்படி $starName ${result.janmaPada}-ஆம் பாதத்தில் பிறந்த குழந்தைக்கு இப்பெயர் எழுத்து சர்வ மங்கலங்களையும் தரும்."
-                AppLanguage.HINDI -> "पारंपरिक पंचांग अनुसार $starName चरण ${result.janmaPada} में जन्मे शिशु के लिए यह अक्षर सर्वकल्याणकारी है।"
-                AppLanguage.ENGLISH -> "As per Vedic Panchangam, naming with this syllable vibration brings supreme prosperity and longevity."
-            }
-            canvas.drawText(padaNote, (PAGE_WIDTH / 2).toFloat(), y + 84f, textPaint)
+            val padaNote = "Tamil Panchangam & Vedic Jyotish resonance for $starEn Pada ${result.janmaPada}: Naming with syllable '$pEn' ($pTa / $pHi) grants longevity, wisdom and prosperity."
+            canvas.drawText(padaNote, (PAGE_WIDTH / 2).toFloat(), currentY + 70f, textPaint)
 
-            y += medHeight + 18f
+            currentY += medHeight + 8f
 
-            // 7. Grid for All 4 Padas of the Nakshatra
-            headerPaint.textAlign = Paint.Align.LEFT
-            headerPaint.color = COLOR_MAROON
-            headerPaint.textSize = 11f
-            headerPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            val allPadasTitle = when (lang) {
-                AppLanguage.TAMIL -> "நட்சத்திரத்தின் 4 பாதங்களுக்குரிய சுப எழுத்துக்கள் (All 4 Padas Letters):"
-                AppLanguage.HINDI -> "नक्षत्र के सभी 4 चरणों के शुभ अक्षर:"
-                AppLanguage.ENGLISH -> "Starting Syllables for All 4 Padas of $starName:"
-            }
-            canvas.drawText(allPadasTitle, boxLeft, y, headerPaint)
-            y += 12f
+            // 7. Grid for All 4 Padas of the Star (Trilingual Columns)
+            textPaint.textAlign = Paint.Align.LEFT
+            textPaint.color = COLOR_MAROON
+            textPaint.textSize = 10f
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            canvas.drawText("Starting Syllables for All 4 Padas of $starEn • 4 பாதங்களுக்கும் உரிய எழுத்துக்கள்:", boxLeft, currentY + 8f, textPaint)
+            currentY += 14f
 
-            val padaCardWidth = (boxRight - boxLeft - 18f) / 4f
-            val padaCardHeight = 84f
+            val padaCardWidth = (contentWidth - 18f) / 4f
+            val padaCardHeight = 76f
 
             result.nakshatraLetters.padas.forEachIndexed { idx, pada ->
                 val pLeft = boxLeft + idx * (padaCardWidth + 6f)
@@ -266,109 +215,128 @@ object BabyNamePdfExporter {
                 val isCurrentPada = (pada.padaNumber == result.janmaPada)
 
                 fillPaint.color = if (isCurrentPada) COLOR_LIGHT_GOLD else COLOR_CARD_BG
-                canvas.drawRoundRect(RectF(pLeft, y, pRight, y + padaCardHeight), 6f, 6f, fillPaint)
+                canvas.drawRoundRect(RectF(pLeft, currentY, pRight, currentY + padaCardHeight), 6f, 6f, fillPaint)
 
                 borderPaint.color = if (isCurrentPada) COLOR_MAROON else COLOR_BORDER
-                borderPaint.strokeWidth = if (isCurrentPada) 1.8f else 0.8f
-                canvas.drawRoundRect(RectF(pLeft, y, pRight, y + padaCardHeight), 6f, 6f, borderPaint)
+                borderPaint.strokeWidth = if (isCurrentPada) 1.6f else 0.8f
+                canvas.drawRoundRect(RectF(pLeft, currentY, pRight, currentY + padaCardHeight), 6f, 6f, borderPaint)
 
                 textPaint.textAlign = Paint.Align.CENTER
-                textPaint.textSize = 9.5f
+                textPaint.textSize = 8.5f
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textPaint.color = if (isCurrentPada) COLOR_MAROON else COLOR_MUTED_TEXT
-                val padaTitle = when (lang) {
-                    AppLanguage.TAMIL -> "பாதம் ${pada.padaNumber}" + if (isCurrentPada) " (ஜென்மம்)" else ""
-                    AppLanguage.HINDI -> "चरण ${pada.padaNumber}" + if (isCurrentPada) " (जन्म)" else ""
-                    AppLanguage.ENGLISH -> "Pada ${pada.padaNumber}" + if (isCurrentPada) " ★" else ""
-                }
-                canvas.drawText(padaTitle, pLeft + padaCardWidth / 2f, y + 16f, textPaint)
+                val padaTitle = "Pada ${pada.padaNumber}" + if (isCurrentPada) " ★ (Birth)" else ""
+                canvas.drawText(padaTitle, pLeft + padaCardWidth / 2f, currentY + 14f, textPaint)
 
-                // Letter
-                textPaint.textSize = 22f
+                // Letters (Tamil, English, Hindi)
+                textPaint.textSize = 18f
                 textPaint.color = COLOR_MAROON
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                canvas.drawText(pada.letterTa, pLeft + padaCardWidth / 2f, y + 44f, textPaint)
+                canvas.drawText(pada.letterTa, pLeft + padaCardWidth / 2f, currentY + 36f, textPaint)
 
-                textPaint.textSize = 10f
+                textPaint.textSize = 9.5f
                 textPaint.color = COLOR_DARK_TEXT
                 textPaint.typeface = Typeface.DEFAULT
-                canvas.drawText(pada.letterEn, pLeft + padaCardWidth / 2f, y + 60f, textPaint)
+                canvas.drawText("${pada.letterEn} • ${pada.letterHi}", pLeft + padaCardWidth / 2f, currentY + 50f, textPaint)
 
-                textPaint.textSize = 8.5f
+                textPaint.textSize = 7.5f
                 textPaint.color = COLOR_MUTED_TEXT
-                canvas.drawText(when (lang) { AppLanguage.TAMIL -> pada.rasiTa; AppLanguage.HINDI -> pada.rasiHi; AppLanguage.ENGLISH -> pada.rasiEn }, pLeft + padaCardWidth / 2f, y + 74f, textPaint)
+                canvas.drawText("${pada.rasiEn} (${pada.rasiTa})", pLeft + padaCardWidth / 2f, currentY + 65f, textPaint)
             }
 
-            y += padaCardHeight + 20f
+            currentY += padaCardHeight + 8f
 
-            // 8. Vedic Astrological Rules & Significance Box
+            // 8. Vedic Astrological Naming Rules Card (Multi-line Wrapped with StaticLayout)
+            val rulesTop = currentY
+            val rulesHeight = 100f
             fillPaint.color = COLOR_LIGHT_GOLD
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + 68f), 6f, 6f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, rulesTop, boxRight, rulesTop + rulesHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_GOLD
             borderPaint.strokeWidth = 1f
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, y + 68f), 6f, 6f, borderPaint)
+            canvas.drawRoundRect(RectF(boxLeft, rulesTop, boxRight, rulesTop + rulesHeight), 6f, 6f, borderPaint)
 
             textPaint.textAlign = Paint.Align.LEFT
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
-            textPaint.textSize = 10f
-            canvas.drawText("📜 வேத ஜோதிட நாமகரண விதிமுறைகள் (Vedic Naming Principles):", boxLeft + 12f, y + 18f, textPaint)
+            textPaint.textSize = 9.5f
+            canvas.drawText("📜 VEDIC NAMING PRINCIPLES & GUIDELINES • நாமகரண சாஸ்திர விதிகள்:", boxLeft + 10f, rulesTop + 14f, textPaint)
 
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            textPaint.textSize = 8.5f
-            val ruleText1 = when (lang) {
-                AppLanguage.TAMIL -> "1. குழந்தையின் ஜென்ம நட்சத்திர பாத ஒலி அலைகள் வாழ்நாள் முழுவதும் நேர்மறை ஆற்றலையும் புகழையும் ஈர்க்கும்."
-                AppLanguage.HINDI -> "1. जन्म नक्षत्र चरण का शुभ ध्वनि-कंपन शिशु के संपूर्ण जीवन में सकारात्मक ऊर्जा एवं उत्तम स्वास्थ्य प्रदान करता है।"
-                AppLanguage.ENGLISH -> "1. Starting the child's name with the resonant Vedic syllable of the birth star brings divine protection and success."
+            val textPaintWrapped = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+                textSize = 7.8f
+                color = COLOR_DARK_TEXT
+                typeface = Typeface.DEFAULT
             }
-            val ruleText2 = when (lang) {
-                AppLanguage.TAMIL -> "2. யோனி: ${result.nakshatraLetters.getYoni(lang)}  |  ரஜ்ஜு: ${result.nakshatraLetters.getRajju(lang)}  |  தேவதை அருள் பெற்ற பெயர்களைத் தேர்ந்தெடுக்கவும்."
-                AppLanguage.HINDI -> "2. योनि: ${result.nakshatraLetters.getYoni(lang)}  |  रज्जु: ${result.nakshatraLetters.getRajju(lang)}  |  शुभ अर्थयुक्त नाम का चयन करें।"
-                AppLanguage.ENGLISH -> "2. Yoni: ${result.nakshatraLetters.getYoni(lang)}  |  Rajju: ${result.nakshatraLetters.getRajju(lang)}  |  Choose meaningful names with positive resonance."
-            }
-            canvas.drawText(ruleText1, boxLeft + 12f, y + 36f, textPaint)
-            canvas.drawText(ruleText2, boxLeft + 12f, y + 54f, textPaint)
 
-            y += 82f
+            val rulesCombined = """
+                1. English: Starting the name with the resonant syllable of birth nakshatra pada harmonizes cosmic planetary energies and enhances health, fame and intellect.
+                2. தமிழ்: ஜென்ம நட்சத்திர பாத ஆரம்ப ஒலி அலைகள் குழந்தையின் வாழ்நாள் முழுவதும் நேர்மறை ஆற்றலையும் தெய்வீக பாதுகாப்பையும் வழங்கும்.
+                3. हिन्दी: जन्म नक्षत्र के शुभ चरण अक्षर से नामकरण करने से बालक को दीर्घायु, विद्या, बल और सर्वतोन्मुखी समृद्धि प्राप्त होती है।
+                4. Astrological Vibrations: Gana: ${result.nakshatraLetters.ganaEn} (${result.nakshatraLetters.ganaTa}) | Yoni: ${result.nakshatraLetters.yoniEn} (${result.nakshatraLetters.yoniTa}) | Rajju: ${result.nakshatraLetters.rajjuEn} (${result.nakshatraLetters.rajjuTa})
+            """.trimIndent()
 
-            // 9. Temple Blessings & Signature Block
+            drawMultilineText(
+                canvas = canvas,
+                text = rulesCombined,
+                x = boxLeft + 10f,
+                y = rulesTop + 22f,
+                width = contentWidth - 20,
+                textPaint = textPaintWrapped
+            )
+
+            currentY = rulesTop + rulesHeight + 8f
+
+            // 9. Temple Blessings & Signature Card (Bottom Box)
+            val bottomTop = currentY
+            val bottomHeight = (PAGE_HEIGHT - 26f) - bottomTop
             fillPaint.color = Color.WHITE
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, (PAGE_HEIGHT - 32).toFloat()), 6f, 6f, fillPaint)
+            canvas.drawRoundRect(RectF(boxLeft, bottomTop, boxRight, bottomTop + bottomHeight), 6f, 6f, fillPaint)
             borderPaint.color = COLOR_MAROON
             borderPaint.strokeWidth = 1.2f
-            canvas.drawRoundRect(RectF(boxLeft, y, boxRight, (PAGE_HEIGHT - 32).toFloat()), 6f, 6f, borderPaint)
+            canvas.drawRoundRect(RectF(boxLeft, bottomTop, boxRight, bottomTop + bottomHeight), 6f, 6f, borderPaint)
 
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.color = COLOR_MAROON
-            textPaint.textSize = 10.5f
-            canvas.drawText("🕉️ ஓம் சரவணபவ • கோயில் குருக்கள் ஆசிர்வாதம் 🕉️", (PAGE_WIDTH / 2).toFloat(), y + 20f, textPaint)
+            textPaint.textSize = 10f
+            canvas.drawText("🕉️ ஓம் சரவணபவ • SRI SIVA SUBRAMANIYA SWAMI TEMPLE BLESSINGS 🕉️", (PAGE_WIDTH / 2).toFloat(), bottomTop + 15f, textPaint)
 
-            textPaint.typeface = Typeface.DEFAULT
-            textPaint.color = COLOR_DARK_TEXT
-            textPaint.textSize = 9f
-            val blessingMsg = when (lang) {
-                AppLanguage.TAMIL -> "எல்லாம் வல்ல நாடி ஸ்ரீ சிவ சுப்பிரமணிய சுவாமியின் அருளால் குழந்தை சகல நலன்களும், ஆயுள், ஆரோக்கியம், கல்வி, செல்வமும் பெற்று வாழ ஆசிகள்."
-                AppLanguage.HINDI -> "भगवान शिव सुब्रमण्यम स्वामी के आशीर्वाद से शिशु को दीर्घायु, उत्तम स्वास्थ्य, विद्या एवं समृद्धि प्राप्त हो।"
-                AppLanguage.ENGLISH -> "May Lord Sri Siva Subramaniya Swami shower the child with abundant health, longevity, wisdom, and eternal prosperity."
+            val blessingPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+                textSize = 7.8f
+                color = COLOR_DARK_TEXT
+                typeface = Typeface.DEFAULT
             }
-            canvas.drawText(blessingMsg, (PAGE_WIDTH / 2).toFloat(), y + 38f, textPaint)
+
+            val blessingCombined = """
+                May Lord Sri Siva Subramaniya Swami shower the child with divine grace, sound health, long life, supreme wisdom, and prosperous fortune.
+                நாடி ஸ்ரீ சிவ சுப்பிரமணிய சுவாமியின் திருவருளால் குழந்தை சகல சௌபாக்கியங்களும் பெற்று நீடூழி வாழ ஆசீர்வதிக்கிறோம்.
+                भगवान शिव सुब्रमण्यम स्वामी की कृपा से शिशु को चिरंजीवी, यशस्वी और सर्व कल्याण की प्राप्ति हो।
+            """.trimIndent()
+
+            drawMultilineText(
+                canvas = canvas,
+                text = blessingCombined,
+                x = boxLeft + 12f,
+                y = bottomTop + 22f,
+                width = contentWidth - 24,
+                textPaint = blessingPaint
+            )
 
             // Seal & Date
             textPaint.textAlign = Paint.Align.LEFT
-            textPaint.textSize = 8.5f
+            textPaint.textSize = 8f
             textPaint.color = COLOR_MUTED_TEXT
-            canvas.drawText("தேதி (Date): ${java.time.LocalDate.now().format(dateFmt)}", boxLeft + 16f, (PAGE_HEIGHT - 42).toFloat(), textPaint)
+            textPaint.typeface = Typeface.DEFAULT
+            canvas.drawText("Date: ${java.time.LocalDate.now().format(dateFmt)}", boxLeft + 12f, bottomTop + bottomHeight - 8f, textPaint)
 
             textPaint.textAlign = Paint.Align.RIGHT
-            canvas.drawText("தலைமை அர்ச்சகர் (Chief Priest) / நாடி திருக்கோயில், பிஜி", boxRight - 16f, (PAGE_HEIGHT - 42).toFloat(), textPaint)
+            canvas.drawText("Chief Priest / தலைமை குருக்கள் • Nadi Temple, Fiji", boxRight - 12f, bottomTop + bottomHeight - 8f, textPaint)
 
             pdfDocument.finishPage(page)
 
             // Write File
             val outputDir = File(context.cacheDir, "baby_naming_certificates").apply { mkdirs() }
-            val fileName = "Baby_Naming_Letters_${result.babyName.replace(" ", "_").ifBlank { "Baby" }}_${System.currentTimeMillis()}.pdf"
+            val cleanBabyName = result.babyName.replace(" ", "_").ifBlank { "Newborn_Baby" }
+            val fileName = "Baby_Naming_Letters_${cleanBabyName}_${System.currentTimeMillis()}.pdf"
             val file = File(outputDir, fileName)
             FileOutputStream(file).use { out ->
                 pdfDocument.writeTo(out)
@@ -381,9 +349,50 @@ object BabyNamePdfExporter {
         }
     }
 
-    private fun drawCornerAccent(canvas: android.graphics.Canvas, borderPaint: Paint, fillPaint: Paint, x: Float, y: Float) {
+    private fun drawCornerAccent(canvas: Canvas, fillPaint: Paint, x: Float, y: Float) {
         fillPaint.color = COLOR_GOLD
         canvas.drawCircle(x, y, 3f, fillPaint)
+    }
+
+    private fun drawLabelValue(canvas: Canvas, label: String, value: String, x: Float, y: Float, labelWidth: Float) {
+        val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = COLOR_MAROON
+            textSize = 8.5f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            textAlign = Paint.Align.LEFT
+        }
+        val valuePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = COLOR_DARK_TEXT
+            textSize = 8.5f
+            typeface = Typeface.DEFAULT
+            textAlign = Paint.Align.LEFT
+        }
+        canvas.drawText(label, x, y, labelPaint)
+        canvas.drawText(value, x + labelWidth, y, valuePaint)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun drawMultilineText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        y: Float,
+        width: Int,
+        textPaint: TextPaint
+    ) {
+        val layout = StaticLayout(
+            text,
+            textPaint,
+            width,
+            Layout.Alignment.ALIGN_NORMAL,
+            1.15f,
+            0.0f,
+            false
+        )
+        canvas.save()
+        canvas.translate(x, y)
+        layout.draw(canvas)
+        canvas.restore()
     }
 
     fun shareBabyNamingPdf(context: Context, file: File, babyName: String) {
@@ -393,11 +402,12 @@ object BabyNamePdfExporter {
                 "${context.packageName}.fileprovider",
                 file
             )
+            val displayName = babyName.ifBlank { "Newborn Baby" }
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "application/pdf"
                 putExtra(Intent.EXTRA_STREAM, uri)
-                putExtra(Intent.EXTRA_SUBJECT, "குழந்தை நாமகரண சுப அட்சர சான்றிதழ் - $babyName")
-                putExtra(Intent.EXTRA_TEXT, "ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி - குழந்தை நாமகரண சுப ஆரம்ப அட்சர சான்றிதழ் PDF.")
+                putExtra(Intent.EXTRA_SUBJECT, "Vedic Baby Naming Certificate - $displayName")
+                putExtra(Intent.EXTRA_TEXT, "Sri Siva Subramaniya Swami Temple, Nadi, Fiji - Vedic Baby Naming & Nakshatra Starting Letters Certificate PDF (Trilingual: English, Tamil, Hindi).")
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(Intent.createChooser(intent, "Share Baby Naming Certificate PDF"))

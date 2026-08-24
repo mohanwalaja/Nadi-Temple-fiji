@@ -34,6 +34,7 @@ import com.example.data.model.Graha
 import com.example.data.model.HoroscopeResult
 import com.example.data.repository.AppStrings
 import com.example.data.service.GpsLocationHelper
+import com.example.ui.components.LocationSearchDialog
 import com.example.ui.components.SouthIndianRasiChart
 import com.example.ui.theme.*
 import com.example.util.HoroscopePdfExporter
@@ -106,6 +107,19 @@ fun JathagamScreen(
     var selectedTab by remember { mutableStateOf(0) } // 0: Horoscope, 1: Saved Profiles
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showLocationSearchDialog by remember { mutableStateOf(false) }
+
+    if (showLocationSearchDialog) {
+        LocationSearchDialog(
+            currentLanguage = lang,
+            initialPlace = state.birthPlace,
+            onDismiss = { showLocationSearchDialog = false },
+            onSelectLocation = { newPlace ->
+                viewModel.onBirthPlaceChange(newPlace)
+                showLocationSearchDialog = false
+            }
+        )
+    }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = state.birthDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
@@ -527,6 +541,37 @@ fun JathagamScreen(
                                     .horizontalScroll(rememberScrollState()),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                // Search Map & Places Chip
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.tertiary
+                                    ),
+                                    modifier = Modifier
+                                        .clickable { showLocationSearchDialog = true }
+                                        .testTag("jathagam_open_map_search_btn")
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(imageVector = Icons.Default.Map, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(13.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = when (lang) {
+                                                AppLanguage.TAMIL -> "🗺️ தேடல் / வரைபடம்"
+                                                AppLanguage.HINDI -> "🗺️ खोज / गूगल मैप्स"
+                                                AppLanguage.ENGLISH -> "🗺️ Search Map & City"
+                                            },
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                                        )
+                                    }
+                                }
+
                                 // GPS My Location Chip
                                 val isGpsActive = state.birthPlace.startsWith("GPS")
                                 Surface(

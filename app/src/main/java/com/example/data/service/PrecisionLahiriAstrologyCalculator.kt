@@ -62,42 +62,165 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         data class LocationInfo(val lat: Double, val lon: Double, val utcOffsetHours: Double)
 
         val LOCATION_MAP = mapOf(
+            // Fiji Islands
             "நாடி (Nadi, Fiji)" to LocationInfo(-17.80, 177.41, 12.0),
             "நாடி (Nadi)" to LocationInfo(-17.80, 177.41, 12.0),
             "Nadi, Fiji" to LocationInfo(-17.80, 177.41, 12.0),
             "Nadi" to LocationInfo(-17.80, 177.41, 12.0),
             "சுவா (Suva)" to LocationInfo(-18.14, 178.44, 12.0),
             "சுவா (Suva, Fiji)" to LocationInfo(-18.14, 178.44, 12.0),
+            "Suva, Fiji" to LocationInfo(-18.14, 178.44, 12.0),
             "Suva" to LocationInfo(-18.14, 178.44, 12.0),
             "லவுடோகா (Lautoka)" to LocationInfo(-17.61, 177.45, 12.0),
+            "Lautoka, Fiji" to LocationInfo(-17.61, 177.45, 12.0),
+            "Lautoka" to LocationInfo(-17.61, 177.45, 12.0),
             "லபாசா (Labasa)" to LocationInfo(-16.43, 179.37, 12.0),
+            "Labasa, Fiji" to LocationInfo(-16.43, 179.37, 12.0),
+            "Labasa" to LocationInfo(-16.43, 179.37, 12.0),
+            "Ba, Fiji" to LocationInfo(-17.53, 177.67, 12.0),
+            "Ba" to LocationInfo(-17.53, 177.67, 12.0),
+            "Sigatoka, Fiji" to LocationInfo(-18.14, 177.51, 12.0),
+            "Sigatoka" to LocationInfo(-18.14, 177.51, 12.0),
+            "Nausori, Fiji" to LocationInfo(-18.03, 178.53, 12.0),
+            "Nausori" to LocationInfo(-18.03, 178.53, 12.0),
+            "Tavua, Fiji" to LocationInfo(-17.44, 177.86, 12.0),
+            "Rakiraki, Fiji" to LocationInfo(-17.36, 178.14, 12.0),
+
+            // Tamil Nadu, India
             "சென்னை (Chennai)" to LocationInfo(13.08, 80.27, 5.5),
             "சென்னை (Chennai, India)" to LocationInfo(13.08, 80.27, 5.5),
+            "Chennai, Tamil Nadu" to LocationInfo(13.08, 80.27, 5.5),
             "Chennai" to LocationInfo(13.08, 80.27, 5.5),
             "மதுரை (Madurai)" to LocationInfo(9.93, 78.12, 5.5),
             "மதுரை (Madurai, India)" to LocationInfo(9.93, 78.12, 5.5),
+            "Madurai, Tamil Nadu" to LocationInfo(9.93, 78.12, 5.5),
             "Madurai" to LocationInfo(9.93, 78.12, 5.5),
             "திருச்சி (Trichy)" to LocationInfo(10.79, 78.70, 5.5),
+            "Tiruchirappalli, Tamil Nadu" to LocationInfo(10.79, 78.70, 5.5),
+            "Tiruchirappalli" to LocationInfo(10.79, 78.70, 5.5),
+            "Trichy" to LocationInfo(10.79, 78.70, 5.5),
             "கோயம்புத்தூர் (Coimbatore)" to LocationInfo(11.01, 76.95, 5.5),
+            "Coimbatore, Tamil Nadu" to LocationInfo(11.01, 76.95, 5.5),
+            "Coimbatore" to LocationInfo(11.01, 76.95, 5.5),
             "சேலம் (Salem)" to LocationInfo(11.66, 78.14, 5.5),
+            "Salem, Tamil Nadu" to LocationInfo(11.66, 78.14, 5.5),
+            "Salem" to LocationInfo(11.66, 78.14, 5.5),
             "திருநெல்வேலி (Tirunelveli)" to LocationInfo(8.71, 77.75, 5.5),
+            "Tirunelveli, Tamil Nadu" to LocationInfo(8.71, 77.75, 5.5),
+            "Tirunelveli" to LocationInfo(8.71, 77.75, 5.5),
             "தஞ்சாவூர் (Thanjavur)" to LocationInfo(10.78, 79.13, 5.5),
-            "தில்லி (Delhi)" to LocationInfo(28.61, 77.20, 5.5),
-            "மும்பை (Mumbai)" to LocationInfo(19.07, 72.87, 5.5),
+            "Thanjavur, Tamil Nadu" to LocationInfo(10.78, 79.13, 5.5),
+            "Thanjavur" to LocationInfo(10.78, 79.13, 5.5),
+            "ஈரோடு (Erode)" to LocationInfo(11.34, 77.71, 5.5),
+            "Erode, Tamil Nadu" to LocationInfo(11.34, 77.71, 5.5),
+            "Erode" to LocationInfo(11.34, 77.71, 5.5),
+            "திருப்பூர் (Tirupur)" to LocationInfo(11.10, 77.34, 5.5),
+            "Tirupur, Tamil Nadu" to LocationInfo(11.10, 77.34, 5.5),
+            "Tirupur" to LocationInfo(11.10, 77.34, 5.5),
+            "வேலூர் (Vellore)" to LocationInfo(12.91, 79.13, 5.5),
+            "Vellore, Tamil Nadu" to LocationInfo(12.91, 79.13, 5.5),
+            "Vellore" to LocationInfo(12.91, 79.13, 5.5),
+            "காஞ்சிபுரம் (Kanchipuram)" to LocationInfo(12.83, 79.70, 5.5),
+            "Kanchipuram, Tamil Nadu" to LocationInfo(12.83, 79.70, 5.5),
+            "Kanchipuram" to LocationInfo(12.83, 79.70, 5.5),
+            "திண்டுக்கல் (Dindigul)" to LocationInfo(10.36, 77.98, 5.5),
+            "Dindigul, Tamil Nadu" to LocationInfo(10.36, 77.98, 5.5),
+            "Dindigul" to LocationInfo(10.36, 77.98, 5.5),
+            "நாகர்கோவில் (Nagercoil)" to LocationInfo(8.18, 77.43, 5.5),
+            "Nagercoil, Tamil Nadu" to LocationInfo(8.18, 77.43, 5.5),
+            "Nagercoil" to LocationInfo(8.18, 77.43, 5.5),
+            "கன்னியாகுமரி (Kanyakumari)" to LocationInfo(8.08, 77.55, 5.5),
+            "தூத்துக்குடி (Thoothukudi)" to LocationInfo(8.76, 78.13, 5.5),
+            "கடலூர் (Cuddalore)" to LocationInfo(11.75, 79.77, 5.5),
+            "விழுப்புரம் (Villupuram)" to LocationInfo(11.94, 79.49, 5.5),
+            "கரூர் (Karur)" to LocationInfo(10.96, 78.08, 5.5),
+            "நாமக்கல் (Namakkal)" to LocationInfo(11.22, 78.17, 5.5),
+            "ஓசூர் (Hosur)" to LocationInfo(12.74, 77.83, 5.5),
+            "திருவண்ணாமலை (Tiruvannamalai)" to LocationInfo(12.22, 79.07, 5.5),
+            "கும்பகோணம் (Kumbakonam)" to LocationInfo(10.96, 79.38, 5.5),
+            "பாண்டிச்சேரி (Pondicherry)" to LocationInfo(11.94, 79.80, 5.5),
+            "Pondicherry" to LocationInfo(11.94, 79.80, 5.5),
+            "Puducherry" to LocationInfo(11.94, 79.80, 5.5),
+
+            // India Metros
             "பெங்களூரு (Bangalore)" to LocationInfo(12.97, 77.59, 5.5),
+            "Bengaluru, India" to LocationInfo(12.97, 77.59, 5.5),
+            "Bengaluru" to LocationInfo(12.97, 77.59, 5.5),
+            "Bangalore" to LocationInfo(12.97, 77.59, 5.5),
             "ஹைதராபாத் (Hyderabad)" to LocationInfo(17.38, 78.48, 5.5),
+            "Hyderabad, India" to LocationInfo(17.38, 78.48, 5.5),
+            "Hyderabad" to LocationInfo(17.38, 78.48, 5.5),
+            "மும்பை (Mumbai)" to LocationInfo(19.07, 72.87, 5.5),
+            "Mumbai, India" to LocationInfo(19.07, 72.87, 5.5),
+            "Mumbai" to LocationInfo(19.07, 72.87, 5.5),
+            "தில்லி (Delhi)" to LocationInfo(28.61, 77.20, 5.5),
+            "New Delhi, India" to LocationInfo(28.61, 77.20, 5.5),
+            "Delhi" to LocationInfo(28.61, 77.20, 5.5),
             "கொல்கத்தா (Kolkata)" to LocationInfo(22.57, 88.36, 5.5),
+            "Kolkata" to LocationInfo(22.57, 88.36, 5.5),
+            "புனே (Pune)" to LocationInfo(18.52, 73.85, 5.5),
+            "Pune" to LocationInfo(18.52, 73.85, 5.5),
+            "கொச்சி (Kochi)" to LocationInfo(9.93, 76.26, 5.5),
+            "Kochi" to LocationInfo(9.93, 76.26, 5.5),
+            "திருவனந்தபுரம் (Trivandrum)" to LocationInfo(8.52, 76.93, 5.5),
+
+            // Sri Lanka & Southeast Asia
             "யாழ்ப்பாணம் (Jaffna)" to LocationInfo(9.66, 80.01, 5.5),
+            "Jaffna" to LocationInfo(9.66, 80.01, 5.5),
             "கொழும்பு (Colombo)" to LocationInfo(6.93, 79.86, 5.5),
+            "Colombo" to LocationInfo(6.93, 79.86, 5.5),
             "சிங்கப்பூர் (Singapore)" to LocationInfo(1.35, 103.82, 8.0),
+            "Singapore" to LocationInfo(1.35, 103.82, 8.0),
             "கோலாலம்பூர் (Kuala Lumpur)" to LocationInfo(3.14, 101.69, 8.0),
+            "Kuala Lumpur, Malaysia" to LocationInfo(3.14, 101.69, 8.0),
+            "Kuala Lumpur" to LocationInfo(3.14, 101.69, 8.0),
+            "பினாங்கு (Penang)" to LocationInfo(5.41, 100.32, 8.0),
+
+            // Australia & New Zealand
             "சிட்னி (Sydney)" to LocationInfo(-33.87, 151.21, 10.0),
+            "Sydney, Australia" to LocationInfo(-33.87, 151.21, 10.0),
+            "Sydney" to LocationInfo(-33.87, 151.21, 10.0),
             "மெல்போர்ன் (Melbourne)" to LocationInfo(-37.81, 144.96, 10.0),
+            "Melbourne, Australia" to LocationInfo(-37.81, 144.96, 10.0),
+            "Melbourne" to LocationInfo(-37.81, 144.96, 10.0),
+            "பிரிஸ்பேன் (Brisbane)" to LocationInfo(-27.47, 153.02, 10.0),
+            "பெர்த் (Perth)" to LocationInfo(-31.95, 115.86, 8.0),
             "ஆக்லாந்து (Auckland)" to LocationInfo(-36.85, 174.76, 12.0),
+            "Auckland, New Zealand" to LocationInfo(-36.85, 174.76, 12.0),
+            "Auckland" to LocationInfo(-36.85, 174.76, 12.0),
+            "வெல்லிங்டன் (Wellington)" to LocationInfo(-41.29, 174.77, 12.0),
+
+            // Middle East
+            "துபாய் (Dubai)" to LocationInfo(25.20, 55.27, 4.0),
+            "Dubai, UAE" to LocationInfo(25.20, 55.27, 4.0),
+            "Dubai" to LocationInfo(25.20, 55.27, 4.0),
+            "அபுதாபி (Abu Dhabi)" to LocationInfo(24.45, 54.37, 4.0),
+            "Abu Dhabi" to LocationInfo(24.45, 54.37, 4.0),
+            "தோஹா (Doha)" to LocationInfo(25.28, 51.53, 3.0),
+            "Doha" to LocationInfo(25.28, 51.53, 3.0),
+            "மஸ்கட் (Muscat)" to LocationInfo(23.58, 58.40, 4.0),
+            "பஹ்ரைன் (Bahrain)" to LocationInfo(26.06, 50.55, 3.0),
+            "குவைத் (Kuwait)" to LocationInfo(29.37, 47.97, 3.0),
+            "ரியாத் (Riyadh)" to LocationInfo(24.71, 46.67, 3.0),
+
+            // Europe & Americas
             "லண்டன் (London)" to LocationInfo(51.51, -0.13, 0.0),
+            "London, UK" to LocationInfo(51.51, -0.13, 0.0),
+            "London" to LocationInfo(51.51, -0.13, 0.0),
+            "பாரிஸ் (Paris)" to LocationInfo(48.85, 2.35, 1.0),
             "டொராண்டோ (Toronto)" to LocationInfo(43.65, -79.38, -5.0),
+            "Toronto, Canada" to LocationInfo(43.65, -79.38, -5.0),
+            "Toronto" to LocationInfo(43.65, -79.38, -5.0),
+            "வான்கூவர் (Vancouver)" to LocationInfo(49.28, -123.12, -8.0),
             "நியூயார்க் (New York)" to LocationInfo(40.71, -74.00, -5.0),
-            "சான் பிரான்சிஸ்கோ (San Francisco)" to LocationInfo(37.77, -122.41, -8.0)
+            "New York, USA" to LocationInfo(40.71, -74.00, -5.0),
+            "New York" to LocationInfo(40.71, -74.00, -5.0),
+            "சான் பிரான்சிஸ்கோ (San Francisco)" to LocationInfo(37.77, -122.41, -8.0),
+            "San Francisco, USA" to LocationInfo(37.77, -122.41, -8.0),
+            "San Francisco" to LocationInfo(37.77, -122.41, -8.0),
+            "லாஸ் ஏஞ்சலஸ் (Los Angeles)" to LocationInfo(34.05, -118.24, -8.0),
+            "சிகாகோ (Chicago)" to LocationInfo(41.87, -87.62, -6.0),
+            "டல்லாஸ் (Dallas)" to LocationInfo(32.77, -96.79, -6.0)
         )
     }
 
@@ -313,27 +436,41 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
     }
 
     private fun resolveLocation(place: String): LocationInfo {
-        if (place.startsWith("GPS:", ignoreCase = true) || place.startsWith("GPS (", ignoreCase = true)) {
+        // 1. Check for coordinates in string e.g. "GPS: 13.08, 80.27" or "(13.08, 80.27)" or "13.08, 80.27"
+        val gpsRegex = Regex("""(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)""")
+        val match = gpsRegex.find(place)
+        if (match != null) {
             try {
-                val cleaned = place.replace("GPS:", "").replace("GPS", "").replace("(", "").replace(")", "").replace("°", "")
-                val parts = cleaned.split(",").map { it.trim().toDouble() }
-                if (parts.size >= 2) {
-                    val lat = parts[0]
-                    val lon = parts[1]
-                    val offset = if (parts.size >= 3) parts[2] else (java.util.TimeZone.getDefault().rawOffset / 3600000.0)
-                    return LocationInfo(lat, lon, offset)
+                val lat = match.groupValues[1].toDouble()
+                val lon = match.groupValues[2].toDouble()
+                // Determine sensible UTC timezone offset based on longitude
+                val calculatedOffset = when {
+                    lon in 170.0..180.0 || lon in -180.0..-170.0 -> 12.0 // Fiji / NZ
+                    lon in 68.0..90.0 && lat in 6.0..37.0 -> 5.5 // India / Sri Lanka
+                    lon in 95.0..110.0 -> 8.0 // Singapore / Malaysia
+                    lon in 140.0..155.0 -> 10.0 // East Australia
+                    lon in 45.0..60.0 -> 4.0 // UAE / Gulf
+                    lon in -10.0..10.0 -> 0.0 // UK / Western Europe
+                    lon in -85.0..-65.0 -> -5.0 // US Eastern / Toronto
+                    lon in -125.0..-115.0 -> -8.0 // US Pacific
+                    else -> Math.round((lon / 15.0) * 2.0) / 2.0
                 }
+                return LocationInfo(lat, lon, calculatedOffset)
             } catch (e: Exception) {
                 // fall through
             }
         }
 
+        // 2. Match with expanded LOCATION_MAP
+        val trimmedPlace = place.trim().lowercase()
         for ((key, value) in LOCATION_MAP) {
-            if (place.contains(key, ignoreCase = true) || key.contains(place, ignoreCase = true)) {
+            val lowerKey = key.lowercase()
+            if (trimmedPlace.contains(lowerKey) || lowerKey.contains(trimmedPlace)) {
                 return value
             }
         }
-        // Default to Nadi, Fiji
+
+        // 3. Fallback default: Nadi, Fiji Islands
         return LocationInfo(-17.80, 177.41, 12.0)
     }
 

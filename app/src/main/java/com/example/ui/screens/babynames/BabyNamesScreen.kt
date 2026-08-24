@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.AppLanguage
 import com.example.data.model.BabyNamingBirthResult
 import com.example.data.model.NakshatraBabyLetters
+import com.example.ui.components.LocationSearchDialog
 import com.example.ui.theme.*
 import com.example.util.BabyNamePdfExporter
 import java.time.LocalDate
@@ -187,10 +188,10 @@ fun BabyNamesScreen(
                         onExportPdf = {
                             val file = viewModel.exportPdfCertificate(context, currentLanguage)
                             if (file != null) {
-                                Toast.makeText(context, "PDF சான்றிதழ் தயாராகிவிட்டது!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "3-Language PDF Certificate Ready!", Toast.LENGTH_SHORT).show()
                                 BabyNamePdfExporter.shareBabyNamingPdf(context, file, result.babyName)
                             } else {
-                                Toast.makeText(context, "PDF உருவாக்குவதில் பிழை ஏற்பட்டது", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Failed to generate PDF", Toast.LENGTH_SHORT).show()
                             }
                         }
                     )
@@ -253,8 +254,7 @@ fun BabyNamesScreen(
                                 label = {
                                     Text(
                                         text = "${star.nakshatraIndex}. ${star.getName(currentLanguage)}",
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        fontSize = 12.sp
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                     )
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
@@ -269,89 +269,32 @@ fun BabyNamesScreen(
 
             uiState.currentNakshatraLetters?.let { star ->
                 item {
-                    NakshatraSpotlightCard(
-                        star = star,
-                        currentLanguage = currentLanguage
-                    )
+                    NakshatraSpotlightCard(star = star, currentLanguage = currentLanguage)
                 }
             }
         } else {
-            // Tab 2: All 27 Nakshatras Directory
+            // Tab 2: All 27 Stars Quick Table
             item {
-                OutlinedTextField(
-                    value = uiState.searchQuery,
-                    onValueChange = { viewModel.updateSearchQuery(it) },
-                    placeholder = {
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "27 நட்சத்திரங்களில் தேட..."
-                                AppLanguage.HINDI -> "27 नक्षत्रों में खोजें..."
-                                AppLanguage.ENGLISH -> "Search in all 27 stars..."
-                            },
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                Text(
+                    text = when (currentLanguage) {
+                        AppLanguage.TAMIL -> "27 நட்சத்திரங்களின் தமிழ் பஞ்சாங்க நாமகரண அட்டவணை:"
+                        AppLanguage.HINDI -> "27 नक्षत्रों की वैदिक नामकरण सूची:"
+                        AppLanguage.ENGLISH -> "All 27 Stars Vedic Naming Letters Table:"
                     },
-                    leadingIcon = {
-                        Icon(Icons.Filled.Search, contentDescription = null, tint = TempleMaroon)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = TempleMaroon
                 )
             }
 
-            items(uiState.searchResults) { star ->
-                NakshatraSummaryCard(
-                    star = star,
-                    currentLanguage = currentLanguage
-                )
-            }
-        }
-
-        // Traditional Guidelines Card
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(
-                    modifier = Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(Icons.Filled.MenuBook, contentDescription = null, tint = TempleMaroon, modifier = Modifier.size(20.dp))
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "பெயர் சூட்டும் ஜோதிட சாஸ்திர விதிகள்"
-                                AppLanguage.HINDI -> "नामकरण संस्कार ज्योतिषीय नियम"
-                                AppLanguage.ENGLISH -> "Vedic Naming Guidelines"
-                            },
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = TempleMaroon
-                        )
-                    }
-
-                    Text(
-                        text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "1. குழந்தையின் ஜென்ம நட்சத்திர பாதத்திற்குரிய முதல் சுப அட்சரத்தைக் கொண்டு பெயர் தொடங்குவது ஆயுள், ஆரோக்கியம் மற்றும் நற்புகழை அருளும்.\n2. ஒரு நட்சத்திரத்திற்கு நான்கு பாதங்கள் உள்ளன. பிறந்த நேரத்தைக்கொண்டு துல்லிய பாதத்தை அறிந்து கொள்ளவும்.\n3. குலதெய்வம் அல்லது முன்னோர்களின் பெயர்களை இணைக்கும்போதும் ஆரம்ப எழுத்து சுப பாத எழுத்தாக இருப்பது உத்தமம்."
-                            AppLanguage.HINDI -> "1. जन्म नक्षत्र और पाद (चरण) के प्रथम शुभ अक्षर से नामकरण करने से दीर्घायु, उत्तम स्वास्थ्य एवं कीर्ति की प्राप्ति होती है।\n2. प्रत्येक नक्षत्र में 4 चरण होते हैं, जन्म समय से सही चरण ज्ञात करें।"
-                            AppLanguage.ENGLISH -> "1. Starting the child's name with the auspicious letter of the birth Nakshatra Pada brings longevity, health, and prosperity.\n2. Each Nakshatram has 4 Padas with unique sound vibrations (Aksharas)."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 18.sp
-                    )
-                }
+            items(allNakshatras) { star ->
+                NakshatraSummaryCard(star = star, currentLanguage = currentLanguage)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BirthDetailsInputCard(
     uiState: BabyNamesUiState,
@@ -364,8 +307,21 @@ fun BirthDetailsInputCard(
     onCalculate: () -> Unit
 ) {
     val context = LocalContext.current
-    val dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH)
+    val dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
     val timeFmt = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+    var showLocationSearchDialog by remember { mutableStateOf(false) }
+
+    if (showLocationSearchDialog) {
+        LocationSearchDialog(
+            currentLanguage = currentLanguage,
+            initialPlace = uiState.inputPlace,
+            onDismiss = { showLocationSearchDialog = false },
+            onSelectLocation = { newPlace ->
+                onPlaceChange(newPlace)
+                showLocationSearchDialog = false
+            }
+        )
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -394,18 +350,24 @@ fun BirthDetailsInputCard(
                 )
             }
 
-            // Baby Name Field
+            // Baby Name Field (Optional for Newborn Baby)
             OutlinedTextField(
                 value = uiState.inputBabyName,
                 onValueChange = onNameChange,
                 label = {
                     Text(when (currentLanguage) {
-                        AppLanguage.TAMIL -> "குழந்தையின் பெயர் (விரும்பினால்)"
-                        AppLanguage.HINDI -> "शिशु का नाम (वैकल्पिक)"
-                        AppLanguage.ENGLISH -> "Baby Name (Optional)"
+                        AppLanguage.TAMIL -> "குழந்தையின் பெயர் (விரும்பினால் / பிறந்த குழந்தை)"
+                        AppLanguage.HINDI -> "शिशु का नाम (वैकल्पिक / नवजात)"
+                        AppLanguage.ENGLISH -> "Baby Name (Optional / Newborn)"
                     })
                 },
-                placeholder = { Text("செல்வன் / செல்வி") },
+                placeholder = {
+                    Text(when (currentLanguage) {
+                        AppLanguage.TAMIL -> "பிறந்த குழந்தை"
+                        AppLanguage.HINDI -> "नवजात शिशु"
+                        AppLanguage.ENGLISH -> "Newborn Baby"
+                    })
+                },
                 leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null, tint = TempleMaroon) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -509,7 +471,7 @@ fun BirthDetailsInputCard(
                 }
             }
 
-            // Birth Place Field
+            // Birth Place Field with Search / Map / GPS Integration
             OutlinedTextField(
                 value = uiState.inputPlace,
                 onValueChange = onPlaceChange,
@@ -521,10 +483,44 @@ fun BirthDetailsInputCard(
                     })
                 },
                 leadingIcon = { Icon(Icons.Filled.LocationOn, contentDescription = null, tint = TempleMaroon) },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { showLocationSearchDialog = true },
+                        modifier = Modifier.testTag("open_location_search_btn")
+                    ) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search Location", tint = TempleMaroon)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp)
             )
+
+            // Quick Map & GPS Location Selector Button
+            OutlinedButton(
+                onClick = { showLocationSearchDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("search_location_map_btn"),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TempleMaroon)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(Icons.Filled.Map, contentDescription = null, tint = TempleMaroon)
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "🗺️ வரைபடம் / தேடல் / ஜிபிஎஸ் மூலம் இடம் மாற்றுக"
+                            AppLanguage.HINDI -> "🗺️ गूगल मैप्स / खोज / जीपीएस से स्थान बदलें"
+                            AppLanguage.ENGLISH -> "🗺️ Change Location via Map / Search / GPS"
+                        },
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp
+                    )
+                }
+            }
 
             // Calculate Button
             Button(
@@ -564,6 +560,24 @@ fun BabyNamingResultCard(
     val star = result.nakshatraLetters
     val currentPada = result.janmaPada
 
+    val padaLabel = when (currentLanguage) {
+        AppLanguage.TAMIL -> "${result.janmaPada}-ஆம் பாதம்"
+        AppLanguage.HINDI -> "चरण ${result.janmaPada}"
+        AppLanguage.ENGLISH -> "Pada ${result.janmaPada}"
+    }
+
+    val rasiLabel = when (currentLanguage) {
+        AppLanguage.TAMIL -> "🌙 ராசி: ${result.chandraRasi.nameTa}"
+        AppLanguage.HINDI -> "🌙 राशि: ${result.chandraRasi.nameHi}"
+        AppLanguage.ENGLISH -> "🌙 Moon Sign: ${result.chandraRasi.nameEn}"
+    }
+
+    val lagnaLabel = when (currentLanguage) {
+        AppLanguage.TAMIL -> "லக்னம்: ${result.lagnaRasi.nameTa}"
+        AppLanguage.HINDI -> "लग्न: ${result.lagnaRasi.nameHi}"
+        AppLanguage.ENGLISH -> "Ascendant: ${result.lagnaRasi.nameEn}"
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -584,13 +598,13 @@ fun BabyNamingResultCard(
             ) {
                 Column {
                     Text(
-                        text = "⭐ ${star.getName(currentLanguage)} (${result.janmaPada}-ஆம் பாதம்)",
+                        text = "⭐ ${star.getName(currentLanguage)} ($padaLabel)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = TempleMaroon
                     )
                     Text(
-                        text = "🌙 ${result.chandraRasi.getName(currentLanguage)}  •  லக்னம்: ${result.lagnaRasi.getName(currentLanguage)}",
+                        text = "$rasiLabel  •  $lagnaLabel",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -643,8 +657,12 @@ fun BabyNamingResultCard(
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                text = result.primaryPadaInfo.letterTa,
-                                fontSize = 32.sp,
+                                text = when (currentLanguage) {
+                                    AppLanguage.TAMIL -> result.primaryPadaInfo.letterTa
+                                    AppLanguage.HINDI -> result.primaryPadaInfo.letterHi
+                                    AppLanguage.ENGLISH -> result.primaryPadaInfo.letterEn
+                                },
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 24.sp else 30.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleGold
                             )
@@ -652,7 +670,11 @@ fun BabyNamingResultCard(
                     }
 
                     Text(
-                        text = "${result.primaryPadaInfo.letterTa} (${result.primaryPadaInfo.letterEn})",
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "${result.primaryPadaInfo.letterTa} (${result.primaryPadaInfo.letterEn})"
+                            AppLanguage.HINDI -> "${result.primaryPadaInfo.letterHi} (${result.primaryPadaInfo.letterEn})"
+                            AppLanguage.ENGLISH -> "${result.primaryPadaInfo.letterEn} (${result.primaryPadaInfo.letterTa})"
+                        },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = TempleMaroon
@@ -662,7 +684,7 @@ fun BabyNamingResultCard(
                         text = when (currentLanguage) {
                             AppLanguage.TAMIL -> "தமிழ் பஞ்சாங்க விதிப்படி ${star.getName(currentLanguage)} $currentPada-ஆம் பாதத்தில் பிறந்த குழந்தைக்கு இப்பெயர் ஒலி அட்சரம் சர்வ மங்கலங்களையும் தரும்."
                             AppLanguage.HINDI -> "वैदिक पंचांग अनुसार $currentPada चरण में जन्मे शिशु के लिए यह शुभ ध्वनि कंपन सर्वोत्तम है।"
-                            AppLanguage.ENGLISH -> "Naming the child starting with this sacred syllable vibration brings divine protection & success."
+                            AppLanguage.ENGLISH -> "As per Vedic Panchangam, naming with sacred syllable vibration '${result.primaryPadaInfo.letterEn}' for ${star.getName(currentLanguage)} Pada $currentPada brings supreme longevity, wisdom and prosperity."
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -724,16 +746,18 @@ fun BabyNamingResultCard(
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
                                 },
-                                fontSize = 20.sp,
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 18.sp else 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
 
-                            Text(
-                                text = pada.letterEn,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            if (currentLanguage != AppLanguage.ENGLISH) {
+                                Text(
+                                    text = pada.letterEn,
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
 
                             Text(
                                 text = when (currentLanguage) {
@@ -752,7 +776,7 @@ fun BabyNamingResultCard(
 
             HorizontalDivider()
 
-            // EXPORT CERTIFICATE PDF BUTTON
+            // EXPORT CERTIFICATE PDF BUTTON (TRILINGUAL PDF)
             Button(
                 onClick = onExportPdf,
                 modifier = Modifier
@@ -768,9 +792,9 @@ fun BabyNamingResultCard(
                     Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = TempleGold)
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "நாமகரண சான்றிதழ் PDF பதிவிறக்கம் / பகிர்வு"
-                            AppLanguage.HINDI -> "नामकरण प्रमाण पत्र PDF डाउनलोड / साझा करें"
-                            AppLanguage.ENGLISH -> "Export & Share Naming Certificate PDF"
+                            AppLanguage.TAMIL -> "நாமகரண சான்றிதழ் PDF பதிவிறக்கம் / பகிர்வு (3 மொழிகள்)"
+                            AppLanguage.HINDI -> "नामकरण प्रमाण पत्र PDF डाउनलोड (3 भाषाएं)"
+                            AppLanguage.ENGLISH -> "Export Naming Certificate PDF (Trilingual)"
                         },
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -876,7 +900,7 @@ fun NakshatraSpotlightCard(
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
                                 },
-                                fontSize = 22.sp,
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 18.sp else 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
@@ -1045,9 +1069,13 @@ fun NakshatraSummaryCard(
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
                                 },
-                                fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TempleMaroon
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 14.sp else 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TempleMaroon
                             )
-                            Text(pada.letterEn, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            if (currentLanguage != AppLanguage.ENGLISH) {
+                                Text(pada.letterEn, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
                             Text(
                                 when (currentLanguage) {
                                     AppLanguage.TAMIL -> pada.rasiTa

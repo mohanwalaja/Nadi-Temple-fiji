@@ -56,10 +56,10 @@ class BabyNamesViewModel(
     init {
         // Run initial calculation for today's birth preview
         calculateByBirthDetails(
-            babyName = "செல்வன்",
+            babyName = "",
             dob = LocalDate.now(),
             tob = LocalTime.of(10, 30),
-            place = "Chennai, Tamil Nadu",
+            place = "Nadi, Fiji",
             gender = "M"
         )
     }

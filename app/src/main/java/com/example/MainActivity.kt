@@ -111,9 +111,8 @@ fun MainAppContainer(
                     currentLanguage = currentLanguage,
                     onToggleLanguage = {
                         val nextLang = when (currentLanguage) {
-                            AppLanguage.TAMIL -> AppLanguage.HINDI
-                            AppLanguage.HINDI -> AppLanguage.ENGLISH
-                            AppLanguage.ENGLISH -> AppLanguage.TAMIL
+                            AppLanguage.TAMIL -> AppLanguage.ENGLISH
+                            else -> AppLanguage.TAMIL
                         }
                         preferencesRepository.setLanguage(nextLang)
                     },

@@ -99,7 +99,7 @@ fun SettingsScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             val isTamil = lang == AppLanguage.TAMIL
                             Surface(
@@ -115,33 +115,12 @@ fun SettingsScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "தமிழ்\n(Tamil)",
-                                    fontSize = 13.sp,
+                                    text = "தமிழ் (Tamil)",
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isTamil) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp)
-                                )
-                            }
-
-                            val isHindi = lang == AppLanguage.HINDI
-                            Surface(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable { viewModel.setLanguage(AppLanguage.HINDI) }
-                                    .testTag("setting_lang_hindi"),
-                                color = if (isHindi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(10.dp),
-                                border = androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    if (isHindi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-                                )
-                            ) {
-                                Text(
-                                    text = "हिन्दी\n(Hindi)",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isHindi) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp)
+                                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
 
@@ -159,11 +138,12 @@ fun SettingsScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "English\n(Default)",
-                                    fontSize = 13.sp,
+                                    text = "English",
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isEng) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp)
+                                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
                         }
