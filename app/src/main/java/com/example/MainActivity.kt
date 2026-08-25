@@ -24,7 +24,6 @@ import com.example.data.repository.BabyNamesRepository
 import com.example.data.repository.JathagamRepository
 import com.example.data.service.AstrologyCalculator
 import com.example.data.service.PrecisionLahiriAstrologyCalculator
-import com.example.data.service.StandardPanchangamCalculator
 import com.example.ui.components.TempleBottomBar
 import com.example.ui.components.TempleTopBar
 import com.example.ui.navigation.Screen
@@ -34,8 +33,6 @@ import com.example.ui.screens.jathagam.JathagamScreen
 import com.example.ui.screens.jathagam.JathagamViewModel
 import com.example.ui.screens.matchmaking.MatchMakingScreen
 import com.example.ui.screens.matchmaking.MatchMakingViewModel
-import com.example.ui.screens.panchangam.PanchangamScreen
-import com.example.ui.screens.panchangam.PanchangamViewModel
 import com.example.ui.screens.settings.SettingsScreen
 import com.example.ui.screens.settings.SettingsViewModel
 import com.example.ui.theme.SriSivaKovilTheme
@@ -48,7 +45,6 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(this)
         val preferencesRepository = UserPreferencesRepository(this)
-        val panchangamCalculator = StandardPanchangamCalculator()
         val astrologyCalculator: AstrologyCalculator = PrecisionLahiriAstrologyCalculator()
         val jathagamRepository = JathagamRepository(database.horoscopeDao(), astrologyCalculator)
         val babyNamesRepository = BabyNamesRepository()
@@ -62,7 +58,6 @@ class MainActivity : ComponentActivity() {
                 MainAppContainer(
                     preferencesRepository = preferencesRepository,
                     database = database,
-                    panchangamCalculator = panchangamCalculator,
                     astrologyCalculator = astrologyCalculator,
                     jathagamRepository = jathagamRepository,
                     babyNamesRepository = babyNamesRepository
@@ -76,7 +71,6 @@ class MainActivity : ComponentActivity() {
 fun MainAppContainer(
     preferencesRepository: UserPreferencesRepository,
     database: AppDatabase,
-    panchangamCalculator: StandardPanchangamCalculator,
     astrologyCalculator: AstrologyCalculator,
     jathagamRepository: JathagamRepository,
     babyNamesRepository: BabyNamesRepository
@@ -88,14 +82,12 @@ fun MainAppContainer(
     val currentLanguage = userPrefs.language
 
     // Instantiate ViewModels
-    val panchangamViewModel = remember { PanchangamViewModel(preferencesRepository, panchangamCalculator) }
     val jathagamViewModel = remember { JathagamViewModel(jathagamRepository, preferencesRepository) }
     val matchMakingViewModel = remember { MatchMakingViewModel() }
     val babyNamesViewModel = remember { BabyNamesViewModel(babyNamesRepository) }
     val settingsViewModel = remember { SettingsViewModel(preferencesRepository) }
 
     val isTopLevelRoute = currentRoute in listOf(
-        Screen.Panchangam.route,
         Screen.Jathagam.route,
         Screen.WeddingMatch.route,
         Screen.BabyNames.route
@@ -131,7 +123,7 @@ fun MainAppContainer(
                     currentLanguage = currentLanguage,
                     onNavigate = { route ->
                         navController.navigate(route) {
-                            popUpTo(Screen.Panchangam.route) {
+                            popUpTo(Screen.Jathagam.route) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -144,15 +136,10 @@ fun MainAppContainer(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Panchangam.route,
+            startDestination = Screen.Jathagam.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // 1. Panchangam Screen (Primary)
-            composable(Screen.Panchangam.route) {
-                PanchangamScreen(viewModel = panchangamViewModel)
-            }
-
-            // 2. Jathagam (Horoscope) Screen
+            // 1. Jathagam (Horoscope) Screen (Primary Start Screen)
             composable(Screen.Jathagam.route) {
                 JathagamScreen(
                     viewModel = jathagamViewModel,
@@ -162,7 +149,7 @@ fun MainAppContainer(
                             babyNamesViewModel.loadFromHoroscopeResult(currentHoroscope)
                         }
                         navController.navigate(Screen.BabyNames.route) {
-                            popUpTo(Screen.Panchangam.route) {
+                            popUpTo(Screen.Jathagam.route) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -172,7 +159,7 @@ fun MainAppContainer(
                 )
             }
 
-            // 3. Wedding Match (திருமணப் பொருத்தம் & செவ்வாய் தோஷம்) Screen
+            // 2. Wedding Match (திருமணப் பொருத்தம் & செவ்வாய் தோஷம்) Screen
             composable(Screen.WeddingMatch.route) {
                 MatchMakingScreen(
                     viewModel = matchMakingViewModel,
@@ -180,7 +167,7 @@ fun MainAppContainer(
                 )
             }
 
-            // 4. Baby Names & Naming Letters by Birth Details Screen
+            // 3. Baby Names & Naming Letters by Birth Details Screen
             composable(Screen.BabyNames.route) {
                 BabyNamesScreen(
                     viewModel = babyNamesViewModel,
@@ -188,7 +175,7 @@ fun MainAppContainer(
                 )
             }
 
-            // 5. Settings Screen
+            // 4. Settings Screen
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     viewModel = settingsViewModel,

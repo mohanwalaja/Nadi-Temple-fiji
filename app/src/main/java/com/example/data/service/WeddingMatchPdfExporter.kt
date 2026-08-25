@@ -264,7 +264,7 @@ object WeddingMatchPdfExporter {
         canvas.drawRoundRect(brideHeaderRect, 5f, 5f, brideHeaderPaint)
         canvas.drawRect(brideLeft, y + 8f, brideLeft + cardWidth, y + 16f, brideHeaderPaint)
         val brideHeaderTitle = when (lang) {
-            AppLanguage.TAMIL -> "மணமகள் விபரம் (Bride Profile)"
+            AppLanguage.TAMIL -> "மணமகள் விபரம்"
             AppLanguage.HINDI -> "वधू (कन्या) विवरण"
             AppLanguage.ENGLISH -> "Bride Profile"
         }
@@ -288,13 +288,21 @@ object WeddingMatchPdfExporter {
         drawField(canvas, bx, by, getLabel("Rasi", lang), brideRasiStr, labelPaint, textPaint, maxValWidth)
         by += 12.5f
 
-        val brideStarStr = "${data.brideNakshatraName} (பாதம் ${data.bridePada})"
+        val brideStarStr = when (lang) {
+            AppLanguage.TAMIL -> "${data.brideNakshatraName} (${data.bridePada}-ஆம் பாதம்)"
+            AppLanguage.HINDI -> "${data.brideNakshatraName} (चरण ${data.bridePada})"
+            AppLanguage.ENGLISH -> "${data.brideNakshatraName} (Pada ${data.bridePada})"
+        }
         drawField(canvas, bx, by, getLabel("Star", lang), brideStarStr, labelPaint, textPaint, maxValWidth)
         by += 12.5f
 
         val brideLagnaStr = data.brideLagna?.getName(lang) ?: "-"
         val brideMarsDoshaStr = if (data.brideMarsHouse in listOf(2, 4, 7, 8, 12)) getLabel("DoshamPresent", lang) else getLabel("NoDosham", lang)
-        val brideLagnaMarsStr = "$brideLagnaStr • செவ்: ${data.brideMarsHouse} ($brideMarsDoshaStr)"
+        val brideLagnaMarsStr = when (lang) {
+            AppLanguage.TAMIL -> "$brideLagnaStr • செவ்: ${data.brideMarsHouse} ($brideMarsDoshaStr)"
+            AppLanguage.HINDI -> "$brideLagnaStr • मंगल: ${data.brideMarsHouse} ($brideMarsDoshaStr)"
+            AppLanguage.ENGLISH -> "$brideLagnaStr • Mars: House ${data.brideMarsHouse} ($brideMarsDoshaStr)"
+        }
         drawField(canvas, bx, by, getLabel("Lagna", lang), brideLagnaMarsStr, labelPaint, textPaint, maxValWidth)
 
         // --- Groom Card ---
@@ -307,7 +315,7 @@ object WeddingMatchPdfExporter {
         canvas.drawRoundRect(groomHeaderRect, 5f, 5f, groomHeaderPaint)
         canvas.drawRect(groomLeft, y + 8f, groomLeft + cardWidth, y + 16f, groomHeaderPaint)
         val groomHeaderTitle = when (lang) {
-            AppLanguage.TAMIL -> "மணமகன் விபரம் (Groom Profile)"
+            AppLanguage.TAMIL -> "மணமகன் விபரம்"
             AppLanguage.HINDI -> "वर (दूल्हा) विवरण"
             AppLanguage.ENGLISH -> "Groom Profile"
         }
@@ -330,13 +338,21 @@ object WeddingMatchPdfExporter {
         drawField(canvas, gx, gy, getLabel("Rasi", lang), groomRasiStr, labelPaint, textPaint, maxValWidth)
         gy += 12.5f
 
-        val groomStarStr = "${data.groomNakshatraName} (பாதம் ${data.groomPada})"
+        val groomStarStr = when (lang) {
+            AppLanguage.TAMIL -> "${data.groomNakshatraName} (${data.groomPada}-ஆம் பாதம்)"
+            AppLanguage.HINDI -> "${data.groomNakshatraName} (चरण ${data.groomPada})"
+            AppLanguage.ENGLISH -> "${data.groomNakshatraName} (Pada ${data.groomPada})"
+        }
         drawField(canvas, gx, gy, getLabel("Star", lang), groomStarStr, labelPaint, textPaint, maxValWidth)
         gy += 12.5f
 
         val groomLagnaStr = data.groomLagna?.getName(lang) ?: "-"
         val groomMarsDoshaStr = if (data.groomMarsHouse in listOf(2, 4, 7, 8, 12)) getLabel("DoshamPresent", lang) else getLabel("NoDosham", lang)
-        val groomLagnaMarsStr = "$groomLagnaStr • செவ்: ${data.groomMarsHouse} ($groomMarsDoshaStr)"
+        val groomLagnaMarsStr = when (lang) {
+            AppLanguage.TAMIL -> "$groomLagnaStr • செவ்: ${data.groomMarsHouse} ($groomMarsDoshaStr)"
+            AppLanguage.HINDI -> "$groomLagnaStr • मंगल: ${data.groomMarsHouse} ($groomMarsDoshaStr)"
+            AppLanguage.ENGLISH -> "$groomLagnaStr • Mars: House ${data.groomMarsHouse} ($groomMarsDoshaStr)"
+        }
         drawField(canvas, gx, gy, getLabel("Lagna", lang), groomLagnaMarsStr, labelPaint, textPaint, maxValWidth)
 
         y += cardHeight + 7f
@@ -518,7 +534,12 @@ object WeddingMatchPdfExporter {
             AppLanguage.HINDI -> result.sevvayDosham.recommendationHi
             AppLanguage.ENGLISH -> result.sevvayDosham.recommendationEn
         }
-        val recLine = "வழிகாட்டல் / பலன்: $samyamRecTxt"
+        val recPrefix = when (lang) {
+            AppLanguage.TAMIL -> "வழிகாட்டல் / பலன்: "
+            AppLanguage.HINDI -> "मार्गदर्शन / फल: "
+            AppLanguage.ENGLISH -> "Guidance / Remedy: "
+        }
+        val recLine = "$recPrefix$samyamRecTxt"
         canvas.drawText(recLine.take(90), sx, sy, labelPaint.apply { textSize = 7.5f })
 
         y += sevvayBoxHeight + 7f
@@ -541,14 +562,18 @@ object WeddingMatchPdfExporter {
         py += 13f
 
         val priestName = when (lang) {
-            AppLanguage.TAMIL -> "பிரம்மஸ்ரீ மோகன் குருக்கள் (Head Priest: Mohan Gurukkal)"
-            AppLanguage.HINDI -> "ब्रह्मश्री मोहन गुरुक्कल (Head Priest: Mohan Gurukkal)"
+            AppLanguage.TAMIL -> "பிரம்மஸ்ரீ மோகன் குருக்கள்"
+            AppLanguage.HINDI -> "ब्रह्मश्री मोहन गुरुक्कल"
             AppLanguage.ENGLISH -> "Brahmasri Mohan Gurukkal (Head Priest)"
         }
         canvas.drawText(priestName, px, py, boldTextPaint.apply { textSize = 9.2f; color = deepMaroon })
         py += 12.5f
 
-        val priestTemple = "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • Ph: +6797607465"
+        val priestTemple = when (lang) {
+            AppLanguage.TAMIL -> "தலைமை குருக்கள் • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி திருக்கோயில், நாடி, பிஜி தீவுகள் • Ph: +6797607465"
+            AppLanguage.HINDI -> "मुख्य पुजारी • श्री शिव सुब्रमण्य स्वामी मंदिर, नादी, फिजी द्वीप • Ph: +6797607465"
+            AppLanguage.ENGLISH -> "Head Priest • Sri Siva Subramaniya Swami Kovil, Nadi, Fiji Islands • Ph: +6797607465"
+        }
         canvas.drawText(priestTemple, px, py, textPaint.apply { textSize = 7.8f; color = textDark })
 
         // Right-side Auspicious Seal Badge
@@ -573,9 +598,23 @@ object WeddingMatchPdfExporter {
             isAntiAlias = true
         }
         val sealMidX = sealRight - (sealWidth / 2f)
-        canvas.drawText("|| சுபமஸ்து ||", sealMidX, sealTop + 13f, sealPaint)
-        canvas.drawText("ஸ்ரீ சுப்பிரமணிய", sealMidX, sealTop + 24f, sealPaint)
-        canvas.drawText("சுவாமி துணை", sealMidX, sealTop + 34f, sealPaint)
+        when (lang) {
+            AppLanguage.TAMIL -> {
+                canvas.drawText("|| சுபமஸ்து ||", sealMidX, sealTop + 13f, sealPaint)
+                canvas.drawText("ஸ்ரீ சுப்பிரமணிய", sealMidX, sealTop + 24f, sealPaint)
+                canvas.drawText("சுவாமி துணை", sealMidX, sealTop + 34f, sealPaint)
+            }
+            AppLanguage.HINDI -> {
+                canvas.drawText("॥ शुभमस्तु ॥", sealMidX, sealTop + 13f, sealPaint)
+                canvas.drawText("श्री सुब्रमण्य", sealMidX, sealTop + 24f, sealPaint)
+                canvas.drawText("स्वामी कृपा", sealMidX, sealTop + 34f, sealPaint)
+            }
+            AppLanguage.ENGLISH -> {
+                canvas.drawText("|| Subhamastu ||", sealMidX, sealTop + 13f, sealPaint)
+                canvas.drawText("Sri Subramaniya", sealMidX, sealTop + 24f, sealPaint)
+                canvas.drawText("Swami Blessings", sealMidX, sealTop + 34f, sealPaint)
+            }
+        }
 
         y += priestCardHeight + 7f
 
@@ -590,18 +629,26 @@ object WeddingMatchPdfExporter {
             val gx2 = tableLeft + 8f
 
             val guideTitle = when (lang) {
-                AppLanguage.TAMIL -> "முக்கிய பொருத்த விளக்கம் (Key Astrological Factors):"
-                AppLanguage.HINDI -> "मुख्य मिलान सूत्र (Key Astrological Factors):"
+                AppLanguage.TAMIL -> "முக்கிய பொருத்த விளக்கம்:"
+                AppLanguage.HINDI -> "मुख्य मिलान सूत्र:"
                 AppLanguage.ENGLISH -> "Key Astrological Marriage Harmony Factors:"
             }
             canvas.drawText(guideTitle, gx2, gy2, boldTextPaint.apply { color = deepMaroon; textSize = 8f })
             gy2 += 11f
 
-            val rajjuNote = "• ரஜ்ஜுப் பொருத்தம்: தம்பதியரின் மாங்கல்ய பலம் மற்றும் தீர்க்காயுளுக்கு அதிமுக்கிய பொருத்தமாகும்."
+            val rajjuNote = when (lang) {
+                AppLanguage.TAMIL -> "• ரஜ்ஜுப் பொருத்தம்: தம்பதியரின் மாங்கல்ய பலம் மற்றும் தீர்க்காயுளுக்கு அதிமுக்கிய பொருத்தமாகும்."
+                AppLanguage.HINDI -> "• रज्जु मिलान: दांपत्य जीवन में दीर्घायु एवं अखंड सौभाग्य हेतु अत्यंत महत्वपूर्ण मिलान है।"
+                AppLanguage.ENGLISH -> "• Rajju Match: Most crucial for marital longevity and unbroken union."
+            }
             canvas.drawText(rajjuNote.take(90), gx2, gy2, labelPaint.apply { textSize = 7.2f })
             gy2 += 10.5f
 
-            val ganaDinaNote = "• தினப் பொருத்தம் & கணப் பொருத்தம்: தேக சௌக்கியம், ஆயுள் விருத்தி மற்றும் தம்பதியர் மன ஒற்றுமைக்கு உகந்தது."
+            val ganaDinaNote = when (lang) {
+                AppLanguage.TAMIL -> "• தினப் பொருத்தம் & கணப் பொருத்தம்: தேக சௌக்கியம், ஆயுள் விருத்தி மற்றும் தம்பதியர் மன ஒற்றுமைக்கு உகந்தது."
+                AppLanguage.HINDI -> "• दिन एवं गण मिलान: उत्तम स्वास्थ्य, आरोग्य, दीर्घायु एवं आपसी सामंजस्य के लिए आवश्यक है।"
+                AppLanguage.ENGLISH -> "• Dina & Gana Match: Essential for physical health, longevity, and mental harmony."
+            }
             canvas.drawText(ganaDinaNote.take(90), gx2, gy2, labelPaint.apply { textSize = 7.2f })
         }
 
@@ -616,7 +663,7 @@ object WeddingMatchPdfExporter {
         val footerText = when (lang) {
             AppLanguage.TAMIL -> "ஓம் சரவணபவ • ஸ்ரீ சிவ சுப்பிரமணிய சுவாமி துணை • லோகா சமஸ்தா சுகினோ பவந்து • சுபம்"
             AppLanguage.HINDI -> "॥ ॐ नमः शिवाय ॥ श्री शिव सुब्रमण्य स्वामी प्रसन्न ॥ लोकाः समस्ताः सुखिनो भवन्तु ॥ शुभम् ॥"
-            AppLanguage.ENGLISH -> "Om Saravanabhava • Sri Siva Subramaniya Swami Thunai • Subhamastu"
+            AppLanguage.ENGLISH -> "Om Saravanabhava • Sri Siva Subramaniya Swami Blessings • Subhamastu"
         }
         canvas.drawText(footerText, PAGE_WIDTH / 2f, PAGE_HEIGHT - 22f, footerPaint)
     }
@@ -648,16 +695,56 @@ object WeddingMatchPdfExporter {
 
     private fun getStandardPoruthamName(index: Int, lang: AppLanguage, originalName: String): String {
         return when (index) {
-            0 -> if (lang == AppLanguage.TAMIL) "1. தினப் பொருத்தம் (Dina)" else "1. Dina Porutham"
-            1 -> if (lang == AppLanguage.TAMIL) "2. கணப் பொருத்தம் (Gana)" else "2. Gana Porutham"
-            2 -> if (lang == AppLanguage.TAMIL) "3. மகேந்திரம் (Mahendra)" else "3. Mahendra Porutham"
-            3 -> if (lang == AppLanguage.TAMIL) "4. ஸ்திரீ தீர்க்கம் (Stree)" else "4. Stree Deergha"
-            4 -> if (lang == AppLanguage.TAMIL) "5. யோனிப் பொருத்தம் (Yoni)" else "5. Yoni Porutham"
-            5 -> if (lang == AppLanguage.TAMIL) "6. ராசிப் பொருத்தம் (Rasi)" else "6. Rasi Porutham"
-            6 -> if (lang == AppLanguage.TAMIL) "7. ராசி அதிபதி (Lord)" else "7. Rasiyadhipathi"
-            7 -> if (lang == AppLanguage.TAMIL) "8. வசியப் பொருத்தம் (Vasiya)" else "8. Vasiya Porutham"
-            8 -> if (lang == AppLanguage.TAMIL) "9. ரஜ்ஜுப் பொருத்தம் (Rajju)" else "9. Rajju Porutham"
-            9 -> if (lang == AppLanguage.TAMIL) "10. வேதைப் பொருத்தம் (Vedha)" else "10. Vedhai Porutham"
+            0 -> when (lang) {
+                AppLanguage.TAMIL -> "1. தினப் பொருத்தம்"
+                AppLanguage.HINDI -> "1. दिन मिलान (Dina)"
+                AppLanguage.ENGLISH -> "1. Dina Porutham"
+            }
+            1 -> when (lang) {
+                AppLanguage.TAMIL -> "2. கணப் பொருத்தம்"
+                AppLanguage.HINDI -> "2. गण मिलान (Gana)"
+                AppLanguage.ENGLISH -> "2. Gana Porutham"
+            }
+            2 -> when (lang) {
+                AppLanguage.TAMIL -> "3. மகேந்திரப் பொருத்தம்"
+                AppLanguage.HINDI -> "3. महेन्द्र मिलान (Mahendra)"
+                AppLanguage.ENGLISH -> "3. Mahendra Porutham"
+            }
+            3 -> when (lang) {
+                AppLanguage.TAMIL -> "4. ஸ்திரீ தீர்க்கம்"
+                AppLanguage.HINDI -> "4. स्त्री दीर्घ (Stree)"
+                AppLanguage.ENGLISH -> "4. Stree Deergha"
+            }
+            4 -> when (lang) {
+                AppLanguage.TAMIL -> "5. யோனிப் பொருத்தம்"
+                AppLanguage.HINDI -> "5. योनि मिलान (Yoni)"
+                AppLanguage.ENGLISH -> "5. Yoni Porutham"
+            }
+            5 -> when (lang) {
+                AppLanguage.TAMIL -> "6. ராசிப் பொருத்தம்"
+                AppLanguage.HINDI -> "6. राशि मिलान (Rasi)"
+                AppLanguage.ENGLISH -> "6. Rasi Porutham"
+            }
+            6 -> when (lang) {
+                AppLanguage.TAMIL -> "7. ராசி அதிபதி"
+                AppLanguage.HINDI -> "7. राश्याधिपति (Lord)"
+                AppLanguage.ENGLISH -> "7. Rasi Lord Match"
+            }
+            7 -> when (lang) {
+                AppLanguage.TAMIL -> "8. வசியப் பொருத்தம்"
+                AppLanguage.HINDI -> "8. वश्य मिलान (Vasiya)"
+                AppLanguage.ENGLISH -> "8. Vasiya Porutham"
+            }
+            8 -> when (lang) {
+                AppLanguage.TAMIL -> "9. ரஜ்ஜுப் பொருத்தம்"
+                AppLanguage.HINDI -> "9. रज्जु मिलान (Rajju)"
+                AppLanguage.ENGLISH -> "9. Rajju Porutham"
+            }
+            9 -> when (lang) {
+                AppLanguage.TAMIL -> "10. வேதைப் பொருத்தம்"
+                AppLanguage.HINDI -> "10. वेधा मिलान (Vedha)"
+                AppLanguage.ENGLISH -> "10. Vedha Porutham"
+            }
             else -> originalName
         }
     }

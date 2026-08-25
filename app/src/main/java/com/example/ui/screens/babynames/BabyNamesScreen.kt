@@ -46,6 +46,7 @@ fun BabyNamesScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val allNakshatras = viewModel.allNakshatraLetters
+    var showPdfLanguageDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier
@@ -186,13 +187,7 @@ fun BabyNamesScreen(
                         result = result,
                         currentLanguage = currentLanguage,
                         onExportPdf = {
-                            val file = viewModel.exportPdfCertificate(context, currentLanguage)
-                            if (file != null) {
-                                Toast.makeText(context, "3-Language PDF Certificate Ready!", Toast.LENGTH_SHORT).show()
-                                BabyNamePdfExporter.shareBabyNamingPdf(context, file, result.babyName)
-                            } else {
-                                Toast.makeText(context, "Failed to generate PDF", Toast.LENGTH_SHORT).show()
-                            }
+                            showPdfLanguageDialog = true
                         }
                     )
                 }
@@ -291,6 +286,133 @@ fun BabyNamesScreen(
                 NakshatraSummaryCard(star = star, currentLanguage = currentLanguage)
             }
         }
+    }
+
+    // PDF Language Selection Dialog
+    if (showPdfLanguageDialog && uiState.birthResult != null) {
+        val result = uiState.birthResult!!
+        AlertDialog(
+            onDismissRequest = { showPdfLanguageDialog = false },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = TempleMaroon)
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "PDF மொழி தேர்வு"
+                            AppLanguage.HINDI -> "PDF भाषा चयन"
+                            AppLanguage.ENGLISH -> "PDF Language Selection"
+                        },
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "நாமகரண சான்றிதழ் PDF-ஐ எந்த மொழியில் உருவாக்க வேண்டும்?"
+                            AppLanguage.HINDI -> "नामकरण प्रमाण पत्र किस भाषा में PDF डाउनलोड करना है?"
+                            AppLanguage.ENGLISH -> "Select the language for the Vedic Baby Naming Certificate PDF:"
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    // Tamil Option
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPdfLanguageDialog = false
+                                val file = viewModel.exportPdfCertificate(context, AppLanguage.TAMIL)
+                                if (file != null) {
+                                    Toast.makeText(context, "தமிழ் PDF உருவாக்கப்பட்டது!", Toast.LENGTH_SHORT).show()
+                                    BabyNamePdfExporter.shareBabyNamingPdf(context, file, result.babyName, AppLanguage.TAMIL)
+                                }
+                            },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text("🕉️", fontSize = 20.sp)
+                            Column {
+                                Text("தமிழ் (Tamil)", fontWeight = FontWeight.Bold, color = TempleMaroon)
+                                Text("100% தூய தமிழ் வேத நாமகரண சான்றிதழ்", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+
+                    // English Option
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPdfLanguageDialog = false
+                                val file = viewModel.exportPdfCertificate(context, AppLanguage.ENGLISH)
+                                if (file != null) {
+                                    Toast.makeText(context, "English PDF Generated!", Toast.LENGTH_SHORT).show()
+                                    BabyNamePdfExporter.shareBabyNamingPdf(context, file, result.babyName, AppLanguage.ENGLISH)
+                                }
+                            },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text("📜", fontSize = 20.sp)
+                            Column {
+                                Text("English", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                Text("100% Pure English Vedic Naming Certificate", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+
+                    // Hindi Option
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPdfLanguageDialog = false
+                                val file = viewModel.exportPdfCertificate(context, AppLanguage.HINDI)
+                                if (file != null) {
+                                    Toast.makeText(context, "हिन्दी PDF तैयार है!", Toast.LENGTH_SHORT).show()
+                                    BabyNamePdfExporter.shareBabyNamingPdf(context, file, result.babyName, AppLanguage.HINDI)
+                                }
+                            },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text("🕉️", fontSize = 20.sp)
+                            Column {
+                                Text("हिन्दी (Hindi)", fontWeight = FontWeight.Bold, color = TempleMaroon)
+                                Text("100% शुद्ध हिन्दी वैदिक नामकरण प्रमाण पत्र", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPdfLanguageDialog = false }) {
+                    Text(when (currentLanguage) {
+                        AppLanguage.TAMIL -> "மூடு"
+                        AppLanguage.HINDI -> "बंद करें"
+                        AppLanguage.ENGLISH -> "Close"
+                    })
+                }
+            }
+        )
     }
 }
 
@@ -776,7 +898,7 @@ fun BabyNamingResultCard(
 
             HorizontalDivider()
 
-            // EXPORT CERTIFICATE PDF BUTTON (TRILINGUAL PDF)
+            // EXPORT CERTIFICATE PDF BUTTON
             Button(
                 onClick = onExportPdf,
                 modifier = Modifier
@@ -792,9 +914,9 @@ fun BabyNamingResultCard(
                     Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = TempleGold)
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "நாமகரண சான்றிதழ் PDF பதிவிறக்கம் / பகிர்வு (3 மொழிகள்)"
-                            AppLanguage.HINDI -> "नामकरण प्रमाण पत्र PDF डाउनलोड (3 भाषाएं)"
-                            AppLanguage.ENGLISH -> "Export Naming Certificate PDF (Trilingual)"
+                            AppLanguage.TAMIL -> "நாமகரண சான்றிதழ் PDF பதிவிறக்கம் / பகிர்வு"
+                            AppLanguage.HINDI -> "नामकरण प्रमाण पत्र PDF डाउनलोड / शेयर"
+                            AppLanguage.ENGLISH -> "Export Naming Certificate PDF"
                         },
                         fontWeight = FontWeight.Bold,
                         color = Color.White

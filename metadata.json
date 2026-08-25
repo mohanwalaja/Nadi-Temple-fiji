@@ -1,6 +1,6 @@
 {
   "name": "Sri Siva Subramaniya Swami Kovil",
-  "description": "Tamil-first Hindu temple, Panchangam, Tamil calendar, and astrology app for Sri Siva Subramaniya Swami Kovil devotees.",
+  "description": "Vedic Astrology, Jathagam (ஜாதகம்), Thirumana Porutham (திருமணப் பொருத்தம்), and Baby Naming Letters (குழந்தை பெயர்) app for Sri Siva Subramaniya Swami Kovil devotees.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -5,17 +5,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.ChildCare
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -24,10 +19,6 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.AppLanguage
 import com.example.data.repository.AppStrings
 import com.example.ui.navigation.Screen
-import com.example.ui.theme.TempleGold
-import com.example.ui.theme.TempleGoldLight
-import com.example.ui.theme.TempleMaroon
-import com.example.ui.theme.TempleSandal
 
 data class NavItem(
     val route: String,
@@ -44,13 +35,6 @@ fun TempleBottomBar(
     onNavigate: (String) -> Unit
 ) {
     val items = listOf(
-        NavItem(
-            route = Screen.Panchangam.route,
-            filledIcon = Icons.Filled.WbSunny,
-            outlinedIcon = Icons.Outlined.WbSunny,
-            labelProvider = { AppStrings.panchangam(it) },
-            testTag = "nav_bottom_panchangam"
-        ),
         NavItem(
             route = Screen.Jathagam.route,
             filledIcon = Icons.Filled.AutoAwesome,
@@ -96,7 +80,7 @@ fun TempleBottomBar(
                     Text(
                         text = label,
                         maxLines = 1,
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                     )
                 },
