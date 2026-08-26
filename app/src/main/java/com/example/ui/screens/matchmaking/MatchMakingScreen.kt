@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.*
 import com.example.data.service.MatchMakingCalculator
+import com.example.ui.components.LocationSearchDialog
 import com.example.ui.theme.*
 import java.time.LocalDate
 import java.time.LocalTime
@@ -708,45 +709,77 @@ fun PersonBirthInputCard(
                 }
             }
 
-            // Birth Place
-            var placeExpanded by remember { mutableStateOf(false) }
-            val commonPlaces = listOf("Chennai", "Madurai", "Trichy", "Coimbatore", "Salem", "Nadi, Fiji", "Suva, Fiji", "Sydney", "Singapore", "Kuala Lumpur", "London", "New York")
+            // Birth Place with Google Maps / Search Picker
+            var showLocationSearchDialog by remember { mutableStateOf(false) }
 
-            ExposedDropdownMenuBox(
-                expanded = placeExpanded,
-                onExpandedChange = { placeExpanded = !placeExpanded }
-            ) {
-                OutlinedTextField(
-                    value = place,
-                    onValueChange = onPlaceChange,
-                    label = {
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "பிறந்த இடம்"
-                                AppLanguage.HINDI -> "जन्म स्थान"
-                                AppLanguage.ENGLISH -> "Birth Place"
-                            }
-                        )
-                    },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = placeExpanded) },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+            if (showLocationSearchDialog) {
+                LocationSearchDialog(
+                    currentLanguage = currentLanguage,
+                    initialPlace = place,
+                    onDismiss = { showLocationSearchDialog = false },
+                    onSelectLocation = { newPlace ->
+                        onPlaceChange(newPlace)
+                        showLocationSearchDialog = false
+                    }
                 )
-                ExposedDropdownMenu(
-                    expanded = placeExpanded,
-                    onDismissRequest = { placeExpanded = false }
-                ) {
-                    commonPlaces.forEach { p ->
-                        DropdownMenuItem(
-                            text = { Text(p) },
-                            onClick = {
-                                onPlaceChange(p)
-                                placeExpanded = false
-                            }
+            }
+
+            OutlinedTextField(
+                value = place,
+                onValueChange = onPlaceChange,
+                label = {
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "பிறந்த இடம்"
+                            AppLanguage.HINDI -> "जन्म स्थान"
+                            AppLanguage.ENGLISH -> "Birth Place"
+                        }
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.LocationOn,
+                        contentDescription = null,
+                        tint = accentColor
+                    )
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { showLocationSearchDialog = true }
+                    ) {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = "Search Location",
+                            tint = accentColor
                         )
                     }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                singleLine = true
+            )
+
+            // Quick Map Picker Button
+            OutlinedButton(
+                onClick = { showLocationSearchDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(Icons.Filled.Map, contentDescription = null, tint = accentColor, modifier = Modifier.size(16.dp))
+                    Text(
+                        text = when (currentLanguage) {
+                            AppLanguage.TAMIL -> "🗺️ கூகுள் மேப்ஸ் / ஊர் தேடல்"
+                            AppLanguage.HINDI -> "🗺️ गूगल मैप्स / स्थान खोजें"
+                            AppLanguage.ENGLISH -> "🗺️ Google Maps / Search Location"
+                        },
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
 
@@ -1159,7 +1192,7 @@ fun PoruthamDetailCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
@@ -1169,7 +1202,8 @@ fun PoruthamDetailCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Surface(
                         shape = CircleShape,
@@ -1177,7 +1211,7 @@ fun PoruthamDetailCard(
                         modifier = Modifier.size(24.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Text(iconText, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(iconText, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                     Text(
@@ -1195,11 +1229,11 @@ fun PoruthamDetailCard(
                                 text = when (currentLanguage) {
                                     AppLanguage.TAMIL -> "மகா பொருத்தம்"
                                     AppLanguage.HINDI -> "महा पोरुथम"
-                                    AppLanguage.ENGLISH -> "Crucial Match"
+                                    AppLanguage.ENGLISH -> "Crucial"
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 10.sp,
+                                fontSize = 9.sp,
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                             )
                         }
@@ -1207,7 +1241,7 @@ fun PoruthamDetailCard(
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Text(
@@ -1220,11 +1254,16 @@ fun PoruthamDetailCard(
                 }
             }
 
+            // Meaning of the porutham wraps to second line and finishes all words fully
             Text(
                 text = porutham.getExplanation(currentLanguage),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 18.sp
+                lineHeight = 19.sp,
+                softWrap = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 2.dp)
             )
         }
     }

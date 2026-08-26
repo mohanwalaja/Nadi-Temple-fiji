@@ -547,7 +547,7 @@ fun BirthDetailsInputCard(
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
                             text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "பிறந்த தேதி (DOB)"
+                                AppLanguage.TAMIL -> "பிறந்த தேதி"
                                 AppLanguage.HINDI -> "जन्म तिथि"
                                 AppLanguage.ENGLISH -> "Date of Birth"
                             },
@@ -577,7 +577,7 @@ fun BirthDetailsInputCard(
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
                             text = when (currentLanguage) {
-                                AppLanguage.TAMIL -> "பிறந்த நேரம் (TOB)"
+                                AppLanguage.TAMIL -> "பிறந்த நேரம்"
                                 AppLanguage.HINDI -> "जन्म समय"
                                 AppLanguage.ENGLISH -> "Time of Birth"
                             },
@@ -599,8 +599,8 @@ fun BirthDetailsInputCard(
                 onValueChange = onPlaceChange,
                 label = {
                     Text(when (currentLanguage) {
-                        AppLanguage.TAMIL -> "பிறந்த இடம் (Place of Birth)"
-                        AppLanguage.HINDI -> "जन्म स्थान (Birth Place)"
+                        AppLanguage.TAMIL -> "பிறந்த இடம்"
+                        AppLanguage.HINDI -> "जन्म स्थान"
                         AppLanguage.ENGLISH -> "Place of Birth"
                     })
                 },
@@ -634,9 +634,9 @@ fun BirthDetailsInputCard(
                     Icon(Icons.Filled.Map, contentDescription = null, tint = TempleMaroon)
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "🗺️ வரைபடம் / தேடல் / ஜிபிஎஸ் மூலம் இடம் மாற்றுக"
-                            AppLanguage.HINDI -> "🗺️ गूगल मैप्स / खोज / जीपीएस से स्थान बदलें"
-                            AppLanguage.ENGLISH -> "🗺️ Change Location via Map / Search / GPS"
+                            AppLanguage.TAMIL -> "🗺️ கூகுள் மேப்ஸ் / ஊர் தேடல்"
+                            AppLanguage.HINDI -> "🗺️ गूगल मैप्स / स्थान खोजें"
+                            AppLanguage.ENGLISH -> "🗺️ Google Maps / Search Location"
                         },
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
@@ -718,7 +718,7 @@ fun BabyNamingResultCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "⭐ ${star.getName(currentLanguage)} ($padaLabel)",
                         style = MaterialTheme.typography.titleMedium,
@@ -732,6 +732,8 @@ fun BabyNamingResultCard(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = TempleGold.copy(alpha = 0.2f)
@@ -740,7 +742,8 @@ fun BabyNamingResultCard(
                         text = star.getLettersSummary(currentLanguage),
                         fontWeight = FontWeight.Bold,
                         color = TempleMaroon,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -793,9 +796,9 @@ fun BabyNamingResultCard(
 
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "${result.primaryPadaInfo.letterTa} (${result.primaryPadaInfo.letterEn})"
-                            AppLanguage.HINDI -> "${result.primaryPadaInfo.letterHi} (${result.primaryPadaInfo.letterEn})"
-                            AppLanguage.ENGLISH -> "${result.primaryPadaInfo.letterEn} (${result.primaryPadaInfo.letterTa})"
+                            AppLanguage.TAMIL -> result.primaryPadaInfo.letterTa
+                            AppLanguage.HINDI -> result.primaryPadaInfo.letterHi
+                            AppLanguage.ENGLISH -> result.primaryPadaInfo.letterEn
                         },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -843,9 +846,9 @@ fun BabyNamingResultCard(
                         border = if (isCurrent) CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(TempleMaroon)) else null
                     ) {
                         Column(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(3.dp)
                         ) {
                             Surface(
                                 shape = CircleShape,
@@ -868,18 +871,10 @@ fun BabyNamingResultCard(
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
                                 },
-                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 18.sp else 20.sp,
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 17.sp else 19.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
-
-                            if (currentLanguage != AppLanguage.ENGLISH) {
-                                Text(
-                                    text = pada.letterEn,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
 
                             Text(
                                 text = when (currentLanguage) {
@@ -887,9 +882,10 @@ fun BabyNamingResultCard(
                                     AppLanguage.HINDI -> pada.rasiHi
                                     AppLanguage.ENGLISH -> pada.rasiEn
                                 },
-                                fontSize = 9.sp,
+                                fontSize = 8.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = TempleGoldDark
+                                color = TempleGoldDark,
+                                maxLines = 1
                             )
                         }
                     }
@@ -948,20 +944,13 @@ fun NakshatraSpotlightCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f, fill = false)) {
                     Text(
                         text = "${star.nakshatraIndex}. ${star.getName(currentLanguage)}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = TempleMaroon
                     )
-                    if (currentLanguage == AppLanguage.TAMIL) {
-                        Text(
-                            text = "(${star.nakshatraNameEn})",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
 
                 Surface(
@@ -982,7 +971,7 @@ fun NakshatraSpotlightCard(
             // 4 Padas Visual Display Grid
             Text(
                 text = when (currentLanguage) {
-                    AppLanguage.TAMIL -> "4 பாதங்களின் சுப ஆரம்ப எழுத்துக்கள் (4 Padas):"
+                    AppLanguage.TAMIL -> "4 பாதங்களின் சுப ஆரம்ப எழுத்துக்கள்:"
                     AppLanguage.HINDI -> "4 चरणों के शुभ अक्षर:"
                     AppLanguage.ENGLISH -> "Auspicious Starting Letters for 4 Padas:"
                 },
@@ -1002,9 +991,9 @@ fun NakshatraSpotlightCard(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Column(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(3.dp)
                         ) {
                             Surface(
                                 shape = CircleShape,
@@ -1022,36 +1011,23 @@ fun NakshatraSpotlightCard(
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
                                 },
-                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 18.sp else 22.sp,
+                                fontSize = if (currentLanguage == AppLanguage.ENGLISH) 18.sp else 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
-                            if (currentLanguage != AppLanguage.ENGLISH) {
-                                Text(
-                                    text = pada.letterEn,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(4.dp),
-                                color = TempleGold.copy(alpha = 0.2f)
-                            ) {
-                                Text(
-                                    text = when (currentLanguage) {
-                                        AppLanguage.TAMIL -> pada.rasiTa
-                                        AppLanguage.HINDI -> pada.rasiHi
-                                        AppLanguage.ENGLISH -> pada.rasiEn
-                                    },
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = TempleMaroon,
-                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                                )
-                            }
+                            Text(
+                                text = when (currentLanguage) {
+                                    AppLanguage.TAMIL -> pada.rasiTa
+                                    AppLanguage.HINDI -> pada.rasiHi
+                                    AppLanguage.ENGLISH -> pada.rasiEn
+                                },
+                                style = MaterialTheme.typography.labelSmall,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TempleMaroon,
+                                maxLines = 1,
+                                modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
+                            )
                         }
                     }
                 }
@@ -1128,7 +1104,8 @@ fun NakshatraSummaryCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Surface(
                         shape = CircleShape,
@@ -1141,7 +1118,7 @@ fun NakshatraSummaryCard(
                     }
                     Text(
                         text = when (currentLanguage) {
-                            AppLanguage.TAMIL -> "${star.nakshatraIndex}. ${star.nakshatraNameTa} (${star.nakshatraNameEn})"
+                            AppLanguage.TAMIL -> "${star.nakshatraIndex}. ${star.nakshatraNameTa}"
                             AppLanguage.HINDI -> "${star.nakshatraIndex}. ${star.nakshatraNameHi}"
                             AppLanguage.ENGLISH -> "${star.nakshatraIndex}. ${star.nakshatraNameEn}"
                         },
@@ -1186,7 +1163,7 @@ fun NakshatraSummaryCard(
                                 fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                when (currentLanguage) {
+                                text = when (currentLanguage) {
                                     AppLanguage.TAMIL -> pada.letterTa
                                     AppLanguage.HINDI -> pada.letterHi
                                     AppLanguage.ENGLISH -> pada.letterEn
@@ -1195,16 +1172,14 @@ fun NakshatraSummaryCard(
                                 fontWeight = FontWeight.Bold,
                                 color = TempleMaroon
                             )
-                            if (currentLanguage != AppLanguage.ENGLISH) {
-                                Text(pada.letterEn, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
                             Text(
-                                when (currentLanguage) {
+                                text = when (currentLanguage) {
                                     AppLanguage.TAMIL -> pada.rasiTa
                                     AppLanguage.HINDI -> pada.rasiHi
                                     AppLanguage.ENGLISH -> pada.rasiEn
                                 },
-                                fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = TempleGoldDark
+                                fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = TempleGoldDark,
+                                maxLines = 1
                             )
                         }
                     }

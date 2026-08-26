@@ -442,7 +442,7 @@ object WeddingMatchPdfExporter {
         val rowPaintOdd = Paint().apply { color = Color.rgb(250, 247, 240); style = Paint.Style.FILL }
         val gridLinePaint = Paint().apply { color = Color.rgb(228, 220, 205); strokeWidth = 0.6f }
 
-        val rowHeight = 20f
+        val rowHeight = 24f
         result.poruthams.forEachIndexed { index, p ->
             val rowY = y
             canvas.drawRect(tableLeft, rowY, tableRight, rowY + rowHeight, if (index % 2 == 0) rowPaintEven else rowPaintOdd)
@@ -460,24 +460,35 @@ object WeddingMatchPdfExporter {
             }
 
             // Col 0: No
-            canvas.drawText("${index + 1}", col0 + 5f, rowY + 13f, textPaint.apply { textSize = 7.8f })
+            canvas.drawText("${index + 1}", col0 + 5f, rowY + 15f, textPaint.apply { textSize = 7.8f })
 
             // Col 1: Porutham Name (Clean & Formatted)
             val pName = getStandardPoruthamName(index, lang, p.getName(lang))
-            canvas.drawText(pName, col1 + 4f, rowY + 13f, boldTextPaint.apply { textSize = 7.8f })
+            canvas.drawText(pName, col1 + 4f, rowY + 15f, boldTextPaint.apply { textSize = 7.8f })
 
-            // Col 2: Explanation (Cleanly trimmed to fit 260f width)
+            // Col 2: Explanation (Clean 2-line wrapping so meaning is fully visible without cutoffs)
             val rawExp = p.getExplanation(lang)
-            val maxChars = 52
-            val expClean = if (rawExp.length > maxChars) rawExp.take(maxChars - 1) + "…" else rawExp
-            canvas.drawText(expClean, col2 + 4f, rowY + 13f, textPaint.apply { textSize = 7.2f; color = textDark })
+            val expPaint = Paint().apply {
+                color = textDark
+                textSize = 6.9f
+                isAntiAlias = true
+                typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+            }
+            val maxCol2Width = w2 - 8f
+            val expLines = wrapTextToLines(rawExp, expPaint, maxCol2Width, 2)
+            if (expLines.size <= 1) {
+                canvas.drawText(expLines.getOrElse(0) { "" }, col2 + 4f, rowY + 15f, expPaint)
+            } else {
+                canvas.drawText(expLines[0], col2 + 4f, rowY + 10f, expPaint)
+                canvas.drawText(expLines[1], col2 + 4f, rowY + 19.5f, expPaint)
+            }
 
             // Col 3: Status Verdict
-            canvas.drawText(p.status.getName(lang), col3 + 4f, rowY + 13f, statusPaint)
+            canvas.drawText(p.status.getName(lang), col3 + 4f, rowY + 15f, statusPaint)
 
             // Col 4: Points
             val ptsStr = if (p.pointsEarned == p.pointsEarned.toInt().toDouble()) "${p.pointsEarned.toInt()} / ${p.maxPoints.toInt()}" else "${p.pointsEarned} / ${p.maxPoints.toInt()}"
-            canvas.drawText(ptsStr, col4 + 6f, rowY + 13f, boldTextPaint.apply { textSize = 7.8f; color = textDark })
+            canvas.drawText(ptsStr, col4 + 6f, rowY + 15f, boldTextPaint.apply { textSize = 7.8f; color = textDark })
 
             // Horizontal row line
             canvas.drawLine(tableLeft, rowY + rowHeight, tableRight, rowY + rowHeight, gridLinePaint)
@@ -904,3 +915,42 @@ object WeddingMatchPdfExporter {
         else -> key
     }
 }
+
+private fun wrapTextToLines(text: String, paint: Paint, maxWidth: Float, maxLines: Int = 2): List<String> {
+    if (paint.measureText(text) <= maxWidth) return listOf(text)
+    val words = text.split(" ")
+    val lines = mutableListOf<String>()
+    var currentLine = ""
+
+    for (word in words) {
+        val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+        if (paint.measureText(testLine) <= maxWidth) {
+            currentLine = testLine
+        } else {
+            if (currentLine.isNotEmpty()) {
+                lines.add(currentLine)
+            }
+            if (lines.size >= maxLines - 1) {
+                // Building the last allowed line
+                currentLine = word
+            } else if (lines.size >= maxLines) {
+                currentLine = ""
+                break
+            } else {
+                currentLine = word
+            }
+        }
+    }
+    if (currentLine.isNotEmpty() && lines.size < maxLines) {
+        var finalLine = currentLine
+        if (paint.measureText(finalLine) > maxWidth) {
+            while (finalLine.isNotEmpty() && paint.measureText("$finalLine…") > maxWidth) {
+                finalLine = finalLine.dropLast(1)
+            }
+            finalLine = "$finalLine…"
+        }
+        lines.add(finalLine)
+    }
+    return lines
+}
+
