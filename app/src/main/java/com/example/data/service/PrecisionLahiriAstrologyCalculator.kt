@@ -233,7 +233,10 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val loc = resolveLocation(birthPlace)
 
         // 1. Julian Day & Ephemeris Time (UTC)
-        val birthUtcHour = tob.hour + (tob.minute / 60.0) + (tob.second / 3600.0) - loc.utcOffsetHours
+        // Preset offsets ignore historical DST (Fiji was UTC+13 in summer through early 2021;
+        // Sydney / London / New York shift every year). Resolve the civil offset at the birth instant.
+        val offsetHours = VedicAstronomy.offsetHoursAt(loc.lat, loc.lon, loc.utcOffsetHours, dob, tob)
+        val birthUtcHour = tob.hour + (tob.minute / 60.0) + (tob.second / 3600.0) - offsetHours
         var calcDate = dob
         var adjustedUtcHour = birthUtcHour
         if (adjustedUtcHour < 0.0) {
@@ -248,7 +251,7 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val t = (jd - 2451545.0) / 36525.0 // Julian centuries from standard epoch J2000.0
 
         // 2. Chitra Paksha (Lahiri) Ayanamsa - Indian Astronomical Ephemeris standard (23° 51' 25.53" at J2000)
-        val ayanamsaDeg = 23.85709167 + 1.396971 * t + 0.000308 * t * t
+        val ayanamsaDeg = VedicAstronomy.lahiriAyanamsaDegrees(t)
 
         // 3. Ascendant (Lagna) via Spherical Trigonometry & Local Sidereal Time
         val lagnaSidereal = calculateSiderealAscendant(jd, t, loc.lat, loc.lon, ayanamsaDeg)
@@ -363,6 +366,7 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val rahuLon = grahaLongitudes[Graha.RAHU] ?: 0.0
         val ketuLon = grahaLongitudes[Graha.KETU] ?: 0.0
         val isKalaSarpa = checkKalaSarpa(grahaLongitudes, rahuLon, ketuLon)
+        val isPitruDosha = checkPitruDosha(planetPositions, bhavas, grahaLongitudes)
 
         val doshas = listOf(
             DoshaCheckResult(
@@ -380,21 +384,21 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
                 nameTa = "கால சர்ப்ப தோஷம் (Kala Sarpa Dosha)",
                 nameEn = "Kala Sarpa Dosha",
                 isPresent = isKalaSarpa,
-                severityTa = if (isKalaSarpa) "அம்ச கால சர்ப்பம்" else "தோஷம் இல்லை",
-                severityEn = if (isKalaSarpa) "Partial Kala Sarpa" else "No Dosha",
-                descriptionTa = if (isKalaSarpa) "கிரகங்கள் ராகு-கேது அச்சிற்குள் பெரும்பாலும் நிலைபெற்றுள்ளன." else "கிரகங்கள் ராகு-கேது அச்சிற்கு வெளியே சுப நிலையாக பரவியுள்ளன.",
-                descriptionEn = if (isKalaSarpa) "Planets are aligned primarily between the Rahu-Ketu nodal axis." else "Planets are well distributed across the natal chart.",
+                severityTa = if (isKalaSarpa) "கால சர்ப்ப தோஷம் உண்டு" else "தோஷம் இல்லை",
+                severityEn = if (isKalaSarpa) "Kala Sarpa present" else "No Dosha",
+                descriptionTa = if (isKalaSarpa) "ஏழு கிரகங்களும் ராகு-கேது அச்சுக்கு ஒரே பக்கத்தில் உள்ளன." else "கிரகங்கள் ராகு-கேது அச்சுக்கு இருபுறமும் பரவியுள்ளன.",
+                descriptionEn = if (isKalaSarpa) "All seven planets lie on one side of the Rahu-Ketu axis." else "Planets are distributed on both sides of the Rahu-Ketu axis.",
                 traditionalRemedyTa = "நாக சதுர்த்தி நாளில் திருக்காளஹஸ்தி அல்லது நாகராஜர் வழிபாடு மற்றும் ருத்ராபிஷேகம்.",
                 traditionalRemedyEn = "Worship Lord Shiva and Nagaraja on Naga Chaturthi."
             ),
             DoshaCheckResult(
                 nameTa = "பித்ரு தோஷம் (Pitru Dosha Indicator)",
                 nameEn = "Pitru Dosha Indicator",
-                isPresent = false,
-                severityTa = "சுப நிலை (Clear)",
-                severityEn = "Auspicious Status",
-                descriptionTa = "9-ஆம் பாவம் மற்றும் சூரிய பகவான் நல்ல சுப சேர்க்கை பெற்றுள்ளனர்.",
-                descriptionEn = "9th house and Sun receive auspicious aspects.",
+                isPresent = isPitruDosha,
+                severityTa = if (isPitruDosha) "பித்ரு தோஷ அறிகுறி உண்டு" else "சுப நிலை (Clear)",
+                severityEn = if (isPitruDosha) "Pitru Dosha indicated" else "Auspicious Status",
+                descriptionTa = if (isPitruDosha) "சூரியன் அல்லது 9-ஆம் பாவ அதிபதி ராகு/கேது/சனியுடன் சேர்க்கையில் உள்ளார், அல்லது 9-ஆம் பாவத்தில் ராகு/கேது உள்ளது." else "9-ஆம் பாவம் மற்றும் சூரிய பகவான் நல்ல சுப சேர்க்கை பெற்றுள்ளனர்.",
+                descriptionEn = if (isPitruDosha) "Sun or the 9th lord is conjunct Rahu, Ketu or Saturn, or a node occupies the 9th house." else "9th house and Sun are free of the usual Pitru afflictions.",
                 traditionalRemedyTa = "அமாவாசை தோறும் முன்னோர்களுக்கு எள் தர்ப்பணம் மற்றும் ஏழைகளுக்கு அன்னதானம்.",
                 traditionalRemedyEn = "Offer sesame tarpanam and annadhanam on Amavasai days."
             )
@@ -465,7 +469,8 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val trimmedPlace = place.trim().lowercase()
         for ((key, value) in LOCATION_MAP) {
             val lowerKey = key.lowercase()
-            if (trimmedPlace.contains(lowerKey) || lowerKey.contains(trimmedPlace)) {
+            // Reverse-contains only for a real query, so "New" does not bind New Delhi ahead of New York.
+            if (trimmedPlace.contains(lowerKey) || (trimmedPlace.length >= 4 && lowerKey.contains(trimmedPlace))) {
                 return value
             }
         }
@@ -500,18 +505,11 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
 
         // Local Sidereal Time (LST)
         val lst = normalizeDeg(gmst + lonDeg)
-        val ramcRad = Math.toRadians(lst)
 
-        // Obliquity of Ecliptic (eps)
+        // Obliquity of Ecliptic (eps). Eastern-horizon ascendant — not atan2(-cos RAMC, +x),
+        // which is the descendant and places every Lagna in the opposite sign.
         val eps = 23.4392911 - (0.0130042 * t)
-        val epsRad = Math.toRadians(eps)
-        val latRad = Math.toRadians(latDeg)
-
-        // Spherical trigonometry formula for Ascendant
-        val y = -cos(ramcRad)
-        val x = sin(ramcRad) * cos(epsRad) + tan(latRad) * sin(epsRad)
-        var ascTropical = Math.toDegrees(atan2(y, x))
-        ascTropical = normalizeDeg(ascTropical)
+        val ascTropical = VedicAstronomy.tropicalAscendant(lst, latDeg, eps)
 
         // Convert to Sidereal
         return normalizeDeg(ascTropical - ayanamsa)
@@ -586,47 +584,9 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         )
         val (xe, ye, ze) = getPlanetHeliocentricCoords(earthElements, t)
 
-        // 1. SUN (Geocentric Apparent Sun)
-        val mSun = normalizeDeg(357.52911 + 35999.05029 * t - 0.0001537 * t * t)
-        val mSunRad = Math.toRadians(mSun)
-        val l0Sun = normalizeDeg(280.46646 + 36000.76983 * t + 0.0003032 * t * t)
-        val cSun = (1.914602 - 0.004817 * t - 0.000014 * t * t) * sin(mSunRad) +
-                (0.019993 - 0.000101 * t) * sin(2 * mSunRad) +
-                0.000289 * sin(3 * mSunRad)
-        val sunTropical = normalizeDeg(l0Sun + cSun - 0.00569 - 0.00478 * sin(Math.toRadians(125.04 - 1934.136 * t)))
-        result[Graha.SURYA] = normalizeDeg(sunTropical - ayanamsa)
-
-        // 2. MOON (Chapront ELP2000 full precision periodic perturbation series)
-        val lMoon = normalizeDeg(218.3164477 + 481267.881279 * t - 0.0015786 * t * t)
-        val dMoon = normalizeDeg(297.8501921 + 445267.1114034 * t - 0.0018819 * t * t)
-        val mMoon = normalizeDeg(134.9633964 + 477198.8675055 * t + 0.0087414 * t * t)
-        val fMoon = normalizeDeg(93.2720950 + 483202.0175233 * t - 0.0036539 * t * t)
-
-        val dRad = Math.toRadians(dMoon)
-        val mMoonRad = Math.toRadians(mMoon)
-        val fRad = Math.toRadians(fMoon)
-
-        val deltaLMoon = 6.288774 * sin(mMoonRad) +
-                1.274027 * sin(2 * dRad - mMoonRad) +
-                0.658314 * sin(2 * dRad) +
-                0.213618 * sin(2 * mMoonRad) -
-                0.185116 * sin(mSunRad) -
-                0.114332 * sin(2 * fRad) +
-                0.058793 * sin(2 * dRad - 2 * mMoonRad) +
-                0.057066 * sin(2 * dRad - mSunRad - mMoonRad) +
-                0.053322 * sin(2 * dRad + mMoonRad) +
-                0.046100 * sin(2 * dRad - mSunRad) +
-                0.041024 * sin(mMoonRad - mSunRad) -
-                0.034728 * sin(dRad) -
-                0.030465 * sin(mMoonRad + mSunRad) +
-                0.015327 * sin(2 * dRad - 2 * fRad) -
-                0.012528 * sin(2 * fRad + mMoonRad) -
-                0.010980 * sin(2 * fRad - mMoonRad) +
-                0.010675 * sin(4 * dRad - mMoonRad) +
-                0.010034 * sin(3 * mMoonRad) +
-                0.008548 * sin(4 * dRad - 2 * mMoonRad)
-        val moonTropical = normalizeDeg(lMoon + deltaLMoon)
-        result[Graha.CHANDRA] = normalizeDeg(moonTropical - ayanamsa)
+        // 1–2. Apparent Sun and Moon, shared with the panchangam so tithi and nakshatra agree.
+        result[Graha.SURYA] = normalizeDeg(VedicAstronomy.apparentSunTropical(t) - ayanamsa)
+        result[Graha.CHANDRA] = normalizeDeg(VedicAstronomy.moonTropicalLongitude(t) - ayanamsa)
 
         // 3. MARS (Chevvai) - Keplerian Geocentric
         val marsElements = OrbitalElements(
@@ -684,10 +644,10 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val satSid = calculateGeocentricSidereal(satElements, xe, ye, ze, t, ayanamsa, satPerturbation)
         result[Graha.SANI] = satSid
 
-        // 8. RAHU & KETU (Standard True Lunar Node with solar & lunar evection terms)
-        var meanNode = 125.0445222 - 1934.1362608 * t + 0.0020708 * t * t
-        val trueNode = meanNode - 0.28 * sin(2 * dRad - 2 * fRad) - 0.17 * sin(mSunRad) - 0.05 * sin(2 * dRad - mSunRad)
-        val rahuSidereal = normalizeDeg(trueNode - ayanamsa)
+        // 8. RAHU & KETU — mean node, matching the Lahiri transit table.
+        // The true node can sit in the next sign for weeks around an ingress.
+        val meanNode = VedicAstronomy.meanRahuTropical(t)
+        val rahuSidereal = normalizeDeg(meanNode - ayanamsa)
         val ketuSidereal = normalizeDeg(rahuSidereal + 180.0)
         result[Graha.RAHU] = rahuSidereal
         result[Graha.KETU] = ketuSidereal
@@ -721,8 +681,8 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val dt = 0.0001 // ~3.65 days step
         val t2 = t + dt
         val jd2 = jd + dt * 36525.0
-        val ayanamsa1 = 23.85709167 + 1.396971 * t
-        val ayanamsa2 = 23.85709167 + 1.396971 * t2
+        val ayanamsa1 = VedicAstronomy.lahiriAyanamsaDegrees(t)
+        val ayanamsa2 = VedicAstronomy.lahiriAyanamsaDegrees(t2)
 
         val pos1 = calculateAllGrahaLongitudes(jd, t, ayanamsa1)
         val pos2 = calculateAllGrahaLongitudes(jd2, t2, ayanamsa2)
@@ -781,6 +741,61 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         return allOnOneSide || allOnOtherSide
     }
 
+    /**
+     * Pitru dosha when the 9th house or its lord is afflicted by a node or Saturn,
+     * or the Sun is conjunct Rahu/Ketu (or Saturn in a dusthana / the 9th).
+     */
+    private fun checkPitruDosha(
+        planets: List<PlanetPosition>,
+        bhavas: List<BhavaDetail>,
+        longitudes: Map<Graha, Double>
+    ): Boolean {
+        val sun = planets.firstOrNull { it.graha == Graha.SURYA } ?: return false
+        val sani = planets.firstOrNull { it.graha == Graha.SANI }
+        val rahu = planets.firstOrNull { it.graha == Graha.RAHU }
+        val ketu = planets.firstOrNull { it.graha == Graha.KETU }
+        val sunLon = longitudes[Graha.SURYA] ?: return false
+        val rahuLon = longitudes[Graha.RAHU] ?: 0.0
+        val ketuLon = longitudes[Graha.KETU] ?: 0.0
+        val saniLon = longitudes[Graha.SANI] ?: 0.0
+
+        fun near(a: Double, b: Double, orb: Double) = abs(normalizeDelta(a - b)) <= orb
+
+        val sunWithNode = near(sunLon, rahuLon, 10.0) || near(sunLon, ketuLon, 10.0)
+        val dusthanaOrNinth = setOf(1, 8, 9, 12)
+        val sunWithSani = near(sunLon, saniLon, 8.0) &&
+                (sun.bhavaNumber in dusthanaOrNinth || (sani != null && sani.bhavaNumber in dusthanaOrNinth))
+
+        val ninth = bhavas.firstOrNull { it.number == 9 }
+        val nodeInNinth = ninth?.occupantGrahas?.any { it == Graha.RAHU || it == Graha.KETU } == true
+
+        val ninthLord = ninth?.let { getGrahaForRasiLord(it.rasi) }
+        val ninthLordPos = ninthLord?.let { lord -> planets.firstOrNull { it.graha == lord } }
+        val ninthLordWithNode = ninthLordPos != null && ninthLord != Graha.RAHU && ninthLord != Graha.KETU &&
+                (ninthLordPos.rasi == rahu?.rasi || ninthLordPos.rasi == ketu?.rasi)
+        val ninthLordWithSani = ninthLordPos != null && ninthLord != Graha.SANI && ninthLordPos.rasi == sani?.rasi
+
+        return sunWithNode || sunWithSani || nodeInNinth || ninthLordWithNode || ninthLordWithSani
+    }
+
+    /** Antardasha running at [elapsedFraction] of the mahadasha (sub-periods proportional to 120). */
+    private fun antardashaAt(
+        mahaLord: Graha,
+        elapsedFraction: Double,
+        order: List<Graha>,
+        years: Map<Graha, Double>
+    ): Graha {
+        val start = order.indexOf(mahaLord).let { if (it < 0) 0 else it }
+        var cursor = 0.0
+        for (i in order.indices) {
+            val lord = order[(start + i) % order.size]
+            val fraction = (years[lord] ?: 0.0) / 120.0
+            if (elapsedFraction < cursor + fraction || i == order.lastIndex) return lord
+            cursor += fraction
+        }
+        return mahaLord
+    }
+
     private fun calculateVimshottariDashaBalance(
         nakshatraIdx: Int,
         posInNak: Double,
@@ -800,6 +815,7 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val totalYears = dashaYears[startingLord] ?: 10.0
         val elapsedFraction = (posInNak / nakSpan).coerceIn(0.0, 1.0)
         val remainingYears = totalYears * (1.0 - elapsedFraction)
+        val birthAntardasha = antardashaAt(startingLord, elapsedFraction, dashaOrder, dashaYears)
 
         val periods = mutableListOf<DashaPeriod>()
         val startLordIdx = dashaOrder.indexOf(startingLord)
@@ -812,7 +828,7 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         periods.add(
             DashaPeriod(
                 mahadashaLord = startingLord,
-                antardashaLord = startingLord,
+                antardashaLord = birthAntardasha,
                 startDate = dob,
                 endDate = firstEndDate,
                 descriptionTa = "${startingLord.nameTa} மகாதிசை இருப்பு (பிறப்பில் $remYearsInt வரு $remMonthsInt மாதம்)",
@@ -901,7 +917,7 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
         val healthTa = if (lagnaLordBhava in listOf(1, 4, 5, 7, 9, 10)) {
             "லக்னம் ${lagnaRasi.nameTa}. லக்னாதிபதி ${lagnaRasi.lordTa} $lagnaLordBhava-ஆம் பாவத்தில் கேந்திர/திரிகோண சுப ஸ்தானத்தில் அமர்ந்துள்ளதால் சிறப்பான தேக ஆரோக்கியம், நல்ல மன உறுதி மற்றும் நோய் எதிர்ப்பு சக்தி உண்டாகும். உஷ்ண சமநிலையைக் காக்க சமச்சீரான உணவு முறை நலம் தரும்."
         } else {
-            "லக்னம் ${lagnaRasi.nameTa}. லக்னாதிபதி ${lagnaRasi.lordTa} $lagnaLordBhava-ஆம் பாவத்தில் அமர்ந்துள்ளார். சீரான உடல் நலம் காக்க உரிய ஓய்வு, உடற்பயிற்சி மற்றும் செரிமான நலனில் விழிப்புணர்வு தேவை. திருக்கோயில் வழிபாடும் எளிய விரதங்களும் தேக பலம் தரும்."
+            "லக்னம் ${lagnaRasi.nameTa}. லக்னாதிபதி ${lagnaRasi.lordTa} $lagnaLordBhava-ஆம் பாவத்தில் அமர்ந்துள்ளார். ��்பயிற்சி மற்றும் செரிமான நலனில் விழிப்புணர்வு தேவை. திருக்கோயில் வழிபாடும் எளிய விரதங்களும் தேக பலம் தரும்."
         }
         val healthEn = if (lagnaLordBhava in listOf(1, 4, 5, 7, 9, 10)) {
             "Ascendant (Lagna) is ${lagnaRasi.nameEn}. Lagna Lord ${lagnaRasi.lordEn} sits auspiciously in the ${lagnaLordBhava}th house, conferring robust physical vitality, sharp immunity, and enduring stamina."
@@ -970,6 +986,47 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
             foreignTravelHi = foreignTravelHi,
             currentPeriodGuidanceTa = currentPeriodGuidanceTa,
             currentPeriodGuidanceEn = currentPeriodGuidanceEn,
+            currentPeriodGuidanceHi = currentPeriodGuidanceHi
+        )
+    }
+}
+
+
+ும் நீக்கி காரிய சித்தியையும் மன நிம்மதியையும் தரும்."
+        val currentPeriodGuidanceEn = "Janma Rasi is ${chandraRasi.nameEn}$saniNoteEn. Offering sincere prayers to Lord Murugan, Lord Ganesha, and Navagrahas at Sri Siva Subramaniya Swami Temple Nadi mitigates obstacles and grants auspicious success."
+        val currentPeriodGuidanceHi = "आपकी जन्म राशि ${chandraRasi.nameHi} है$saniNoteHi। नाडी श्री शिव सुब्रमण्यम स्वामी मंदिर में भगवान मुरुगन, श्री गणेश एवं नवग्रहों की आराधना से सभी विघ्न दूर होकर मनःशांति व मनोवांछित फल प्राप्त होंगे।"
+
+        return TempleJathagaSummary(
+            healthTa = healthTa,
+            healthEn = healthEn,
+            healthHi = healthHi,
+            wealthTa = wealthTa,
+            wealthEn = wealthEn,
+            wealthHi = wealthHi,
+            educationTa = educationTa,
+            educationEn = educationEn,
+            educationHi = educationHi,
+            careerTa = careerTa,
+            careerEn = careerEn,
+            careerHi = careerHi,
+            marriageTa = marriageTa,
+            marriageEn = marriageEn,
+            marriageHi = marriageHi,
+            familyTa = familyTa,
+            familyEn = familyEn,
+            familyHi = familyHi,
+            foreignTravelTa = foreignTravelTa,
+            foreignTravelEn = foreignTravelEn,
+            foreignTravelHi = foreignTravelHi,
+            currentPeriodGuidanceTa = currentPeriodGuidanceTa,
+            currentPeriodGuidanceEn = currentPeriodGuidanceEn,
+            currentPeriodGuidanceHi = currentPeriodGuidanceHi
+        )
+    }
+}
+
+
+dGuidanceEn,
             currentPeriodGuidanceHi = currentPeriodGuidanceHi
         )
     }

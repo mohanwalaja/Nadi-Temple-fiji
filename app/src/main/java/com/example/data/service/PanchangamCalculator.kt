@@ -207,7 +207,10 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         tzOffsetHours: Double,
         locationName: String
     ): PanchangamDetail {
-        val loc = LocationCoordinates(lat, lon, tzOffsetHours, locationName, locationName, locationName)
+        // Civil offset at local noon, so Fiji/Australia/UK/US daylight saving is applied
+        // instead of the preset's year-round standard offset.
+        val effectiveOffset = VedicAstronomy.offsetHoursAt(lat, lon, tzOffsetHours, date, LocalTime.NOON)
+        val loc = LocationCoordinates(lat, lon, effectiveOffset, locationName, locationName, locationName)
         val (sunriseDec, sunsetDec) = calculateSunriseSunsetDec(date, loc.lat, loc.lon, loc.timeZoneOffsetHours)
         val sunriseLocal = formatDecTime(sunriseDec)
         val sunsetLocal = formatDecTime(sunsetDec)
@@ -224,11 +227,11 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         // 1. Tamil Solar Month & Year calculation
         val sunRasiIndex = (sunSid / 30.0).toInt() % 12
         val tamilMonthEnum = TamilMonth.entries[sunRasiIndex]
-        val tamilDay = (sunSid % 30.0).toInt() + 1
-
-        // Tamil Year cycle (60 years starting with Prabhava at Kali Yuga offset)
-        val tamilYearIndex = ((date.year - 1987 + 60) % 60)
-        val tamilSamvatsara = TamilSamvatsaraEngine.YEARS_60[tamilYearIndex]
+        // Solar day is the count of sunrises since Mesha/other sankranti, not degrees/30.
+        // A rasi can hold 29, 30 or 31 days; the degree formula never emits 31.
+        val tamilDay = tamilSolarDay(date, sunriseDec, loc.timeZoneOffsetHours, sunRasiIndex)
+        // Year changes at Mesha sankranti (mid-April), not on 1 January.
+        val tamilSamvatsara = samvatsaraForSolarYear(date, sunRasiIndex)
         val samvatsaraName = tamilSamvatsara.tamilName
 
         // 2. Sanskrit Month & Vedic Season (Ritu)
@@ -464,7 +467,7 @@ class StandardPanchangamCalculator : PanchangamCalculator {
             paksha = pakshaTa,
             tithi = tithiNameTa,
             tithiEndTime = tithiEndTime,
-            tithiPercent = 100,
+            tithiPercent = (((elongation % 12.0) / 12.0) * 100.0).toInt().coerceIn(0, 100),
             nextTithi = nextTithi,
             vasaram = vasaramTa,
             dayOfWeek = dayTa,
@@ -574,59 +577,15 @@ class StandardPanchangamCalculator : PanchangamCalculator {
      */
     private fun calculateEphemeris(jd: Double): EphemerisData {
         val t = (jd - 2451545.0) / 36525.0
-
-        // Lahiri Ayanamsha (Chitra Paksha)
-        val ayanamsha = 23.8564 + (1.396887 * t)
-
-        // 1. Sun Tropical Longitude
-        val l0 = normalizeDegrees(280.46646 + 36000.76983 * t + 0.0003032 * t * t)
-        val mSun = normalizeDegrees(357.52911 + 35999.05029 * t - 0.0001537 * t * t)
-        val mSunRad = Math.toRadians(mSun)
-        val cSun = (1.914602 - 0.004817 * t - 0.000014 * t * t) * sin(mSunRad) +
-                (0.019993 - 0.000101 * t) * sin(2 * mSunRad) +
-                0.000289 * sin(3 * mSunRad)
-        val sunTropical = normalizeDegrees(l0 + cSun)
-        val sunSidereal = normalizeDegrees(sunTropical - ayanamsha)
-
-        // 2. Moon Tropical Longitude & Latitude
-        val lMoon = normalizeDegrees(218.3164477 + 481267.881279 * t - 0.0015786 * t * t)
-        val dMoon = normalizeDegrees(297.8501921 + 445267.1114034 * t - 0.0018819 * t * t)
-        val mMoon = normalizeDegrees(134.9633964 + 477198.8675055 * t + 0.0087414 * t * t)
-        val fMoon = normalizeDegrees(93.2720950 + 483202.0175233 * t - 0.0036539 * t * t)
-
-        val dRad = Math.toRadians(dMoon)
-        val mMoonRad = Math.toRadians(mMoon)
-        val fRad = Math.toRadians(fMoon)
-
-        val deltaLMoon = 6.288774 * sin(mMoonRad) +
-                1.274027 * sin(2 * dRad - mMoonRad) +
-                0.658314 * sin(2 * dRad) +
-                0.213618 * sin(2 * mMoonRad) -
-                0.185116 * sin(mSunRad) -
-                0.114332 * sin(2 * fRad) +
-                0.058793 * sin(2 * dRad - 2 * mMoonRad) +
-                0.057066 * sin(2 * dRad - mSunRad - mMoonRad) +
-                0.053322 * sin(2 * dRad + mMoonRad) +
-                0.046100 * sin(2 * dRad - mSunRad) +
-                0.041024 * sin(mMoonRad - mSunRad) -
-                0.034728 * sin(dRad) -
-                0.030465 * sin(mMoonRad + mSunRad)
-
-        val moonTropical = normalizeDegrees(lMoon + deltaLMoon)
-        val moonSidereal = normalizeDegrees(moonTropical - ayanamsha)
-
-        // Moon Ecliptic Latitude
-        val moonLatitude = 5.128 * sin(fRad) +
-                0.280 * sin(mMoonRad + fRad) +
-                0.277 * sin(mMoonRad - fRad) +
-                0.173 * sin(2 * dRad - fRad)
-
+        val ayanamsha = VedicAstronomy.lahiriAyanamsaDegrees(t)
+        val sunTropical = VedicAstronomy.apparentSunTropical(t)
+        val moonTropical = VedicAstronomy.moonTropicalLongitude(t)
         return EphemerisData(
             sunTropical = sunTropical,
-            sunSidereal = sunSidereal,
+            sunSidereal = normalizeDegrees(sunTropical - ayanamsha),
             moonTropical = moonTropical,
-            moonSidereal = moonSidereal,
-            moonLatitude = moonLatitude,
+            moonSidereal = normalizeDegrees(moonTropical - ayanamsha),
+            moonLatitude = VedicAstronomy.moonLatitude(t),
             ayanamsha = ayanamsha,
             t = t,
             jd = jd
@@ -756,7 +715,64 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         return WORLD_PRESETS[0]
     }
 
+    /**
+     * Sunrise and sunset by searching the apparent solar altitude for the -0.833 degree
+     * horizon (refraction + semidiameter). The equation-of-time formula is only the
+     * polar fallback, where the Sun may not cross the horizon.
+     */
     private fun calculateSunriseSunsetDec(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<Double, Double> {
+        val horizon = -0.833
+        fun altitude(localHour: Double): Double {
+            val jd = getJulianDayFromLocalDateTime(date, localHour, tzOffset)
+            val ephem = calculateEphemeris(jd)
+            val eps = Math.toRadians(23.439291 - 0.0130042 * ephem.t)
+            val lam = Math.toRadians(ephem.sunTropical)
+            val sinDec = sin(eps) * sin(lam)
+            val dec = asin(sinDec.coerceIn(-1.0, 1.0))
+            val ra = atan2(cos(eps) * sin(lam), cos(lam))
+            val gmst = Math.toRadians(normalizeDegrees(280.46061837 + 360.98564736629 * (jd - 2451545.0)))
+            val ha = gmst + Math.toRadians(lon) - ra
+            val latRad = Math.toRadians(lat)
+            val sinAlt = sin(latRad) * sin(dec) + cos(latRad) * cos(dec) * cos(ha)
+            return Math.toDegrees(asin(sinAlt.coerceIn(-1.0, 1.0)))
+        }
+
+        fun findCrossing(rising: Boolean): Double? {
+            val step = 0.25
+            var h = 0.0
+            var prevAlt = altitude(0.0)
+            while (h < 24.0 - 1e-9) {
+                val nextH = min(h + step, 24.0)
+                val nextAlt = altitude(nextH)
+                val crossed = if (rising) prevAlt < horizon && nextAlt >= horizon
+                else prevAlt > horizon && nextAlt <= horizon
+                if (crossed) {
+                    var low = h
+                    var high = nextH
+                    repeat(16) {
+                        val mid = (low + high) / 2.0
+                        val midAlt = altitude(mid)
+                        if (rising) {
+                            if (midAlt < horizon) low = mid else high = mid
+                        } else {
+                            if (midAlt > horizon) low = mid else high = mid
+                        }
+                    }
+                    return (low + high) / 2.0
+                }
+                prevAlt = nextAlt
+                h = nextH
+            }
+            return null
+        }
+
+        val approx = approximateSunriseSunset(date, lat, lon, tzOffset)
+        val rise = findCrossing(true) ?: approx.first
+        val set = findCrossing(false) ?: approx.second
+        return if (set > rise) rise to set else approx
+    }
+
+    private fun approximateSunriseSunset(date: LocalDate, lat: Double, lon: Double, tzOffset: Double): Pair<Double, Double> {
         val dayOfYear = date.dayOfYear
         val b = 2.0 * Math.PI * (dayOfYear - 81) / 365.0
         val eot = 9.87 * sin(2 * b) - 7.53 * cos(b) - 1.5 * sin(b)
@@ -771,8 +787,29 @@ class StandardPanchangamCalculator : PanchangamCalculator {
         val solarNoonUtc = 12.0 - (lon / 15.0) - (eot / 60.0)
         val sunriseLocalDec = (solarNoonUtc - hHours + tzOffset + 24.0) % 24.0
         val sunsetLocalDec = (solarNoonUtc + hHours + tzOffset + 24.0) % 24.0
-
         return sunriseLocalDec to sunsetLocalDec
+    }
+
+    /** Tamil solar day: sunrises since the Sun entered the current sidereal rasi. */
+    private fun tamilSolarDay(date: LocalDate, sunriseDec: Double, tz: Double, rasiIndex: Int): Int {
+        var daysBack = 0
+        var cursor = date
+        while (daysBack < 33) {
+            val prev = cursor.minusDays(1)
+            val prevSid = calculateEphemeris(getJulianDayFromLocalDateTime(prev, sunriseDec, tz)).sunSidereal
+            if ((prevSid / 30.0).toInt() % 12 != rasiIndex) break
+            cursor = prev
+            daysBack++
+        }
+        return daysBack + 1
+    }
+
+    /** 60-year name of the Mesha year that contains this date. January to mid-April still belong to the previous year. */
+    private fun samvatsaraForSolarYear(date: LocalDate, sunRasiIndex: Int): TamilSamvatsara {
+        val meshaEntered = date.monthValue > 4 || (date.monthValue == 4 && sunRasiIndex == 0)
+        val baseYear = if (meshaEntered) date.year else date.year - 1
+        val index = Math.floorMod(baseYear - 1987, 60)
+        return TamilSamvatsaraEngine.YEARS_60[index]
     }
 
     /**
@@ -1100,7 +1137,9 @@ class StandardPanchangamCalculator : PanchangamCalculator {
     }
 
     private fun formatDecTime(decHours: Double): String {
-        val totalMins = (decHours * 60).toInt() % (24 * 60)
+        val minsInDay = 24 * 60
+        var totalMins = (decHours * 60.0).roundToInt()
+        totalMins = ((totalMins % minsInDay) + minsInDay) % minsInDay
         val h = totalMins / 60
         val m = totalMins % 60
         val amPm = if (h >= 12) "PM" else "AM"

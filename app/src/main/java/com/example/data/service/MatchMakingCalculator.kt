@@ -91,7 +91,11 @@ object MatchMakingCalculator {
         groomNakshatraIndex: Int, // 0 to 26
         groomPada: Int,
         brideMarsHouse: Int = 1, // House of Mars from Lagna (1 to 12)
-        groomMarsHouse: Int = 1
+        groomMarsHouse: Int = 1,
+        brideLagna: Rasi? = null,
+        groomLagna: Rasi? = null,
+        brideMarsRasi: Rasi? = null,
+        groomMarsRasi: Rasi? = null
     ): WeddingMatchResult {
 
         val bStar = brideNakshatraIndex
@@ -286,14 +290,14 @@ object MatchMakingCalculator {
         // 7. Rasiyadhipathi Porutham (ராசியாதிபதிப் பொருத்தம்)
         val bLord = brideRasi.lordEn
         val gLord = groomRasi.lordEn
-        val devaPlanets = setOf("Sun", "Moon", "Mars", "Jupiter")
-        val asuraPlanets = setOf("Mercury", "Venus", "Saturn")
         val isSameLord = bLord == gLord
-        val isFriendlyLords = (bLord in devaPlanets && gLord in devaPlanets) || (bLord in asuraPlanets && gLord in asuraPlanets)
+        val relBrideToGroom = naturalGrahaRelation(bLord, gLord)
+        val relGroomToBride = naturalGrahaRelation(gLord, bLord)
+        // Natural friendship, not the crude Deva/Asura grouping (that treated Mars-Mercury as friends).
         val rasiAdhipathiStatus = when {
-            isSameLord || isFriendlyLords -> PoruthamStatus.UTTHAMAM
-            (bLord == "Mercury" && gLord in devaPlanets) || (gLord == "Mercury" && bLord in devaPlanets) -> PoruthamStatus.MADHYAMAM
-            else -> PoruthamStatus.PORUNDHADHU
+            isSameLord || (relBrideToGroom == 1 && relGroomToBride == 1) -> PoruthamStatus.UTTHAMAM
+            relBrideToGroom == -1 || relGroomToBride == -1 -> PoruthamStatus.PORUNDHADHU
+            else -> PoruthamStatus.MADHYAMAM
         }
         poruthams.add(
             SinglePoruthamResult(
@@ -401,26 +405,30 @@ object MatchMakingCalculator {
             )
         )
 
-        // Sevvay Dosham (Kuja Dosha) Analysis
+        // Sevvay Dosham (Kuja Dosha). Cancellation uses the sign Mars occupies,
+        // counted from Lagna (and from the Moon when the Mars sign is known).
+        // The Moon's own sign is not Mars's sign.
         val doshaHouses = setOf(2, 4, 7, 8, 12)
-        val bHasRawDosham = brideMarsHouse in doshaHouses
-        val gHasRawDosham = groomMarsHouse in doshaHouses
+        val brideMarsSign = marsSignIndex(brideLagna, brideMarsHouse, brideMarsRasi)
+        val groomMarsSign = marsSignIndex(groomLagna, groomMarsHouse, groomMarsRasi)
+        val brideMoonHouse = brideMarsSign?.let { ((it - brideRasi.index + 12) % 12) + 1 }
+        val groomMoonHouse = groomMarsSign?.let { ((it - groomRasi.index + 12) % 12) + 1 }
 
-        // Cancellation rules (Own house, exaltation, etc.)
-        val bCancelled = (bHasRawDosham && (brideMarsHouse == 2 && bRasiIdx in listOf(3, 6))) || // 2nd in Gemini/Virgo
-                (brideMarsHouse == 4 && bRasiIdx in listOf(1, 8)) || // 4th in Aries/Scorpio
-                (brideMarsHouse == 7 && bRasiIdx in listOf(4, 10)) || // 7th in Cancer/Capricorn
-                (brideMarsHouse == 8 && bRasiIdx in listOf(9, 12)) || // 8th in Sag/Pisces
-                (brideMarsHouse == 12 && bRasiIdx in listOf(2, 7)) // 12th in Taurus/Libra
+        val brideLagnaRaw = brideMarsHouse in doshaHouses
+        val groomLagnaRaw = groomMarsHouse in doshaHouses
+        val brideMoonRaw = brideMoonHouse != null && brideMoonHouse in doshaHouses
+        val groomMoonRaw = groomMoonHouse != null && groomMoonHouse in doshaHouses
+        val brideLagnaCancelled = kujaCancelled(brideMarsHouse, brideMarsSign)
+        val groomLagnaCancelled = kujaCancelled(groomMarsHouse, groomMarsSign)
+        val brideMoonCancelled = brideMoonHouse != null && kujaCancelled(brideMoonHouse, brideMarsSign)
+        val groomMoonCancelled = groomMoonHouse != null && kujaCancelled(groomMoonHouse, groomMarsSign)
 
-        val gCancelled = (gHasRawDosham && (groomMarsHouse == 2 && gRasiIdx in listOf(3, 6))) ||
-                (groomMarsHouse == 4 && gRasiIdx in listOf(1, 8)) ||
-                (groomMarsHouse == 7 && gRasiIdx in listOf(4, 10)) ||
-                (groomMarsHouse == 8 && gRasiIdx in listOf(9, 12)) ||
-                (groomMarsHouse == 12 && gRasiIdx in listOf(2, 7))
-
-        val bDoshaEffective = bHasRawDosham && !bCancelled
-        val gDoshaEffective = gHasRawDosham && !gCancelled
+        val bHasRawDosham = brideLagnaRaw || brideMoonRaw
+        val gHasRawDosham = groomLagnaRaw || groomMoonRaw
+        val bDoshaEffective = (brideLagnaRaw && !brideLagnaCancelled) || (brideMoonRaw && !brideMoonCancelled)
+        val gDoshaEffective = (groomLagnaRaw && !groomLagnaCancelled) || (groomMoonRaw && !groomMoonCancelled)
+        val bCancelled = bHasRawDosham && !bDoshaEffective
+        val gCancelled = gHasRawDosham && !gDoshaEffective
 
         val sevvayAnalysis = SevvayDoshamAnalysis(
             isBrideHasDosham = bDoshaEffective,
@@ -520,5 +528,57 @@ object MatchMakingCalculator {
             groomNakshatramEn = NAKSHATRAM_NAMES_EN[gStar],
             groomNakshatramHi = NAKSHATRAM_NAMES_HI[gStar]
         )
+    }
+
+    /** 1-based rasi index of Mars. Prefer the chart sign; otherwise derive it from Lagna + house. */
+    private fun marsSignIndex(lagna: Rasi?, marsHouse: Int, marsRasi: Rasi?): Int? = when {
+        marsRasi != null -> marsRasi.index
+        lagna != null -> ((lagna.index - 1 + marsHouse - 1) % 12) + 1
+        else -> null
+    }
+
+    /**
+     * Own sign (Aries, Scorpio), exaltation (Capricorn), and the classical
+     * house-specific signs. [marsSign] is required — do not substitute the Moon sign.
+     */
+    private fun kujaCancelled(houseFromReference: Int, marsSign: Int?): Boolean {
+        if (marsSign == null || houseFromReference !in setOf(2, 4, 7, 8, 12)) return false
+        if (marsSign == 1 || marsSign == 8 || marsSign == 10) return true
+        return when (houseFromReference) {
+            2 -> marsSign == 3 || marsSign == 6
+            4 -> marsSign == 1 || marsSign == 8
+            7 -> marsSign == 4 || marsSign == 10
+            8 -> marsSign == 9 || marsSign == 12
+            12 -> marsSign == 2 || marsSign == 7
+            else -> false
+        }
+    }
+
+    /** 1 friend, 0 neutral, -1 enemy. Natural (naisargika) friendship. */
+    private fun naturalGrahaRelation(from: String, to: String): Int {
+        if (from == to) return 1
+        val friends = mapOf(
+            "Sun" to setOf("Moon", "Mars", "Jupiter"),
+            "Moon" to setOf("Sun", "Mercury"),
+            "Mars" to setOf("Sun", "Moon", "Jupiter"),
+            "Mercury" to setOf("Sun", "Venus"),
+            "Jupiter" to setOf("Sun", "Moon", "Mars"),
+            "Venus" to setOf("Mercury", "Saturn"),
+            "Saturn" to setOf("Mercury", "Venus")
+        )
+        val enemies = mapOf(
+            "Sun" to setOf("Venus", "Saturn"),
+            "Moon" to emptySet<String>(),
+            "Mars" to setOf("Mercury"),
+            "Mercury" to setOf("Moon"),
+            "Jupiter" to setOf("Mercury", "Venus"),
+            "Venus" to setOf("Sun", "Moon"),
+            "Saturn" to setOf("Sun", "Moon", "Mars")
+        )
+        return when {
+            to in (friends[from] ?: emptySet()) -> 1
+            to in (enemies[from] ?: emptySet()) -> -1
+            else -> 0
+        }
     }
 }

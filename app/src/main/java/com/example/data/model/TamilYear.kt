@@ -134,10 +134,11 @@ object TamilSamvatsaraEngine {
         val c = (1.914602 - 0.004817 * t - 0.000014 * t * t) * kotlin.math.sin(Math.toRadians(m)) +
                 (0.019993 - 0.000101 * t) * kotlin.math.sin(Math.toRadians(2 * m)) +
                 0.000289 * kotlin.math.sin(Math.toRadians(3 * m))
-        var sunTrue = (l0 + c) % 360.0
+        val omega = Math.toRadians(125.04 - 1934.136 * t)
+        var sunTrue = (l0 + c - 0.00569 - 0.00478 * kotlin.math.sin(omega)) % 360.0
         if (sunTrue < 0) sunTrue += 360.0
-        // Lahiri Ayanamsha
-        val ayanamsha = 23.85 + (jd - 2451545.0) * (50.29 / 3600.0 / 365.25)
+        // IAE Lahiri (same series as VedicAstronomy; inlined so this model does not depend on the service layer).
+        val ayanamsha = 23.85709167 + 1.396971278 * t + 0.0003086 * t * t
         var sunSid = (sunTrue - ayanamsha) % 360.0
         if (sunSid < 0) sunSid += 360.0
         return sunSid
@@ -151,9 +152,9 @@ object TamilSamvatsaraEngine {
         val jd = getJulianDay(date, 0.25)
         val sunSid = getSunSiderealLongitude(jd)
         val year = date.year
-        // If in Jan-April before Mesha Sankranti (when sun is in Makara, Kumbha, or Meena > 270 deg),
-        // effective year is year - 1
-        val effectiveYear = if (date.monthValue < 4 || (date.monthValue == 4 && sunSid >= 330.0)) {
+        // January through the April sunrise before Mesha sankranti still belong to the previous Tamil year.
+        val rasiIndex = (sunSid / 30.0).toInt() % 12
+        val effectiveYear = if (date.monthValue < 4 || (date.monthValue == 4 && rasiIndex != 0)) {
             year - 1
         } else {
             year
