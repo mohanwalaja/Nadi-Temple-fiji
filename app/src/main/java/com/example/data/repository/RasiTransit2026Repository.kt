@@ -375,20 +375,20 @@ object RasiTransit2026Repository {
         RasiTransitPalan2026(
             rasi = Rasi.DHANUSU,
             severity = AlertSeverity.PERIOD_ALERT,
-            alertTagTa = "🟠 குரு — ஜூன் 2 முதல் அஷ்டம குரு கவனம்",
-            alertTagEn = "🟠 Guru — 8th House Transit from June 2",
-            alertTagHi = "🟠 गुरु — 2 जून से 8वें भाव में सावधानी",
+            alertTagTa = "🟠 குரு — ஜூன் 2 முதல் அக்டோபர் 31 வரை அஷ்டம குரு",
+            alertTagEn = "🟠 Guru — 8th House from June 2 until Oct 31",
+            alertTagHi = "🟠 गुरु — 2 जून से 31 अक्टूबर तक 8वें भाव में",
             keyPlanets = listOf(
                 PlanetTransitAlert(
                     planetTa = "🌟 குரு",
                     planetEn = "🌟 Guru (Jupiter)",
                     planetHi = "🌟 गुरु (Jupiter)",
-                    headlineTa = "ஜூன் 2 முதல் குரு கடகத்தில் (அஷ்டம குரு)",
-                    headlineEn = "Jupiter in Cancer from June 2 (8th House)",
-                    headlineHi = "2 जून से कर्क में गुरु (अष्टम गुरु)",
-                    detailsTa = "ஜூன் 2 முதல் குரு கடகத்தில் செல்வதால், தனுசுக்கு 8-ஆம் இட குரு நிலை ஏற்படுகிறது. முக்கிய முடிவுகள், நிதி மற்றும் உடல்நலத்தில் கூடுதல் கவனம் நல்லது.",
-                    detailsEn = "From June 2, Jupiter enters Cancer (8th house for Sagittarius). Exercise extra caution in major life choices, investments, and health.",
-                    detailsHi = "2 जून से गुरु के कर्क राशि में जाने से 8वां गुरु रहेगा। महत्वपूर्ण निर्णयों, वित्त और स्वास्थ्य में अतिरिक्त सावधानी बरतें।"
+                    headlineTa = "ஜூன் 2–அக்டோபர் 31 குரு கடகத்தில் (அஷ்டம குரு)",
+                    headlineEn = "Jupiter in Cancer June 2–Oct 31 (8th House)",
+                    headlineHi = "2 जून–31 अक्टूबर कर्क में गुरु (अष्टम गुरु)",
+                    detailsTa = "ஜூன் 2 முதல் அக்டோபர் 31, 2026 வரை குரு கடகத்தில் (தனுசுக்கு 8-ஆம் இடம்). அதன்பின் நவம்பர் 1 முதல் ஜனவரி 24, 2027 வரை சிம்மத்தில் (9-ஆம் இடம்) செல்கிறார். முக்கிய முடிவுகள், நிதி மற்றும் உடல்நலத்தில் கூடுதல் கவனம் நல்லது.",
+                    detailsEn = "Jupiter is in Cancer (8th house for Sagittarius) from June 2 until October 31, 2026, then in Leo (9th house) from November 1 until January 24, 2027. Exercise extra caution in major life choices, investments, and health during the Cancer transit.",
+                    detailsHi = "2 जून से 31 अक्टूबर 2026 तक गुरु कर्क में (धनु के लिए 8वां भाव), फिर 1 नवंबर से 24 जनवरी 2027 तक सिंह में (9वां भाव)। कर्क गोचर में निर्णयों, वित्त और स्वास्थ्य में अतिरिक्त सावधानी बरतें।"
                 )
             ),
             careerTa = "பொறுமையுடன் செயல்பட வேண்டும்; அவசர மாற்றங்கள் வேண்டாம்.",

@@ -16,8 +16,9 @@ import java.util.Locale
  *
  * ASTRONOMICAL CALCULATION RULES:
  * 1. Panchangam events (Tithi, Nakshatram, Yoga, Karanam) occur at a single universal instant (UTC) globally.
- * 2. Fiji Standard Time (FJT) is UTC+12:00, while Indian Standard Time (IST) is UTC+05:30.
- * 3. Fiji is exactly 6 hours and 30 minutes AHEAD of India.
+ * 2. Fiji Standard Time is UTC+12:00. Pacific/Fiji also observed UTC+13 daylight saving
+ *    in summer through early 2021; ZoneId applies that historical offset. IST is UTC+05:30.
+ * 3. Outside those DST summers, Fiji is 6 hours and 30 minutes ahead of India.
  * 4. Local solar events (Sunrise, Sunset, Rahu Kalam, Yamagandam, Suryodaya Tithi) are computed from local latitude/longitude.
  */
 object FijiTimeHelper {

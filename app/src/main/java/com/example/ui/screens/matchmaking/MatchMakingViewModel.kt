@@ -158,7 +158,11 @@ class MatchMakingViewModel(
             groomNakshatraIndex = gStarIdx,
             groomPada = groomChart.janmaPada,
             brideMarsHouse = brideMarsHouse,
-            groomMarsHouse = groomMarsHouse
+            groomMarsHouse = groomMarsHouse,
+            brideLagna = brideChart.lagnaRasi,
+            groomLagna = groomChart.lagnaRasi,
+            brideMarsRasi = brideMars?.rasi,
+            groomMarsRasi = groomMars?.rasi
         )
 
         _uiState.update {
@@ -242,6 +246,13 @@ class MatchMakingViewModel(
         _uiState.update { it.copy(selectedDetailTab = tab) }
     }
 
+    /** Whole-sign Mars rasi from Lagna + house, so a manual house override still cancels on the right sign. */
+    private fun marsRasiFromLagna(lagna: Rasi?, house: Int): Rasi? {
+        if (lagna == null) return null
+        val idx = ((lagna.index - 1 + house - 1) % 12) + 1
+        return Rasi.values().first { it.index == idx }
+    }
+
     private fun recalculate(state: MatchMakingUiState): WeddingMatchResult {
         return MatchMakingCalculator.calculateWeddingMatch(
             brideRasi = state.brideRasi,
@@ -251,7 +262,11 @@ class MatchMakingViewModel(
             groomNakshatraIndex = state.groomNakshatraIndex,
             groomPada = state.groomPada,
             brideMarsHouse = state.brideMarsHouse,
-            groomMarsHouse = state.groomMarsHouse
+            groomMarsHouse = state.groomMarsHouse,
+            brideLagna = state.brideLagna,
+            groomLagna = state.groomLagna,
+            brideMarsRasi = marsRasiFromLagna(state.brideLagna, state.brideMarsHouse),
+            groomMarsRasi = marsRasiFromLagna(state.groomLagna, state.groomMarsHouse)
         )
     }
 

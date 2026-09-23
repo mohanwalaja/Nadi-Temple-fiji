@@ -41,13 +41,19 @@ object TransitEphemerisProvider {
         Ingress(LocalDate.of(2023, 4, 21), Rasi.MESHAM),
         Ingress(LocalDate.of(2024, 5, 1), Rasi.RISHABAM),
         Ingress(LocalDate.of(2025, 5, 14), Rasi.MITHUNAM),
-        Ingress(LocalDate.of(2026, 6, 1), Rasi.KADAGAM),
-        Ingress(LocalDate.of(2027, 6, 25), Rasi.SIMHAM)
+        // Lahiri: Cancer 2 Jun 2026, Leo 31 Oct 2026, back to Cancer 25 Jan 2027
+        // (retrograde), Leo again 26 Jun 2027, Virgo 24 Jul 2028.
+        Ingress(LocalDate.of(2026, 6, 2), Rasi.KADAGAM),
+        Ingress(LocalDate.of(2026, 10, 31), Rasi.SIMHAM),
+        Ingress(LocalDate.of(2027, 1, 25), Rasi.KADAGAM),
+        Ingress(LocalDate.of(2027, 6, 26), Rasi.SIMHAM),
+        Ingress(LocalDate.of(2028, 7, 24), Rasi.KANNI)
     )
 
     // --- Rahu (mean node) — verified transit dates. Ketu is always 7 signs (180°) away. ---
     private val RAHU_INGRESS = listOf(
-        Ingress(LocalDate.of(2020, 9, 23), Rasi.VIRUCHIGAM),
+        // Mean Rahu entered sidereal Taurus on 23 Sep 2020 (not Scorpio).
+        Ingress(LocalDate.of(2020, 9, 23), Rasi.RISHABAM),
         Ingress(LocalDate.of(2022, 4, 12), Rasi.MESHAM),
         Ingress(LocalDate.of(2023, 10, 30), Rasi.MEENAM),
         Ingress(LocalDate.of(2025, 5, 18), Rasi.KUMBAM),

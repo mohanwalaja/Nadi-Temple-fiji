@@ -111,7 +111,8 @@ class StandardAstrologyCalculator : AstrologyCalculator {
 
         // Navamsa mapping
         val navamsa = planets.associate { planet ->
-            val navamsaRasiIdx = (((planet.degrees / 3.333).toInt() + planet.rasi.index * 3) % 12) + 1
+            val navamsaWithin = (planet.degrees / (10.0 / 3.0)).toInt().coerceIn(0, 8)
+            val navamsaRasiIdx = ((navamsaWithin + (planet.rasi.index - 1) * 9) % 12) + 1
             planet.graha to Rasi.values().first { it.index == navamsaRasiIdx }
         }
 
@@ -119,7 +120,7 @@ class StandardAstrologyCalculator : AstrologyCalculator {
         val dashaPeriods = generateVimshottariDasha(nakshatraIndex, dob)
 
         // Sani Transit checks (Saturn is currently in Kumbham/Meenam zone)
-        val currentSaturnRasi = Rasi.KUMBAM
+        val currentSaturnRasi = TransitEphemerisProvider.currentSaniRasi(LocalDate.now()).rasi
         val saniDiff = ((currentSaturnRasi.index - chandraRasi.index + 12) % 12)
         val isEzharai = saniDiff in listOf(11, 0, 1) // 12th, 1st, 2nd from Moon
         val ezharaiTypeTa = when (saniDiff) {
