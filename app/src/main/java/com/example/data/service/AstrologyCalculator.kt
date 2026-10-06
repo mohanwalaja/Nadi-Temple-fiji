@@ -80,16 +80,17 @@ class StandardAstrologyCalculator : AstrologyCalculator {
         val pada = ((moonDegree % (360.0 / 27.0)) / (360.0 / 108.0)).toInt() + 1
 
         // 9 Grahas positions
+        val sunTotalDeg = ((daysFromEpoch * 0.9856 + 280) % 360 + 360) % 360
         val planets = listOf(
-            calculatePlanet(Graha.SURYA, ((daysFromEpoch * 0.9856 + 280) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.CHANDRA, moonDegree, lagnaRasi),
-            calculatePlanet(Graha.CHEVVAI, ((daysFromEpoch * 0.524 + 120) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.BUDHA, ((daysFromEpoch * 1.05 + 260) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.GURU, ((daysFromEpoch * 0.083 + 45) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.SUKRA, ((daysFromEpoch * 1.1 + 180) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.SANI, ((daysFromEpoch * 0.033 + 310) % 360 + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.RAHU, ((360 - (daysFromEpoch * 0.053) % 360) + 360) % 360, lagnaRasi),
-            calculatePlanet(Graha.KETU, ((360 - (daysFromEpoch * 0.053 + 180) % 360) + 360) % 360, lagnaRasi)
+            calculatePlanet(Graha.SURYA, sunTotalDeg, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.CHANDRA, moonDegree, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.CHEVVAI, ((daysFromEpoch * 0.524 + 120) % 360 + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.BUDHA, ((daysFromEpoch * 1.05 + 260) % 360 + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.GURU, ((daysFromEpoch * 0.083 + 45) % 360 + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.SUKRA, ((daysFromEpoch * 1.1 + 180) % 360 + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.SANI, ((daysFromEpoch * 0.033 + 310) % 360 + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.RAHU, ((360 - (daysFromEpoch * 0.053) % 360) + 360) % 360, lagnaRasi, sunTotalDeg),
+            calculatePlanet(Graha.KETU, ((360 - (daysFromEpoch * 0.053 + 180) % 360) + 360) % 360, lagnaRasi, sunTotalDeg)
         )
 
         // 12 Bhavas calculation
@@ -109,10 +110,18 @@ class StandardAstrologyCalculator : AstrologyCalculator {
             )
         }
 
-        // Navamsa mapping
+        // Navamsa (D9) mapping - Proper element-based starting sign
         val navamsa = planets.associate { planet ->
-            val navamsaWithin = (planet.degrees / (10.0 / 3.0)).toInt().coerceIn(0, 8)
-            val navamsaRasiIdx = ((navamsaWithin + (planet.rasi.index - 1) * 9) % 12) + 1
+            val degInRasi = planet.degrees
+            val rasiIdx = planet.rasi.index
+            val navamsaIndex = (degInRasi / (30.0 / 9.0)).toInt().coerceIn(0, 8)
+            val startOffset = when {
+                rasiIdx in listOf(1, 5, 9) -> 0   // Fire: start from same sign
+                rasiIdx in listOf(2, 6, 10) -> 8  // Earth: start from 9th
+                rasiIdx in listOf(3, 7, 11) -> 6  // Air: start from 7th
+                else -> 4                           // Water: start from 5th
+            }
+            val navamsaRasiIdx = ((rasiIdx - 1 + startOffset + navamsaIndex) % 12) + 1
             planet.graha to Rasi.values().first { it.index == navamsaRasiIdx }
         }
 
@@ -232,7 +241,7 @@ class StandardAstrologyCalculator : AstrologyCalculator {
         )
     }
 
-    private fun calculatePlanet(graha: Graha, totalDegrees: Double, lagna: Rasi): PlanetPosition {
+    private fun calculatePlanet(graha: Graha, totalDegrees: Double, lagna: Rasi, sunDegrees: Double = 0.0): PlanetPosition {
         val rasiIdx = ((totalDegrees / 30).toInt() % 12) + 1
         val rasi = Rasi.values().first { it.index == rasiIdx }
         val degreesInRasi = totalDegrees % 30
@@ -240,8 +249,26 @@ class StandardAstrologyCalculator : AstrologyCalculator {
         val pada = (((totalDegrees % (360.0 / 27.0)) / (360.0 / 108.0)).toInt()) + 1
         val bhavaNum = ((rasi.index - lagna.index + 12) % 12) + 1
 
-        val isRetrograde = graha in listOf(Graha.GURU, Graha.SANI) && totalDegrees > 180
-        val isCombust = graha != Graha.SURYA && abs(totalDegrees - 120.0) < 6.0
+        // Retrograde: for demo engine, use approximate mean-motion rule
+        // Outer planets (Mars, Jupiter, Saturn) retrograde when their mean longitude
+        // is near opposition to the Sun (roughly 120°–240° from Sun in the geocentric frame)
+        val isRetrograde = when (graha) {
+            Graha.CHEVVAI -> {
+                val diffFromSun = normalizeDelta(totalDegrees - sunDegrees)
+                diffFromSun > 90.0 && diffFromSun < 270.0 && abs(totalDegrees % 360 - 180) < 60
+            }
+            Graha.GURU, Graha.SANI -> {
+                val diffFromSun = normalizeDelta(totalDegrees - sunDegrees)
+                diffFromSun > 90.0 && diffFromSun < 270.0
+            }
+            Graha.BUDHA -> false // Mercury retrograde needs full calculation; demo marks false
+            Graha.SUKRA -> false // Venus retrograde needs full calculation; demo marks false
+            else -> false
+        }
+        // Combustion: proper check against actual Sun position (not a fixed 120°)
+        val combustionLimit = getCombustionLimit(graha)
+        val isCombust = (graha != Graha.SURYA && graha != Graha.RAHU && graha != Graha.KETU) &&
+                abs(normalizeDelta(totalDegrees - sunDegrees)) < combustionLimit
 
         return PlanetPosition(
             graha = graha,
@@ -256,6 +283,25 @@ class StandardAstrologyCalculator : AstrologyCalculator {
             isCombust = isCombust,
             bhavaNumber = bhavaNum
         )
+    }
+
+    /** Normalize a delta angle to (-180, +180]. */
+    private fun normalizeDelta(deg: Double): Double {
+        var d = deg % 360.0
+        if (d > 180.0) d -= 360.0
+        if (d < -180.0) d += 360.0
+        return d
+    }
+
+    /** Classical combustion (Astha) limits in degrees for each planet. */
+    private fun getCombustionLimit(graha: Graha): Double = when (graha) {
+        Graha.CHANDRA -> 12.0
+        Graha.CHEVVAI -> 17.0
+        Graha.BUDHA -> 14.0
+        Graha.GURU -> 11.0
+        Graha.SUKRA -> 10.0
+        Graha.SANI -> 15.0
+        else -> 0.0
     }
 
     private fun getBhavaDetails(num: Int): List<String> = when (num) {
