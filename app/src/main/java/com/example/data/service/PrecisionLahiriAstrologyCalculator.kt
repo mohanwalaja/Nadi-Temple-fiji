@@ -323,11 +323,23 @@ class PrecisionLahiriAstrologyCalculator : AstrologyCalculator {
             )
         }
 
-        // 7. Navamsa (D9) Chart mapping - Standard 108 Pada Zodiac Division
+        // 7. Navamsa (D9) Chart mapping - Proper element-based starting sign
+        // Fire signs (1,5,9): start from the sign itself
+        // Earth signs (2,6,10): start from the 9th sign from the sign
+        // Air signs (3,7,11): start from the 7th sign from the sign
+        // Water signs (4,8,12): start from the 5th sign from the sign
         val navamsaPositions = planetPositions.associate { p ->
             val totalDeg = grahaLongitudes[p.graha] ?: 0.0
-            val padaOverall = (totalDeg / (360.0 / 108.0)).toInt() % 108
-            val navamsaRasiIdx = (padaOverall % 12) + 1
+            val rasiIdx1Based = ((totalDeg / 30.0).toInt() % 12) + 1
+            val degInRasi = totalDeg % 30.0
+            val navamsaIndex = (degInRasi / (30.0 / 9.0)).toInt().coerceIn(0, 8)
+            val startOffset = when {
+                rasiIdx1Based in listOf(1, 5, 9) -> 0   // Fire: start from same sign
+                rasiIdx1Based in listOf(2, 6, 10) -> 8  // Earth: start from 9th
+                rasiIdx1Based in listOf(3, 7, 11) -> 6  // Air: start from 7th
+                else -> 4                                // Water: start from 5th
+            }
+            val navamsaRasiIdx = ((rasiIdx1Based - 1 + startOffset + navamsaIndex) % 12) + 1
             p.graha to Rasi.values().first { it.index == navamsaRasiIdx }
         }
 

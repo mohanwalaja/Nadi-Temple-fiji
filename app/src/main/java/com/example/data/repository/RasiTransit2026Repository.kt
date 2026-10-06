@@ -45,7 +45,10 @@ object RasiTransit2026Repository {
             familyHi = "पारिवारिक मतभेदों को शांतिपूर्वक सुलझाएं।",
             primaryAdviceTa = "செலவு மற்றும் உடல்நலத்தில் கட்டுப்பாடு மற்றும் நிதானம் அவசியம்.",
             primaryAdviceEn = "Maintain strict budget control and prioritize physical well-being.",
-            primaryAdviceHi = "ख़र्चों पर नियंत्रण रखें और स्वास्थ्य का ध्यान रखें।"
+            primaryAdviceHi = "ख़र्चों पर नियंत्रण रखें और स्वास्थ्य का ध्यान रखें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனப் பயணத்தின் ஆரம்ப கட்டம்; செலவு கவனம். ஜூன்–டிசம்பர்: சனி மீனத்தில் நிலைத்து, குரு கடகம்→சிம்மம் மாற்றம்; முக்கிய முடிவுகளில் நிதானம்.",
+            periodGuidanceEn = "Jan–May: Early Saturn in Pisces, watch expenditure. Jun–Dec: Saturn stable in Pisces; Guru shifts Cancer→Leo, exercise discretion in major decisions.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन गोचर प्रारंभ, व्यय पर नज़र। जून–दिसंबर: शनि मीन में स्थिर; गुरु कर्क→सिंह गोचर, बड़े निर्णयों में विवेक बरतें।"
         ),
 
         // ♉ 2. ரிஷபம் (Taurus)
@@ -88,7 +91,10 @@ object RasiTransit2026Repository {
             familyHi = "परिवार का पूरा सहयोग और मांगलिक कार्य संपन्न होंगे।",
             primaryAdviceTa = "அவசர முதலீடுகளைத் தவிர்க்கவும்; சேமிப்பை வலுப்படுத்தவும்.",
             primaryAdviceEn = "Avoid speculative or hurried investments; focus on secure savings.",
-            primaryAdviceHi = "जल्दबाजी में निवेश से बचें, सुरक्षित बचत पर ध्यान दें।"
+            primaryAdviceHi = "जल्दबाजी में निवेश से बचें, सुरक्षित बचत पर ध्यान दें।",
+            periodGuidanceTa = "ஜனவரி–மே: குரு மீனத்தில் (11-ஆம் இடம்) — லாப வாய்ப்பு. ஜூன்–அக்டோபர்: குரு கடகம் (3-ஆம் இடம்) — முயற்சி அதிகரிப்பு. நவம்பர்–டிசம்பர்: குரு சிம்மம் (4-ஆம் இடம்) — சொத்து/குடும்ப சுபம்.",
+            periodGuidanceEn = "Jan–May: Jupiter in Pisces (11th), gains flow. Jun–Oct: Jupiter in Cancer (3rd), efforts expand. Nov–Dec: Jupiter in Leo (4th), property and family blessings.",
+            periodGuidanceHi = "जनवरी–मई: गुरु मीन में (11वां), लाभ प्राप्ति। जून–अक्टूबर: गुरु कर्क में (तीसरा), प्रयास वृद्धि। नवंबर–दिसंबर: गुरु सिंह में (चौथा), संपत्ति एवं परिवार शुभ।"
         ),
 
         // ♊ 3. மிதுனம் (Gemini)
@@ -131,7 +137,10 @@ object RasiTransit2026Repository {
             familyHi = "परिवार के लिए पर्याप्त समय अवश्य निकालें।",
             primaryAdviceTa = "வேலை மற்றும் குடும்பத்தை சமநிலையில் வைத்துக்கொள்ளவும்.",
             primaryAdviceEn = "Maintain healthy work-life balance and avoid burnout.",
-            primaryAdviceHi = "कार्य और पारिवारिक जीवन में उचित संतुलन बनाए रखें।"
+            primaryAdviceHi = "कार्य और पारिवारिक जीवन में उचित संतुलन बनाए रखें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (10-ஆம் இடம்) — தொழில் பொறுப்பு. ஜூன்–அக்டோபர்: குரு கடகம் (2-ஆம் இடம்) — தன வரவு. நவம்பர்–டிசம்பர்: குரு சிம்மம் (3-ஆம் இடம்) — முயற்சி பலன்.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (10th), career responsibility. Jun–Oct: Jupiter in Cancer (2nd), income growth. Nov–Dec: Jupiter in Leo (3rd), efforts bear fruit.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन में (10वां), कार्य दायित्व। जून–अक्टूबर: गुरु कर्क में (दूसरा), आय वृद्धि। नवंबर–दिसंबर: गुरु सिंह में (तीसरा), परिश्रम का फल।"
         ),
 
         // ♋ 4. கடகம் (Cancer)
@@ -185,7 +194,10 @@ object RasiTransit2026Repository {
             familyHi = "वाणी में मधुरता रखें, कटु शब्दों से बचें।",
             primaryAdviceTa = "எதிர்பாராத மாற்றங்களில் அவசர முடிவுகளைத் தவிர்க்கவும்.",
             primaryAdviceEn = "Do not take hasty decisions when facing sudden life changes.",
-            primaryAdviceHi = "अचानक आए बदलावों में जल्दबाजी में निर्णय न लें।"
+            primaryAdviceHi = "अचानक आए बदलावों में जल्दबाजी में निर्णय न लें।",
+            periodGuidanceTa = "ஜனவரி–மே: ராகு மீனத்தில் (9-ஆம் இடம்) — ஆன்மீகம்/பயணம். ஜூன்–டிசம்பர்: ராகு கும்பம் (8-ஆம் இடம்) — எதிர்பாராத மாற்றங்கள், சனி மீனத்தில் 12-ல்.",
+            periodGuidanceEn = "Jan–May: Rahu in Pisces (9th), spirituality/travel. Jun–Dec: Rahu enters Aquarius (8th), sudden transitions; Saturn in Pisces (12th).",
+            periodGuidanceHi = "जनवरी–मई: राहु मीन में (नवम), आध्यात्मिक/यात्रा। जून–दिसंबर: राहु कुंभ में (अष्टम), अप्रत्याशित बदलाव; शनि मीन में (12वां)।"
         ),
 
         // ♌ 5. சிம்மம் (Leo)
@@ -239,7 +251,10 @@ object RasiTransit2026Repository {
             familyHi = "व्यर्थ के वाद-विवाद से बचकर पारिवारिक शांति बनाए रखें।",
             primaryAdviceTa = "திருமணம் மற்றும் கூட்டுத் தொடர்புகளில் அவசர முடிவுகள் வேண்டாம்.",
             primaryAdviceEn = "Exercise patience in marital matters and joint contractual agreements.",
-            primaryAdviceHi = "विवाह और साझेदारी के मामलों में जल्दबाजी बिल्कुल न करें।"
+            primaryAdviceHi = "विवाह और साझेदारी के मामलों में जल्दबाजी बिल्कुल न करें।",
+            periodGuidanceTa = "ஜனவரி–மே: ராகு மீனம் (10-ல்), கேது கன்னி (4-ல்). ஜூன்–டிசம்பர்: ராகு கும்பம் (7-ல்), கேது சிம்மம் (1-ல்) — உறவு/சுகம் கவனம்.",
+            periodGuidanceEn = "Jan–May: Rahu in Pisces (10th), Ketu in Virgo (4th). Jun–Dec: Rahu in Aquarius (7th), Ketu in Leo (1st) — relationship/comfort alert.",
+            periodGuidanceHi = "जनवरी–मई: राहु मीन (10वां), केतु कन्या (चौथा)। जून–दिसंबर: राहु कुंभ (सातवां), केतु सिंह (पहला) — संबंध/सुख सावधानी।"
         ),
 
         // ♍ 6. கன்னி (Virgo)
@@ -282,7 +297,10 @@ object RasiTransit2026Repository {
             familyHi = "परिवार में बातचीत के दौरान धैर्य और विनम्रता बनाए रखें।",
             primaryAdviceTa = "குடும்பம் மற்றும் பண விஷயங்களில் அவசரப்படாமல் செயல்படவும்.",
             primaryAdviceEn = "Avoid hasty moves in domestic financial matters.",
-            primaryAdviceHi = "पारिवारिक और धन संबंधी निर्णयों में जल्दबाजी न करें।"
+            primaryAdviceHi = "पारिवारिक और धन संबंधी निर्णयों में जल्दबाजी न करें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (5-ல்) — புத்திர/புத்தி சுபம். ஜூன்–டிசம்பர்: குரு கடகம் (12-ல்) → சிம்மம் (1-ல்) — ஆன்மீகம் பின் சுய முன்னேற்றம்.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (5th), progeny/intellect favorable. Jun–Dec: Guru Cancer (12th) → Leo (1st), spiritual then personal growth.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन में (पांचवां), संतान/बुद्धि शुभ। जून–दिसंबर: गुरु कर्क (12वां) → सिंह (पहला), आध्यात्मिक फिर व्यक्तिगत प्रगति।"
         ),
 
         // ♎ 7. துலாம் (Libra)
@@ -325,7 +343,10 @@ object RasiTransit2026Repository {
             familyHi = "शांत और सकारात्मक व्यवहार से घर में सौहार्द बना रहेगा।",
             primaryAdviceTa = "வேலைப்பளுவால் உடல்நலத்தை பாதிக்க விட வேண்டாம்.",
             primaryAdviceEn = "Do not let intense workload compromise your health.",
-            primaryAdviceHi = "काम के अत्यधिक दबाव को अपने स्वास्थ्य पर हावी न होने दें।"
+            primaryAdviceHi = "काम के अत्यधिक दबाव को अपने स्वास्थ्य पर हावी न होने दें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (4-ல்) — குடும்ப/சுக கவனம். ஜூன்–டிசம்பர்: குரு கடகம் (10-ல்) → சிம்மம் (11-ல்) — தொழில் உச்சம் பின் லாபம்.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (4th), family/comfort watch. Jun–Dec: Guru in Cancer (10th) → Leo (11th), career peak then gains.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन में (चौथा), परिवार/सुख सावधानी। जून–दिसंबर: गुरु कर्क (10वां) → सिंह (11वां), करियर शिखर फिर लाभ।"
         ),
 
         // ♏ 8. விருச்சிகம் (Scorpio)
@@ -368,7 +389,10 @@ object RasiTransit2026Repository {
             familyHi = "परिवार का भरपूर स्नेह और समर्थन प्राप्त होगा।",
             primaryAdviceTa = "அவசர முடிவுகளைத் தவிர்த்து நிதானமாக திட்டமிடவும்.",
             primaryAdviceEn = "Avoid impulsive leaps; plan every venture with calm foresight.",
-            primaryAdviceHi = "जल्दबाजी के निर्णयों से बचें और सोच-समझकर कदम उठाएं।"
+            primaryAdviceHi = "जल्दबाजी के निर्णयों से बचें और सोच-समझकर कदम उठाएं।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (3-ல்) — தைரிய முயற்சி. ஜூன் 2–அக்டோபர் 31: குரு கடகம் (9-ல்) — பாக்கிய சுபம். நவம்பர்+: குரு சிம்மம் (10-ல்) — தொழில் உயர்வு.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (3rd), courageous efforts. Jun 2–Oct 31: Guru in Cancer (9th), fortune blessings. Nov+: Guru in Leo (10th), career elevation.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन में (तीसरा), साहसिक प्रयास। 2 जून–31 अक्टूबर: गुरु कर्क में (नवम), भाग्य शुभ। नवंबर+: गुरु सिंह में (दशम), करियर उन्नति।"
         ),
 
         // ♐ 9. தனுசு (Sagittarius)
@@ -411,7 +435,10 @@ object RasiTransit2026Repository {
             familyHi = "पारिवारिक मुद्दों को शांति और सूझबूझ से सुलझाएं।",
             primaryAdviceTa = "ஜூன் முதல் முக்கிய நிதி மற்றும் வாழ்க்கை முடிவுகளில் நிதானம்.",
             primaryAdviceEn = "Exercise great discretion in major decisions from June onwards.",
-            primaryAdviceHi = "जून के बाद बड़े वित्तीय और व्यक्तिगत निर्णयों में सतर्क रहें।"
+            primaryAdviceHi = "जून के बाद बड़े वित्तीय और व्यक्तिगत निर्णयों में सतर्क रहें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (2-ல்), குரு மீனத்தில் (3-ல்) — சுப முயற்சி. ஜூன் 2–அக்டோபர் 31: குரு கடகம் (8-ல்) — அஷ்டம குரு, கவனம். நவம்பர்+: குரு சிம்மம் (9-ல்) — பாக்கிய மீட்சி.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (2nd), Guru in Pisces (3rd) — favorable efforts. Jun 2–Oct 31: Guru in Cancer (8th), 8th-house alert. Nov+: Guru in Leo (9th), fortune recovery.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन (दूसरा), गुरु मीन (तीसरा) — शुभ प्रयास। 2 जून–31 अक्टूबर: गुरु कर्क (अष्टम), अष्टम गुरु सावधानी। नवंबर+: गुरु सिंह (नवम), भाग्य पुनर्स्थापन।"
         ),
 
         // ♑ 10. மகரம் (Capricorn)
@@ -465,7 +492,10 @@ object RasiTransit2026Repository {
             familyHi = "परिवार में कटु वाणी से बचें और मधुरता बनाए रखें।",
             primaryAdviceTa = "பணம், குடும்பம் மற்றும் பேச்சில் அதிக நிதானம் அவசியம்.",
             primaryAdviceEn = "Prudence in financial management and family interactions is paramount.",
-            primaryAdviceHi = "धन, वाणी और पारिवारिक मामलों में अत्यधिक संयम रखें।"
+            primaryAdviceHi = "धन, वाणी और पारिवारिक मामलों में अत्यधिक संयम रखें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (1-ல் அஷ்டமம்), ராகு மீனம் (2-ல்) — இரட்டை கவனம். ஜூன்–டிசம்பர்: குரு கடகம் (7-ல்) → சிம்மம் (8-ல்) — உறவு/ஆயுள் கவனம். டிசம்பர்: ராகு மகரம் பிரவேசம்.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (8th), Rahu in Pisces (2nd) — dual caution. Jun–Dec: Guru Cancer (7th) → Leo (8th), relationship/longevity watch. Dec: Rahu enters Capricorn.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन (अष्टम), राहु मीन (दूसरा) — दोहरा सावधानी। जून–दिसंबर: गुरु कर्क (सातवां) → सिंह (अष्टम), संबंध/आयु सावधानी। दिसंबर: राहु मकर प्रवेश।"
         ),
 
         // ♒ 11. கும்பம் (Aquarius)
@@ -519,7 +549,10 @@ object RasiTransit2026Repository {
             familyHi = "बातचीत में संयम रखें और पारिवारिक एकता को सर्वोपरि मानें।",
             primaryAdviceTa = "பணம், குடும்பம், திருமண உறவு ஆகியவற்றில் கூடுதல் கவனம் செலுத்துங்கள்.",
             primaryAdviceEn = "Give utmost attention to wealth, speech, and marital harmony.",
-            primaryAdviceHi = "धन, वाणी, परिवार और दांपत्य जीवन में विशेष सावधानी बरतें।"
+            primaryAdviceHi = "धन, वाणी, परिवार और दांपत्य जीवन में विशेष सावधानी बरतें।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி மீனத்தில் (12-ல் விரயம்), கேது சிம்மம் (7-ல்) — செலவு/கூட்டு கவனம். ஜூன்–டிசம்பர்: குரு கடகம் (6-ல்) → சிம்மம் (7-ல்) — எதிரி ஜெயம் பின் உறவு மாற்றம்.",
+            periodGuidanceEn = "Jan–May: Saturn in Pisces (12th, expenses), Ketu in Leo (7th) — expense/partnership watch. Jun–Dec: Guru Cancer (6th) → Leo (7th), enemy victory then relationship shift.",
+            periodGuidanceHi = "जनवरी–मई: शनि मीन (12वां, व्यय), केतु सिंह (सातवां) — व्यय/साझेदारी सावधानी। जून–दिसंबर: गुरु कर्क (छठा) → सिंह (सातवां), शत्रु जय फिर संबंध परिवर्तन।"
         ),
 
         // ♓ 12. மீனம் (Pisces)
@@ -573,7 +606,10 @@ object RasiTransit2026Repository {
             familyHi = "पारिवारिक मामलों को धैर्य और कोमलता से सुलझाएं।",
             primaryAdviceTa = "உடல்நலம் மற்றும் மன அமைதியை எப்போதும் முதன்மைப்படுத்தவும்; திருக்கோயில் நவகிரக வழிபாடு சிறந்தது.",
             primaryAdviceEn = "Prioritize physical health and inner peace above all; regular temple worship brings relief.",
-            primaryAdviceHi = "स्वास्थ्य और मानसिक शांति को प्राथमिकता दें; मंदिर में नवग्रह पूजा से शांति मिलेगी।"
+            primaryAdviceHi = "स्वास्थ्य और मानसिक शांति को प्राथमिकता दें; मंदिर में नवग्रह पूजा से शांति मिलेगी।",
+            periodGuidanceTa = "ஜனவரி–மே: சனி ஜென்ம சனி (1-ல்), கேது கன்னி (6-ல்) — உடல்நலம் முக்கியம். ஜூன்–டிசம்பர்: குரு கடகம் (5-ல்) → சிம்மம் (6-ல்) — புத்திர சுபம் பின் உழைப்பு. சனி முழுவதும் மீனத்தில்.",
+            periodGuidanceEn = "Jan–May: Saturn Jenma Sani (1st), Ketu in Virgo (6th) — health priority. Jun–Dec: Guru in Cancer (5th) → Leo (6th), progeny blessings then effort. Saturn in Pisces throughout.",
+            periodGuidanceHi = "जनवरी–मई: शनि जन्म शनि (पहला), केतु कन्या (छठा) — स्वास्थ्य प्राथमिकता। जून–दिसंबर: गुरु कर्क (पांचवां) → सिंह (छठा), संतान शुभ फिर परिश्रम। पूरे वर्ष शनि मीन में।"
         )
     )
 
